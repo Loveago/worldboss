@@ -1,0 +1,171 @@
+🧠 GLOBAL RULE (VERY IMPORTANT)
+
+DO NOT merge Store UI and Admin UI
+
+DO NOT reuse admin dashboard layout for the store
+
+DO NOT show admin elements to customers
+
+Each UI has its own AppShell
+
+🛍️ STORE UI (CUSTOMER-FACING)
+Visual Reference
+
+Use the FIRST UI SCREENSHOT (Explore / marketplace layout) as the ONLY visual reference.
+
+This UI is designed for:
+
+Browsing
+
+Discovering
+
+Shopping
+
+Store AppShell
+
+Marketplace-style layout
+
+Content-first
+
+Product grid focus
+
+No analytics cards
+
+No admin stats
+
+No admin controls
+
+Store Pages (BUILD NOW)
+
+Store Home / Explore
+
+Category pages
+
+Product details
+
+Cart
+
+Checkout (Paystack)
+
+Buy Data
+
+Request Design
+
+Store Navigation
+
+Shop
+
+Categories
+
+Data
+
+Request Design
+
+Cart
+
+Mobile (MANDATORY)
+
+Mobile-first
+
+Bottom nav or collapsible menu
+
+Product grid adapts to small screens
+
+Sticky add-to-cart on product page
+
+🧠 ADMIN UI (KEEP AS IS)
+Visual Reference
+
+Use the SECOND UI SCREENSHOT (Dashboard UI) as the admin reference.
+
+This UI is:
+
+Management-focused
+
+Data-heavy
+
+Admin-only
+
+Admin AppShell
+
+Sidebar dashboard layout
+
+Top bar with search & profile
+
+Stats cards
+
+Tables
+
+Charts
+
+Admin Features (KEEP / EXTEND)
+
+Dashboard
+
+Products
+
+Orders
+
+Users
+
+Categories
+
+Data services
+
+Payments
+
+Settings
+
+Admin Access
+
+/admin/*
+
+Role-protected
+
+Never visible to customers
+
+🧱 ROUTING RULES (STRICT)
+
+/ → Store UI
+
+/shop → Store UI
+
+/product/* → Store UI
+
+/cart → Store UI
+
+/checkout → Store UI
+
+/admin → Admin UI
+
+/admin/* → Admin UI only
+
+No route may mix UI shells.
+
+🧪 EXECUTION ORDER (OVERRIDE)
+
+KEEP existing Admin UI untouched
+
+Build Store AppShell using Explore UI
+
+Build Store Home (Explore)
+
+Build Product Grid & Cards
+
+Build Product Details
+
+Build Cart & Checkout
+
+Integrate Paystack into Store
+
+Connect Store to Admin data
+
+Final mobile polish
+
+FINAL RULE
+
+Admin UI stays exactly as built
+
+Store UI must match the Explore UI reference
+
+Never confuse roles or layouts

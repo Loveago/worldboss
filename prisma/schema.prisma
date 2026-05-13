@@ -1,0 +1,152 @@
+// Prisma schema for Boss Market (Postgres)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum PaymentStatus {
+  INITIATED
+  SUCCESS
+  FAILED
+}
+
+enum Network {
+  mtn
+  telecel
+  airteltigo
+}
+
+enum Channel {
+  whatsapp
+  telegram
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  name         String
+  phone        String?
+  addresses    Json?
+  orders       Order[]
+  createdAt    DateTime @default(now())
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  parentId  String?
+  parent    Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryChildren")
+  products  Product[]
+}
+
+model Product {
+  id         String      @id @default(cuid())
+  name       String
+  slug       String      @unique
+  categoryId String
+  category   Category    @relation(fields: [categoryId], references: [id])
+  price      Decimal
+  salePrice  Decimal?
+  stock      Int
+  variants   Json?
+  media      Json?
+  type       ProductType
+  digitalUrl String?
+  specs      Json?
+  active     Boolean     @default(true)
+  orders     OrderItem[]
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  items        OrderItem[]
+  total        Decimal
+  status       OrderStatus @default(PENDING)
+  payment      Payment?
+  deliveryInfo Json?
+  createdAt    DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  variant   Json?
+  qty       Int
+  price     Decimal
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  orderId   String        @unique
+  order     Order         @relation(fields: [orderId], references: [id])
+  provider  String        @default("paystack")
+  reference String        @unique
+  amount    Decimal
+  currency  String        @default("GHS")
+  status    PaymentStatus @default(INITIATED)
+  meta      Json?
+  createdAt DateTime      @default(now())
+}
+
+model PaystackEvent {
+  id                String   @id @default(cuid())
+  reference         String
+  event             String
+  payload           Json
+  verifiedSignature Boolean  @default(false)
+  receivedAt        DateTime @default(now())
+}
+
+model DataBundle {
+  id       String  @id @default(cuid())
+  network  Network
+  name     String
+  price    Decimal
+  volume   String
+  validity String
+  segment  String?
+  tag      String?
+  badge    String?
+  logoUrl  String?
+}
+
+model DesignRequest {
+  id        String   @id @default(cuid())
+  name      String
+  contact   String
+  channel   Channel
+  message   String?
+  createdAt DateTime @default(now())
+}

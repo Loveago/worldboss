@@ -1,0 +1,195 @@
+
+MASTER PROMPT — UI-ADOPTED TECHY E-COMMERCE PLATFORM (MOBILE-FIRST)
+
+You are a senior full-stack engineer and UI implementer.
+
+An existing UI screenshot has been provided.
+This UI is ONLY a visual/layout reference.
+
+DO NOT recreate the original product or its features.
+DO NOT redesign the UI.
+
+Your job is to adopt the UI shell and component patterns and inject our own features and logic into it.
+
+UI ADOPTION RULES (VERY IMPORTANT)
+
+- Treat the UI as a layout system and visual skin
+- Reuse:
+  - App shell
+  - Sidebar layout
+  - Header layout
+  - Card styles
+  - Table styles
+  - Spacing & density
+- Replace:
+  - Content
+  - Features
+  - Data
+  - Business logic
+
+Strict UI Rules:
+- Do NOT invent new layouts
+- Do NOT add new design systems
+- Do NOT redesign components
+- If unsure, stay minimal and consistent with the reference
+
+GLOBAL APP SHELL (BUILD FIRST)
+
+Build a reusable AppShell based on the UI:
+- Left vertical sidebar (desktop)
+- Collapsible drawer sidebar (mobile)
+- Top header bar (search, theme toggle, profile)
+- Main content area
+- Optional right-side panel (desktop only)
+
+All pages must render inside this shell.
+
+MOBILE-FIRST REQUIREMENTS (MANDATORY)
+
+- Design mobile-first, then enhance for desktop
+- Sidebar becomes a slide-in drawer on mobile
+- Tables convert to stacked card rows on mobile
+- Filters move to modal/bottom-sheet on mobile
+- Touch-friendly buttons and spacing
+- Sticky bottom cart/checkout actions on mobile
+- No horizontal scrolling on phones
+
+PAGE TEMPLATES
+
+Create reusable templates:
+- GridLayout (cards)
+- TableLayout (responsive)
+- DetailLayout
+- DashboardLayout
+
+TECH STACK (FREE ONLY)
+
+Frontend:
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- ShadCN UI
+- Framer Motion
+- TanStack React Query
+- Zustand
+
+Backend:
+- Next.js API routes
+- postgress database  
+- JWT authentication
+- Role-based access control
+
+Payments:
+- Paystack (official API)
+- Webhook verification
+
+STORE FEATURES
+
+Shop:
+- Product listing
+- Categories & sub-categories
+- Product variants
+- Stock control
+- Digital product delivery
+
+Categories:
+Accessories
+- Phone Accessories
+- Phone Covers
+- Screen Protectors
+- Chargers
+- Power Banks
+
+Laptop Accessories
+- Laptop Covers / Skins
+- Laptop Bags
+- Mouse & Keyboards
+
+Digital Products
+- Templates
+- E-books
+- Courses
+
+REQUEST A DESIGN PAGE
+
+- Informational only
+- CTA buttons:
+  - WhatsApp
+  - Telegram
+- No checkout
+
+DATA SERVICES
+
+Buy Data Flow:
+- Select Network (MTN, Telecel, AirtelTigo)
+- Select Bundle
+- Enter Phone Number
+- Pay via Paystack
+
+ADMIN PANEL (SAME UI SHELL)
+
+Admin Features:
+- Dashboard (stats & charts)
+- Products management
+- Orders management
+- Users management
+- Categories management
+- Payments & Paystack logs
+- Settings
+
+ANIMATIONS
+
+- Framer Motion
+- Fade + slide transitions
+- Hover elevation
+- Skeleton loaders
+- No flashy effects
+
+AUTHENTICATION
+
+- JWT-based auth
+- User & Admin roles
+- Protected routes
+
+QUALITY REQUIREMENTS
+
+- Input validation
+- Error handling
+- Secure APIs
+- Webhook signature verification
+- Clean folder structure
+- Clear comments
+
+EXECUTION ORDER (MANDATORY)
+
+1. Build UI AppShell & components (NO LOGIC)
+2. Create page templates
+3. Set up database schemas
+4. Implement authentication & roles
+5. Build admin features
+6. Build store features
+7. Build data services
+8. Integrate Paystack
+9. Add webhooks
+10. Final polish
+
+REQUIRED OUTPUT
+
+- Architecture explanation
+- Folder structure
+- UI components
+- API routes
+- Database schema
+- Admin routes
+- Paystack setup
+- .env example
+- Seed data
+- Setup guide
+
+FINAL RULE
+
+Follow the provided UI screenshot as a visual shell.
+Do not recreate the original product.
+Inject our features cleanly into the UI.
+
+BEGIN NOW.

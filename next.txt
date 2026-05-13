@@ -1,0 +1,206 @@
+The current Store UI is incorrectly using dashboard-style stats and placeholder data.
+
+This must be fixed immediately.
+
+🔴 REMOVE FROM STORE UI (MANDATORY)
+
+From ALL customer-facing pages, REMOVE:
+
+Stats cards (Weekly sales, New users, Purchase orders, Messages)
+
+Analytics-style numbers
+
+Admin-style tables
+
+Any dashboard-only content
+
+These elements are ADMIN ONLY.
+
+🟢 REPLACE WITH REAL STORE CONTENT
+Store Home / Explore (CUSTOMER VIEW)
+
+Replace the stats section with:
+
+Featured Products
+
+Grid of product cards
+
+Image, name, price (GHC), category
+
+“Add to cart” action
+
+Featured Categories
+
+Visual category cards
+
+Latest Products
+
+Real products from database
+
+This page must behave like a real online shop, not a dashboard.
+
+🛍️ BUILD THE SHOP PROPERLY (NO PLACEHOLDERS)
+Shop Page
+
+Fetch products from database
+
+Show product grid
+
+Pagination or infinite scroll
+
+Loading & empty states
+
+Categories Page
+
+MUST list all categories
+
+Clicking a category shows its products
+
+Nested categories supported
+
+Product Details Page
+
+Real product data
+
+Price in GHC (₵)
+
+Variants (if any)
+
+Add to cart works
+
+📶 DATA PAGE (MUST WORK)
+
+The Data page must not be empty.
+
+Implement:
+
+Network selection:
+
+MTN
+
+Telecel
+
+AirtelTigo
+
+Bundle selection
+
+Phone number input
+
+Paystack checkout
+
+Save data orders in database
+
+Admin can mark them fulfilled
+
+💱 CURRENCY FIX (CRITICAL)
+
+Currency MUST be Ghana Cedi (GHC / ₵)
+
+REMOVE Naira completely
+
+Format prices correctly:
+
+₵120.00
+
+Store currency config globally
+
+🔐 AUTHENTICATION (MUST WORK END-TO-END)
+User Auth
+
+User Sign Up
+
+User Sign In
+
+JWT-based auth
+
+Persist session
+
+Protect checkout (login required)
+
+Admin Auth
+
+Admin Sign Up (restricted)
+
+Admin Sign In
+
+Role-based access
+
+/admin/* protected
+
+Shared Rules
+
+One auth system
+
+Separate UI access by role
+
+Admin never sees store-only UI
+
+Users never see admin UI
+
+🔌 CONNECT EVERYTHING TO BACKEND
+Replace ALL static data with:
+
+API calls
+
+Real database data
+
+Implement APIs for:
+
+Products
+
+Categories
+
+Cart
+
+Orders
+
+Data orders
+
+Users
+
+Payments
+
+Use React Query for data fetching.
+
+🧪 GENERAL SITE MUST WORK FULLY
+
+Ensure:
+
+Navigation works
+
+Pages are not empty
+
+Buttons perform actions
+
+Cart persists
+
+Checkout completes
+
+Orders appear in admin
+
+Admin actions reflect on store
+
+🧠 EXECUTION ORDER (FIX PHASE)
+
+Clean Store UI (remove stats)
+
+Build Product & Category APIs
+
+Populate Store Home with products
+
+Fix currency to GHC
+
+Implement auth (user + admin)
+
+Make Shop, Categories, Data pages functional
+
+Connect checkout to Paystack
+
+End-to-end testing
+
+FINAL RULE
+
+Admin UI = dashboard & stats (KEEP)
+
+Store UI = shopping experience (FIX)
+No empty pages
