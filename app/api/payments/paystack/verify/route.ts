@@ -8,6 +8,9 @@ export async function POST(req: NextRequest) {
   const reference = body?.reference as string;
   if (!reference) return fail("reference required", 400);
   const verification = await paystack.transaction.verify(reference);
+  if (!verification.data) {
+    return fail(verification.message || "Unable to verify payment", 400);
+  }
   const status = verification.data.status === "success" ? "SUCCESS" : "FAILED";
   await prisma.payment.update({ where: { reference }, data: { status } });
   if (status === "SUCCESS") {
