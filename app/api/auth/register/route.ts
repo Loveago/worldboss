@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { prisma } from "@/lib/db";
 import { registerSchema } from "@/lib/validators";
 import { comparePassword, hashPassword, signToken, setAuthCookie } from "@/lib/auth";
 import { fail, ok } from "@/lib/response";
 
 export async function POST(req: NextRequest) {
+  const { prisma } = await import("@/lib/db");
   const json = await req.json().catch(() => null);
   const parsed = registerSchema.safeParse(json);
   if (!parsed.success) return fail("Invalid payload", 400, parsed.error.flatten());
