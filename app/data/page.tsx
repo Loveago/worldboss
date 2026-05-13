@@ -136,11 +136,15 @@ export default function DataPage() {
     queryFn: () => apiFetch<DataBundle[]>("/api/data/bundles"),
   });
 
-  const bundles = bundlesQuery.data && bundlesQuery.data.length > 0 ? bundlesQuery.data : seededBundles;
+  const remoteBundles = Array.isArray(bundlesQuery.data) ? (bundlesQuery.data as DataBundle[]) : [];
+  const hasRemoteBundles = remoteBundles.length > 0;
+  const bundles = hasRemoteBundles ? remoteBundles : seededBundles;
   const availableBundles = useMemo(
     () => bundles.filter((bundle) => bundle.network === selectedNetwork),
     [bundles, selectedNetwork]
   );
+
+  const showBundleSkeleton = bundlesQuery.isLoading && !hasRemoteBundles;
 
   const bundleError = bundlesQuery.isError
     ? bundlesQuery.error instanceof Error
@@ -253,7 +257,7 @@ export default function DataPage() {
 
       {bundleError && <div className="store-card p-4 text-sm text-rose-600">{bundleError}</div>}
 
-      {bundlesQuery.isLoading && !bundlesQuery.data?.length ? (
+      {showBundleSkeleton ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <div key={index} className="rounded-2xl border border-slate-200 p-4 h-[156px] animate-pulse bg-white">
