@@ -1,4 +1,4 @@
-import Paystack from "paystack-sdk";
+import { Paystack } from "paystack-sdk";
 
 const secretKey = process.env.PAYSTACK_SECRET_KEY || "";
 export const paystack = new Paystack(secretKey);
