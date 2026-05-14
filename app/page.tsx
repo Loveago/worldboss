@@ -281,7 +281,7 @@ export default function Page() {
                 href={hasCategories ? `/categories/${category.slug}` : "/shop"}
                 data-film-reveal="category"
                 className="store-card store-film-card group p-4 relative overflow-hidden transition hover:-translate-y-1 min-h-[138px] sm:min-h-[172px]"
-                style={{ ["--film-delay" as "--film-delay"]: `${index * 90}ms` }}
+                style={{ "--film-delay": `${index * 90}ms` } as React.CSSProperties}
               >
                 <div className={`absolute inset-0 opacity-75 ${category.theme.gradient}`} />
                 <div className="relative z-10 flex items-center gap-3 sm:block sm:space-y-3">
