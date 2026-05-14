@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 
 type AuthResponse = {
@@ -11,6 +12,7 @@ type AuthResponse = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +29,8 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), password }),
       });
+      queryClient.setQueryData(["auth-profile"], response.user);
+      queryClient.invalidateQueries({ queryKey: ["auth-profile"] });
       if (response.user.role === "ADMIN") {
         router.push("/admin/dashboard");
       } else {

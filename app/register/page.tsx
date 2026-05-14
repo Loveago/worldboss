@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 
 type AuthResponse = {
@@ -11,6 +12,7 @@ type AuthResponse = {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -24,7 +26,7 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      await apiFetch<AuthResponse>("/api/auth/register", {
+      const response = await apiFetch<AuthResponse>("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -34,6 +36,8 @@ export default function RegisterPage() {
           password,
         }),
       });
+      queryClient.setQueryData(["auth-profile"], response.user);
+      queryClient.invalidateQueries({ queryKey: ["auth-profile"] });
       router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to create account.");
