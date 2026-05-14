@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { useCartStore } from "@/store/cart";
 import { formatCurrency } from "@/lib/format";
 import { apiFetch } from "@/lib/api-client";
@@ -11,6 +12,17 @@ type PaystackInit = {
   authorization_url?: string;
   data?: { authorization_url?: string } | null;
 };
+
+type CheckoutProfileOverview = {
+  profile: {
+    email: string;
+  };
+  wallet: {
+    balance: number;
+  };
+};
+
+type PaymentMethod = "paystack" | "wallet";
 
 const resolveAuthUrl = (init: PaystackInit | null) =>
   init?.authorization_url || init?.data?.authorization_url || null;
@@ -24,13 +36,28 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("paystack");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const profileOverviewQuery = useQuery<CheckoutProfileOverview>({
+    queryKey: ["checkout-profile-overview"],
+    queryFn: () => apiFetch<CheckoutProfileOverview>("/api/profile/overview"),
+    retry: false,
+  });
 
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.qty, 0),
     [items]
   );
+
+  const walletBalance = profileOverviewQuery.data?.wallet.balance ?? 0;
+  const savedEmail = profileOverviewQuery.data?.profile.email ?? "";
+
+  useEffect(() => {
+    if (!savedEmail) return;
+    setEmail((prev) => prev || savedEmail);
+  }, [savedEmail]);
 
   const isUnauthorized = error?.toLowerCase().includes("unauthorized");
 
@@ -39,8 +66,13 @@ export default function CheckoutPage() {
       setError("Your cart is empty.");
       return;
     }
-    if (!email.trim()) {
+    if (paymentMethod === "paystack" && !email.trim() && !savedEmail) {
       setError("Enter your email to continue.");
+      return;
+    }
+
+    if (paymentMethod === "wallet" && walletBalance < subtotal) {
+      setError("Insufficient wallet balance. Deposit funds or use Paystack.");
       return;
     }
 
@@ -65,10 +97,21 @@ export default function CheckoutPage() {
         }),
       });
 
+      if (paymentMethod === "wallet") {
+        await apiFetch<{ orderId: string }>("/api/profile/wallet/charge", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: order.id }),
+        });
+        clear();
+        router.push("/orders?paid=wallet");
+        return;
+      }
+
       const init = await apiFetch<PaystackInit>("/api/payments/paystack/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: order.id, email: email.trim() }),
+        body: JSON.stringify({ orderId: order.id, email: email.trim() || savedEmail }),
       });
 
       const authUrl = resolveAuthUrl(init);
@@ -137,15 +180,45 @@ export default function CheckoutPage() {
                   placeholder="Street address, city"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs text-slate-500">Email for Paystack</label>
-                <input
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="w-full store-outline px-3 py-2 text-sm"
-                  type="email"
-                  placeholder="you@email.com"
-                />
+              <div className="space-y-3">
+                <div>
+                  <div className="text-xs text-slate-500 mb-2">Payment method</div>
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("paystack")}
+                      className={`store-outline px-3 py-2 text-sm text-left ${
+                        paymentMethod === "paystack" ? "ring-2 ring-[var(--store-accent)]" : ""
+                      }`}
+                    >
+                      <div className="font-medium text-slate-900">Paystack</div>
+                      <div className="text-xs text-slate-500 mt-0.5">Card, bank, or mobile money</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("wallet")}
+                      className={`store-outline px-3 py-2 text-sm text-left ${
+                        paymentMethod === "wallet" ? "ring-2 ring-[var(--store-accent)]" : ""
+                      }`}
+                    >
+                      <div className="font-medium text-slate-900">Wallet</div>
+                      <div className="text-xs text-slate-500 mt-0.5">Available: {formatCurrency(walletBalance)}</div>
+                    </button>
+                  </div>
+                </div>
+
+                {paymentMethod === "paystack" && (
+                  <div className="space-y-2">
+                    <label className="text-xs text-slate-500">Email for Paystack</label>
+                    <input
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      className="w-full store-outline px-3 py-2 text-sm"
+                      type="email"
+                      placeholder="you@email.com"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -173,7 +246,16 @@ export default function CheckoutPage() {
               <span className="text-slate-500">Total</span>
               <span className="font-semibold text-slate-900">{formatCurrency(subtotal)}</span>
             </div>
-            <p className="text-xs text-slate-500">You will be redirected to Paystack to complete payment.</p>
+            <p className="text-xs text-slate-500">
+              {paymentMethod === "wallet"
+                ? "Wallet payment will complete instantly if your balance is sufficient."
+                : "You will be redirected to Paystack to complete payment."}
+            </p>
+            {paymentMethod === "wallet" && (
+              <div className="store-outline px-3 py-2 text-xs text-slate-600">
+                Wallet balance: <span className="font-semibold text-slate-900">{formatCurrency(walletBalance)}</span>
+              </div>
+            )}
             {error && (
               <div className="store-card p-3 text-xs text-rose-600">
                 {isUnauthorized ? (
@@ -194,7 +276,7 @@ export default function CheckoutPage() {
               disabled={submitting}
               className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
             >
-              {submitting ? "Redirecting..." : "Pay with Paystack"}
+              {submitting ? "Processing..." : paymentMethod === "wallet" ? "Pay with Wallet" : "Pay with Paystack"}
             </button>
           </div>
         </div>

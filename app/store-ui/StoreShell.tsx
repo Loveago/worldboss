@@ -12,15 +12,16 @@ const navItems = [
   { label: "Shop", href: "/shop", icon: "🛍️" },
   { label: "Categories", href: "/categories", icon: "🧭" },
   { label: "Data", href: "/data", icon: "📶" },
+  { label: "Profile", href: "/profile", icon: "👤" },
   { label: "Request Design", href: "/request-design", icon: "🎨" },
 ];
 
 const bottomNav = [
   { label: "Home", href: "/", icon: "🏠" },
   { label: "Shop", href: "/shop", icon: "🛍️" },
+  { label: "Profile", href: "/profile", icon: "�" },
   { label: "Data", href: "/data", icon: "📶" },
   { label: "Cart", href: "/cart", icon: "🧺" },
-  { label: "Design", href: "/request-design", icon: "🎨" },
 ];
 
 type AuthProfile = {
@@ -28,6 +29,8 @@ type AuthProfile = {
   email: string;
   role: "USER" | "ADMIN";
   name?: string | null;
+  phone?: string | null;
+  createdAt?: string;
 };
 
 export default function StoreShell({
@@ -134,6 +137,9 @@ export default function StoreShell({
                 {user ? (
                   <>
                     <span className="text-xs text-slate-600 hidden sm:inline shrink-0">Hi, {user.name || user.email.split("@")[0]}</span>
+                    <Link href="/profile" className="store-outline px-3 py-1.5 text-xs font-medium shrink-0">
+                      Profile
+                    </Link>
                     <button
                       type="button"
                       onClick={() => logoutMutation.mutate()}

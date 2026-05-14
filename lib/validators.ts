@@ -22,6 +22,20 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const profileUpdateSchema = z.object({
+  name: z.string().min(2),
+  phone: z.string().optional(),
+});
+
+export const walletDepositSchema = z.object({
+  amount: z.number().positive(),
+  email: z.string().email().optional(),
+});
+
+export const walletChargeSchema = z.object({
+  orderId: z.string().min(1),
+});
+
 export const categorySchema = z.object({
   name: z.string().min(2),
   slug: z.string().min(2),
