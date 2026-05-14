@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
@@ -140,6 +140,28 @@ export default function Page() {
     : null;
   const categoryCountLabel = (index: number) => `${(index + 1) * 60}+ items`;
 
+  useEffect(() => {
+    const cards = document.querySelectorAll<HTMLElement>("[data-film-reveal='category']");
+    if (!cards.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px 0px -12% 0px",
+      }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, [themedCategories.length]);
+
   return (
     <div className="space-y-12">
       <section className="store-hero p-5 md:p-8 xl:p-10 relative overflow-hidden">
@@ -230,12 +252,12 @@ export default function Page() {
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-sora text-xl text-slate-900">Explore top categories ✨</h2>
             <p className="text-sm text-slate-600">Discover best sellers by collection.</p>
           </div>
-          <Link href="/categories" className="text-sm text-[var(--store-accent)]">
+          <Link href="/categories" className="text-sm text-[var(--store-accent)] w-fit">
             View all categories
           </Link>
         </div>
@@ -252,21 +274,34 @@ export default function Page() {
             ))}
           </div>
         ) : themedCategories.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             {themedCategories.map((category, index) => (
               <Link
                 key={category.id}
                 href={hasCategories ? `/categories/${category.slug}` : "/shop"}
-                className="store-card p-4 relative overflow-hidden transition hover:-translate-y-1 min-h-[158px]"
-                style={{ animationDelay: `${index * 90}ms` }}
+                data-film-reveal="category"
+                className="store-card store-film-card group p-4 relative overflow-hidden transition hover:-translate-y-1 min-h-[138px] sm:min-h-[172px]"
+                style={{ ["--film-delay" as "--film-delay"]: `${index * 90}ms` }}
               >
-                <div className={`absolute inset-0 opacity-70 ${category.theme.gradient}`} />
-                <div className="relative z-10 space-y-3 store-fade-up">
-                  <div className="text-4xl" aria-hidden>
+                <div className={`absolute inset-0 opacity-75 ${category.theme.gradient}`} />
+                <div className="relative z-10 flex items-center gap-3 sm:block sm:space-y-3">
+                  <div
+                    className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white/85 border border-white/80 shadow-[0_10px_20px_rgba(52,63,128,0.12)] flex items-center justify-center text-3xl sm:text-4xl shrink-0"
+                    aria-hidden
+                  >
                     {category.theme.icon}
                   </div>
-                  <div className="text-sm font-semibold text-slate-900 font-sora leading-tight">{category.name}</div>
-                  <div className="text-xs text-slate-600">{categoryCountLabel(index)}</div>
+                  <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${category.theme.badge}`}>{category.theme.tag}</span>
+                      <span className="text-[10px] text-slate-500">{categoryCountLabel(index)}</span>
+                    </div>
+                    <div className="text-[15px] sm:text-sm font-semibold text-slate-900 font-sora leading-tight">{category.name}</div>
+                    <div className="text-xs text-slate-600 leading-snug line-clamp-2">{category.theme.description}</div>
+                  </div>
+                  <span className="ml-auto text-slate-400 text-base sm:hidden" aria-hidden>
+                    →
+                  </span>
                 </div>
               </Link>
             ))}
