@@ -179,17 +179,30 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="store-card p-6 md:p-8 relative overflow-hidden min-h-[300px] md:min-h-[320px] xl:h-full flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-100/70 via-white to-indigo-100/80" />
-            <div className="absolute -top-7 right-8 h-20 w-20 rounded-3xl bg-white/90 shadow-[0_18px_34px_rgba(91,92,230,0.2)] flex items-center justify-center text-3xl store-float">
-              📱
+          <div className="store-card p-5 md:p-7 relative overflow-hidden min-h-[300px] md:min-h-[320px] xl:h-full flex flex-col justify-between">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-sky-100/80" />
+            <div className="absolute -top-10 -right-10 h-28 w-28 rounded-full bg-indigo-200/40 blur-2xl" aria-hidden />
+            <div className="absolute -bottom-12 -left-8 h-28 w-28 rounded-full bg-sky-200/50 blur-2xl" aria-hidden />
+
+            <div className="relative z-10 flex items-center justify-between gap-3">
+              <span className="store-pill px-3 py-1 text-[11px] uppercase tracking-wide">Fresh drops</span>
+              <span className="store-outline px-2.5 py-1 text-[10px] text-slate-600">Updated weekly</span>
             </div>
-            <div className="absolute -bottom-8 left-8 h-24 w-24 rounded-3xl bg-white/90 shadow-[0_18px_34px_rgba(91,92,230,0.22)] flex items-center justify-center text-4xl store-float" style={{ animationDelay: "0.9s" }}>
-              📦
+
+            <div className="relative z-10 flex flex-col items-center text-center gap-4 py-2 md:py-4">
+              <div className="h-24 w-24 rounded-[28px] bg-white/90 border border-white/90 shadow-[0_18px_34px_rgba(91,92,230,0.2)] flex items-center justify-center text-5xl store-float">
+                ⚡
+              </div>
+              <div className="space-y-2 max-w-[240px]">
+                <h3 className="font-sora text-base md:text-lg text-slate-900">Built for speed</h3>
+                <p className="text-sm text-slate-600">Curated box drops, templates, and instant bundles.</p>
+              </div>
             </div>
-            <div className="relative z-10 text-center space-y-4">
-              <div className="text-7xl store-float">⚡</div>
-              <p className="text-sm text-slate-600">Curated box drops, templates, and instant bundles.</p>
+
+            <div className="relative z-10 flex flex-wrap justify-center gap-2 text-xs text-slate-600">
+              <span className="store-outline px-3 py-1">📱 Gadgets</span>
+              <span className="store-outline px-3 py-1">📦 Bundles</span>
+              <span className="store-outline px-3 py-1">🧩 Templates</span>
             </div>
           </div>
 
