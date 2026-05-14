@@ -95,7 +95,7 @@ export default function StoreShell({
             <div className="absolute -top-20 right-4 h-32 w-32 rounded-full bg-fuchsia-100 blur-3xl opacity-70 store-glow" />
             <div className="absolute -bottom-24 left-10 h-40 w-40 rounded-full bg-sky-100 blur-3xl opacity-70 store-glow" />
 
-            <div className="relative z-10 grid gap-3 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+            <div className="relative z-10 grid gap-3 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
               <div className="flex items-center gap-2.5">
                 <Link href="/" className="font-sora text-lg md:text-xl font-semibold flex items-center gap-2">
                   <span className="text-base" aria-hidden>
@@ -106,8 +106,8 @@ export default function StoreShell({
                 <span className="store-pill px-2 py-0.5 text-[10px]">Live</span>
               </div>
 
-              <div className="hidden lg:flex items-center gap-3">
-                <label className="store-outline flex-1 flex items-center gap-2 px-3 py-2.5 bg-white/92 shadow-[0_8px_18px_rgba(74,85,130,0.08)] min-w-[320px]">
+              <div className="hidden lg:flex items-center gap-3 min-w-0">
+                <label className="store-outline flex-1 min-w-0 flex items-center gap-2 px-3 py-2.5 bg-white/92 shadow-[0_8px_18px_rgba(74,85,130,0.08)] lg:min-w-[240px] xl:min-w-[300px]">
                   <span className="text-sm">🔎</span>
                   <input
                     className="flex-1 bg-transparent text-sm outline-none"
@@ -116,7 +116,7 @@ export default function StoreShell({
                   <span className="store-outline px-1.5 py-0.5 text-[10px] text-slate-500">⌘ K</span>
                 </label>
 
-                <div className="hidden xl:flex items-center gap-1.5 text-sm text-slate-600">
+                <div className="hidden 2xl:flex items-center gap-1.5 text-sm text-slate-600">
                   {navItems.map((item) => (
                     <Link key={`top-${item.href}`} href={item.href} className="px-2.5 py-1.5 rounded-full hover:bg-white transition">
                       {item.label}
@@ -125,7 +125,7 @@ export default function StoreShell({
                 </div>
               </div>
 
-              <div className="flex items-center justify-start lg:justify-end gap-2 md:gap-2.5 overflow-x-auto no-scrollbar max-w-full pb-1">
+              <div className="flex items-center justify-start lg:justify-end gap-2 md:gap-2.5 overflow-x-auto lg:overflow-visible no-scrollbar max-w-full pb-1">
                 {isAdmin && (
                   <Link href="/admin/dashboard" className="store-outline px-3 py-1.5 text-xs font-medium shrink-0">
                     Admin
