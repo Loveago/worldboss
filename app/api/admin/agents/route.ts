@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
         storefrontSlug: profile.storefrontSlug,
         contactPhone: profile.contactPhone,
         whatsappNumber: profile.whatsappNumber,
+        adminBundlePrices: profile.adminBundlePrices || {},
         appliedAt: profile.appliedAt,
       };
     })

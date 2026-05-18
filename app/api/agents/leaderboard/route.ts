@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { ok } from "@/lib/response";
 import { computeAgentTier, getAgentProfile } from "@/lib/agents";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const users = await prisma.user.findMany({
     where: {

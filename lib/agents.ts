@@ -11,6 +11,7 @@ export type AgentProfile = {
   contactPhone: string;
   whatsappNumber: string;
   markups: Record<string, number>;
+  adminBundlePrices: Record<string, number>;
   appliedAt: string;
   approvedAt?: string;
   approvedByUserId?: string;
@@ -24,6 +25,17 @@ export const AGENT_MIN_WITHDRAWAL = 50;
 const toObject = (value: unknown): JsonObject => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
   return value as JsonObject;
+};
+
+const toNumberRecord = (value: unknown): Record<string, number> => {
+  const source = toObject(value);
+  return Object.entries(source).reduce<Record<string, number>>((acc, [key, raw]) => {
+    const num = typeof raw === "number" ? raw : Number(raw);
+    if (Number.isFinite(num) && num > 0) {
+      acc[key] = num;
+    }
+    return acc;
+  }, {});
 };
 
 const sanitizeSlug = (value: string) =>
@@ -54,7 +66,8 @@ export function getAgentProfile(addresses: Prisma.JsonValue | null | undefined):
     storefrontName: typeof agentRaw.storefrontName === "string" ? agentRaw.storefrontName : "",
     contactPhone: typeof agentRaw.contactPhone === "string" ? agentRaw.contactPhone : "",
     whatsappNumber: typeof agentRaw.whatsappNumber === "string" ? agentRaw.whatsappNumber : "",
-    markups: toObject(agentRaw.markups) as Record<string, number>,
+    markups: toNumberRecord(agentRaw.markups),
+    adminBundlePrices: toNumberRecord(agentRaw.adminBundlePrices),
     appliedAt: typeof agentRaw.appliedAt === "string" ? agentRaw.appliedAt : new Date().toISOString(),
     approvedAt: typeof agentRaw.approvedAt === "string" ? agentRaw.approvedAt : undefined,
     approvedByUserId: typeof agentRaw.approvedByUserId === "string" ? agentRaw.approvedByUserId : undefined,
@@ -80,6 +93,14 @@ export function getAgentMarkup(profile: AgentProfile | null, bundleId: string) {
   const raw = profile.markups?.[bundleId];
   const value = typeof raw === "number" ? raw : 0;
   return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+export function getAgentBundleBasePrice(profile: AgentProfile | null, bundleId: string, defaultPrice: number) {
+  if (!profile) return defaultPrice;
+  const raw = profile.adminBundlePrices?.[bundleId];
+  const value = typeof raw === "number" ? raw : Number(raw);
+  if (Number.isFinite(value) && value > 0) return value;
+  return defaultPrice;
 }
 
 export function computeAgentTier(salesCount: number) {

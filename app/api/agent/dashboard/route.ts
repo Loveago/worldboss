@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { getUserFromRequest } from "@/lib/auth";
-import { computeAgentTier, getAgentProfile, getAgentWalletMetrics } from "@/lib/agents";
+import { computeAgentTier, getAgentBundleBasePrice, getAgentProfile, getAgentWalletMetrics } from "@/lib/agents";
 import { ok, unauthorized, fail } from "@/lib/response";
 
 export async function GET(req: NextRequest) {
@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
   const isApproved = profile.status === "APPROVED";
   const storefrontBundles = isApproved
     ? bundles.map((bundle) => {
+        const basePrice = getAgentBundleBasePrice(profile, bundle.id, Number(bundle.price));
         const markup = Number(profile.markups?.[bundle.id] || 0);
         return {
           id: bundle.id,
@@ -54,9 +55,9 @@ export async function GET(req: NextRequest) {
           name: bundle.name,
           volume: bundle.volume,
           validity: bundle.validity,
-          basePrice: Number(bundle.price),
+          basePrice,
           markup,
-          finalPrice: Number(bundle.price) + markup,
+          finalPrice: basePrice + markup,
         };
       })
     : [];

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
-import { getAgentMarkup, getAgentProfile } from "@/lib/agents";
+import { getAgentBundleBasePrice, getAgentMarkup, getAgentProfile } from "@/lib/agents";
 import { fail, ok } from "@/lib/response";
 
 export async function GET(_: NextRequest, { params }: { params: { slug: string } }) {
@@ -29,12 +29,13 @@ export async function GET(_: NextRequest, { params }: { params: { slug: string }
   });
 
   const displayBundles = bundles.map((bundle) => {
+    const basePrice = getAgentBundleBasePrice(profile, bundle.id, Number(bundle.price));
     const markup = getAgentMarkup(profile, bundle.id);
     return {
       ...bundle,
-      basePrice: Number(bundle.price),
+      basePrice,
       markup,
-      price: Number(bundle.price) + markup,
+      price: basePrice + markup,
     };
   });
 

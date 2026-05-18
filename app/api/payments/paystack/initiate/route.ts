@@ -7,19 +7,32 @@ import { getUserFromRequest } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   const { user, payload } = await getUserFromRequest(req);
-  if (!user || !payload) return fail("Unauthorized", 401);
   const body = await req.json().catch(() => null);
   const { orderId, email } = body || {};
   if (!orderId || !email) return fail("orderId and email are required", 400);
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) return fail("Order not found", 404);
+  const deliveryInfo = (order.deliveryInfo || {}) as Record<string, unknown>;
+  const isGuestStorefrontDataOrder =
+    deliveryInfo.type === "DATA" && typeof deliveryInfo.agentSlug === "string" && Boolean(deliveryInfo.agentSlug);
+
+  if (!user || !payload) {
+    if (!isGuestStorefrontDataOrder) return fail("Unauthorized", 401);
+  } else if (payload.role !== "ADMIN" && order.userId !== user.id) {
+    return fail("Unauthorized", 401);
+  }
+
   const amountKobo = Math.round(Number(order.total) * 100);
   const init = await paystack.transaction.initialize({
     amount: amountKobo.toString(),
     email,
     currency: "GHS",
     reference: `BM-${order.id}-${Date.now()}`,
-    metadata: { orderId: order.id, userId: user.id },
+    metadata: {
+      orderId: order.id,
+      userId: user?.id || order.userId,
+      guestCheckout: isGuestStorefrontDataOrder,
+    },
   });
   if (!init.data) {
     return fail(init.message || "Unable to initialize Paystack checkout", 400);

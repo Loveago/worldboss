@@ -94,6 +94,11 @@ export const agentApplicationReviewSchema = z.object({
   action: z.enum(["APPROVE", "REJECT"]),
 });
 
+export const adminAgentBundlePricingSchema = z.object({
+  userId: z.string(),
+  bundlePrices: z.record(z.string(), z.number().positive().nullable()),
+});
+
 export const agentWithdrawalCreateSchema = z.object({
   amount: z.number().min(50),
   momoNumber: z.string().min(9),

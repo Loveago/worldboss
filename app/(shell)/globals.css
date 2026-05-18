@@ -97,6 +97,36 @@ body {
   border-radius: 30px;
 }
 
+.storefront-hero {
+  background: linear-gradient(140deg, #2c61df 0%, #2f6ef4 42%, #4578ea 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.storefront-hero::before,
+.storefront-hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.storefront-hero::before {
+  width: 230px;
+  height: 230px;
+  top: -120px;
+  left: -70px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.storefront-hero::after {
+  width: 270px;
+  height: 270px;
+  right: -110px;
+  bottom: -170px;
+  background: rgba(15, 23, 42, 0.12);
+}
+
 .store-grid-bg {
   background-image: radial-gradient(rgba(91, 92, 230, 0.1) 1px, transparent 0),
     radial-gradient(rgba(91, 92, 230, 0.08) 1px, transparent 0);
@@ -147,6 +177,10 @@ body {
 
 .store-glow {
   animation: storeGlow 4.5s ease-in-out infinite;
+}
+
+.storefront-modal-enter {
+  animation: storefrontModalIn 0.28s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .no-scrollbar {
@@ -237,6 +271,17 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes storefrontModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -390,7 +435,8 @@ a {
   .store-film-card,
   .store-film-card.is-visible,
   .store-film-card::after,
-  .store-film-card.is-visible::after {
+  .store-film-card.is-visible::after,
+  .storefront-modal-enter {
     opacity: 1;
     transform: none;
     filter: none;

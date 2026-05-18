@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
     contactPhone: parsed.data.contactPhone,
     whatsappNumber: parsed.data.whatsappNumber,
     markups: {},
+    adminBundlePrices: {},
     appliedAt: new Date().toISOString(),
   };
 
