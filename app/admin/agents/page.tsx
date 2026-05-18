@@ -41,9 +41,14 @@ type Withdrawal = {
   fee: number;
 };
 
+const EMPTY_APPLICATIONS: Application[] = [];
+const EMPTY_BUNDLES: DataBundle[] = [];
+const EMPTY_WITHDRAWALS: Withdrawal[] = [];
+
 export default function AdminAgentsPage() {
   const queryClient = useQueryClient();
   const [pricingDrafts, setPricingDrafts] = useState<Record<string, Record<string, string>>>({});
+  const [expandedAgentId, setExpandedAgentId] = useState<string | null>(null);
 
   const applicationsQuery = useQuery<Application[]>({
     queryKey: ["admin-agent-applications"],
@@ -90,11 +95,52 @@ export default function AdminAgentsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-agent-applications"] }),
   });
 
-  const apps = applicationsQuery.data || [];
-  const withdrawals = withdrawalsQuery.data || [];
-  const bundles = bundlesQuery.data || [];
+  const apps = applicationsQuery.data ?? EMPTY_APPLICATIONS;
+  const withdrawals = withdrawalsQuery.data ?? EMPTY_WITHDRAWALS;
+  const bundles = bundlesQuery.data ?? EMPTY_BUNDLES;
 
   const approvedApps = useMemo(() => apps.filter((app) => app.status === "APPROVED"), [apps]);
+
+  const sortedApprovedApps = useMemo(
+    () =>
+      [...approvedApps].sort(
+        (a, b) =>
+          (a.storefrontName || "").localeCompare(b.storefrontName || "", undefined, {
+            sensitivity: "base",
+          }) || (a.email || "").localeCompare(b.email || "", undefined, { sensitivity: "base" }),
+      ),
+    [approvedApps],
+  );
+
+  const bundleGroups = useMemo(() => {
+    const getVolumeRank = (volume: string) => {
+      const numeric = Number.parseFloat(volume.replace(/[^\d.]/g, ""));
+      return Number.isFinite(numeric) ? numeric : Number.MAX_SAFE_INTEGER;
+    };
+
+    const grouped = bundles.reduce<Record<string, DataBundle[]>>((acc, bundle) => {
+      const key = bundle.network;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(bundle);
+      return acc;
+    }, {});
+
+    const networkOrder: Array<DataBundle["network"]> = ["mtn", "telecel", "airteltigo"];
+
+    return networkOrder
+      .filter((network) => grouped[network]?.length)
+      .map((network) => ({
+        key: network,
+        title: `${network.toUpperCase()} bundles`,
+        bundles: [...grouped[network]].sort(
+          (a, b) =>
+            getVolumeRank(a.volume) - getVolumeRank(b.volume) ||
+            (a.volume || "").localeCompare(b.volume || "", undefined, { sensitivity: "base" }) ||
+            (a.validity || "").localeCompare(b.validity || "", undefined, { sensitivity: "base" }) ||
+            (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }),
+        ),
+      }));
+  }, [bundles]);
 
   useEffect(() => {
     if (approvedApps.length === 0 || bundles.length === 0) return;
@@ -113,6 +159,18 @@ export default function AdminAgentsPage() {
       return next;
     });
   }, [approvedApps, bundles]);
+
+  useEffect(() => {
+    if (sortedApprovedApps.length === 0) {
+      setExpandedAgentId(null);
+      return;
+    }
+
+    setExpandedAgentId((current) => {
+      if (current && sortedApprovedApps.some((app) => app.userId === current)) return current;
+      return sortedApprovedApps[0].userId;
+    });
+  }, [sortedApprovedApps]);
 
   const setDraft = (userId: string, bundleId: string, value: string) => {
     setPricingDrafts((current) => ({
@@ -194,44 +252,69 @@ export default function AdminAgentsPage() {
           <div className="text-sm text-slate-500">No approved agents yet.</div>
         ) : (
           <div className="space-y-4">
-            {approvedApps.map((app) => (
+            {sortedApprovedApps.map((app) => {
+              const isExpanded = expandedAgentId === app.userId;
+              const isSaving = savePricingMutation.isLoading && savePricingMutation.variables?.userId === app.userId;
+
+              return (
               <div key={`pricing-${app.userId}`} className="rounded-xl border border-slate-200 p-3 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <div className="font-medium text-slate-900">{app.storefrontName}</div>
-                    <div className="text-xs text-slate-500">{app.email}</div>
-                  </div>
                   <button
                     type="button"
-                    onClick={() => saveAgentPricing(app.userId)}
-                    disabled={savePricingMutation.isLoading}
-                    className="text-xs px-3 py-1 rounded-lg border border-indigo-200 text-indigo-700"
+                    onClick={() => setExpandedAgentId((current) => (current === app.userId ? null : app.userId))}
+                    className="text-left"
                   >
-                    {savePricingMutation.isLoading ? "Saving..." : "Save pricing"}
+                    <div className="font-medium text-slate-900">{app.storefrontName}</div>
+                    <div className="text-xs text-slate-500">{app.email}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">{isExpanded ? "Hide bundle pricing" : "Show bundle pricing"}</div>
                   </button>
+
+                  <div className="text-slate-400 text-sm" aria-hidden>
+                    {isExpanded ? "▾" : "▸"}
+                  </div>
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {bundles.map((bundle) => (
-                    <label key={`${app.userId}-${bundle.id}`} className="rounded-lg border border-slate-100 px-2.5 py-2 block">
-                      <div className="text-xs text-slate-900 font-medium">
-                        {bundle.network.toUpperCase()} · {bundle.volume}
+                {isExpanded ? (
+                  <div className="space-y-3">
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => saveAgentPricing(app.userId)}
+                        disabled={savePricingMutation.isLoading}
+                        className="text-xs px-3 py-1 rounded-lg border border-indigo-200 text-indigo-700"
+                      >
+                        {isSaving ? "Saving..." : "Save pricing"}
+                      </button>
+                    </div>
+
+                    {bundleGroups.map((group) => (
+                      <div key={`${app.userId}-${group.key}`} className="rounded-lg border border-slate-100 p-2.5 space-y-2">
+                        <div className="text-xs font-semibold text-slate-700">{group.title}</div>
+                        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                          {group.bundles.map((bundle) => (
+                            <label key={`${app.userId}-${bundle.id}`} className="rounded-lg border border-slate-100 px-2.5 py-2 block">
+                              <div className="text-xs text-slate-900 font-medium">{bundle.volume}</div>
+                              <div className="text-[11px] text-slate-500">{bundle.validity}</div>
+                              <div className="text-[11px] text-slate-500">Default: {formatCurrency(Number(bundle.price))}</div>
+                              <input
+                                type="number"
+                                step="0.01"
+                                min={0}
+                                value={pricingDrafts[app.userId]?.[bundle.id] || ""}
+                                onChange={(event) => setDraft(app.userId, bundle.id, event.target.value)}
+                                placeholder="Use default"
+                                className="mt-1.5 w-full border border-slate-200 rounded-md px-2 py-1 text-xs"
+                              />
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                      <div className="text-[11px] text-slate-500">Default: {formatCurrency(Number(bundle.price))}</div>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min={0}
-                        value={pricingDrafts[app.userId]?.[bundle.id] || ""}
-                        onChange={(event) => setDraft(app.userId, bundle.id, event.target.value)}
-                        placeholder="Use default"
-                        className="mt-1.5 w-full border border-slate-200 rounded-md px-2 py-1 text-xs"
-                      />
-                    </label>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
