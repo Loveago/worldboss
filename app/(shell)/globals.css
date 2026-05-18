@@ -136,8 +136,51 @@ body {
 
 .store-fade-up {
   opacity: 0;
-  transform: translateY(12px);
-  animation: storeFadeUp 0.7s ease forwards;
+  transform: translateY(16px) scale(0.985);
+  filter: blur(2px);
+  animation: storeFadeUp 0.82s cubic-bezier(0.2, 0.9, 0.22, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.store-tile-lift {
+  transition: transform 0.24s ease, box-shadow 0.24s ease, background-color 0.24s ease;
+}
+
+.store-tile-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 26px rgba(55, 68, 140, 0.14);
+}
+
+.dashboard-menu-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.dashboard-menu-row::-webkit-scrollbar {
+  display: none;
+}
+
+.dashboard-menu-btn {
+  white-space: nowrap;
+  flex: 0 0 auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-menu-btn:hover {
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+  .dashboard-menu-row {
+    flex-wrap: wrap;
+    overflow: visible;
+    padding-bottom: 0;
+  }
 }
 
 .store-film-card {
@@ -266,11 +309,13 @@ body {
 @keyframes storeFadeUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px) scale(0.985);
+    filter: blur(2px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
@@ -429,9 +474,23 @@ a {
   .store-hero {
     border-radius: 20px;
   }
+
+  .dashboard-menu-row {
+    gap: 0.4rem;
+  }
+
+  .dashboard-menu-btn {
+    padding: 0.36rem 0.72rem;
+    font-size: 11px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .store-fade-up,
+  .store-tile-lift,
+  .store-tile-lift:hover,
+  .dashboard-menu-btn,
+  .dashboard-menu-btn:hover,
   .store-film-card,
   .store-film-card.is-visible,
   .store-film-card::after,
@@ -442,5 +501,6 @@ a {
     filter: none;
     transition: none;
     animation: none;
+    box-shadow: none;
   }
 }

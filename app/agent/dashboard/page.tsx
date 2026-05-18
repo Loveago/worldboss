@@ -6,6 +6,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { formatCurrency } from "@/lib/format";
 
+type NetworkFilter = "all" | "mtn" | "telecel" | "airteltigo";
+type BundleSortKey = "volume" | "basePrice" | "finalPrice" | "markup";
+
 type DashboardPayload = {
   hasApplication: boolean;
   isApproved: boolean;
@@ -49,6 +52,17 @@ type DashboardPayload = {
   storefrontLink: string | null;
 };
 
+const networkLabel: Record<Exclude<NetworkFilter, "all">, string> = {
+  mtn: "MTN",
+  telecel: "Telecel",
+  airteltigo: "AirtelTigo",
+};
+
+const parseVolumeRank = (value: string) => {
+  const numeric = Number(value.replace(/[^\d.]/g, ""));
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
 export default function AgentDashboardPage() {
   const queryClient = useQueryClient();
   const [storefrontName, setStorefrontName] = useState("");
@@ -60,6 +74,11 @@ export default function AgentDashboardPage() {
   const [momoNumber, setMomoNumber] = useState("");
   const [momoName, setMomoName] = useState("");
   const [momoNetwork, setMomoNetwork] = useState<"mtn" | "telecel" | "airteltigo">("mtn");
+  const [activeSection, setActiveSection] = useState<"overview" | "storefront" | "pricing" | "wallet" | "withdrawals">("overview");
+  const [networkFilter, setNetworkFilter] = useState<NetworkFilter>("all");
+  const [pricingSearch, setPricingSearch] = useState("");
+  const [bundleSortKey, setBundleSortKey] = useState<BundleSortKey>("volume");
+  const [bundleSortDirection, setBundleSortDirection] = useState<"asc" | "desc">("asc");
 
   const dashboardQuery = useQuery<DashboardPayload>({
     queryKey: ["agent-dashboard"],
@@ -112,20 +131,85 @@ export default function AgentDashboardPage() {
 
   const data = dashboardQuery.data;
 
-  const bundlesByNetwork = useMemo(() => {
+  const pricingRows = useMemo(() => {
     const list = data?.bundles || [];
-    return {
-      mtn: list.filter((bundle) => bundle.network === "mtn"),
-      telecel: list.filter((bundle) => bundle.network === "telecel"),
-      airteltigo: list.filter((bundle) => bundle.network === "airteltigo"),
-    };
-  }, [data?.bundles]);
+    const query = pricingSearch.trim().toLowerCase();
+
+    const rows = list
+      .map((bundle) => {
+        const liveMarkup = Number(markups[bundle.id] ?? bundle.markup ?? 0);
+        const liveFinalPrice = bundle.basePrice + liveMarkup;
+        return {
+          ...bundle,
+          liveMarkup,
+          liveFinalPrice,
+        };
+      })
+      .filter((bundle) => {
+        const networkMatches = networkFilter === "all" ? true : bundle.network === networkFilter;
+        if (!networkMatches) return false;
+        if (!query) return true;
+        const text = `${bundle.name} ${bundle.volume} ${bundle.validity} ${bundle.network}`.toLowerCase();
+        return text.includes(query);
+      })
+      .sort((a, b) => {
+        let left = 0;
+        let right = 0;
+
+        if (bundleSortKey === "volume") {
+          left = parseVolumeRank(a.volume);
+          right = parseVolumeRank(b.volume);
+        } else if (bundleSortKey === "basePrice") {
+          left = a.basePrice;
+          right = b.basePrice;
+        } else if (bundleSortKey === "finalPrice") {
+          left = a.liveFinalPrice;
+          right = b.liveFinalPrice;
+        } else {
+          left = a.liveMarkup;
+          right = b.liveMarkup;
+        }
+
+        const result = left - right;
+        return bundleSortDirection === "asc" ? result : -result;
+      });
+
+    return rows;
+  }, [bundleSortDirection, bundleSortKey, data?.bundles, markups, networkFilter, pricingSearch]);
+
+  const jumpTo = (section: "overview" | "storefront" | "pricing" | "wallet" | "withdrawals") => {
+    setActiveSection(section);
+    const target = document.getElementById(`agent-${section}`);
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="space-y-6">
-      <section className="store-hero p-6 space-y-2">
-        <h1 className="font-sora text-3xl text-slate-900">Agent Dashboard</h1>
-        <p className="text-sm text-slate-600">Manage your storefront pricing, link sharing, and withdrawal requests.</p>
+      <section id="agent-overview" className="store-glass p-5 md:p-7 space-y-4 relative overflow-hidden store-fade-up">
+        <div className="absolute -top-20 right-6 h-36 w-36 rounded-full bg-indigo-100/70 blur-3xl store-glow" />
+        <div className="absolute -bottom-24 left-2 h-44 w-44 rounded-full bg-sky-100/70 blur-3xl store-glow" />
+        <div className="relative z-10 space-y-2">
+          <h1 className="font-sora text-3xl text-slate-900">Agent Dashboard</h1>
+          <p className="text-sm text-slate-600">Manage your storefront, pricing markup, wallet, and withdrawals from one modern workspace.</p>
+        </div>
+        <div className="relative z-10 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="store-outline store-tile-lift rounded-2xl px-4 py-3 bg-white/80">
+            <div className="text-[11px] text-slate-500">Sales</div>
+            <div className="mt-1 text-xl font-semibold text-slate-900">{data?.stats.salesCount ?? 0}</div>
+          </div>
+          <div className="store-outline store-tile-lift rounded-2xl px-4 py-3 bg-white/80">
+            <div className="text-[11px] text-slate-500">Agent badge</div>
+            <div className="mt-1 text-xl font-semibold text-slate-900">{data?.stats.badge || "-"}</div>
+          </div>
+          <div className="store-outline store-tile-lift rounded-2xl px-4 py-3 bg-white/80">
+            <div className="text-[11px] text-slate-500">Wallet</div>
+            <div className="mt-1 text-xl font-semibold text-slate-900">{formatCurrency(data?.wallet.balance ?? 0)}</div>
+          </div>
+          <div className="store-outline store-tile-lift rounded-2xl px-4 py-3 bg-white/80">
+            <div className="text-[11px] text-slate-500">Storefront status</div>
+            <div className="mt-1 text-xl font-semibold text-slate-900">{data?.profile?.status || "Not applied"}</div>
+          </div>
+        </div>
       </section>
 
       {dashboardQuery.isLoading && <div className="store-card p-4 text-sm text-slate-500">Loading dashboard...</div>}
@@ -148,9 +232,35 @@ export default function AgentDashboardPage() {
           )}
 
           {data.isApproved && data.profile && (
-            <div className="grid gap-6 lg:grid-cols-[1.1fr_1.2fr]">
-              <div className="space-y-6">
-                <section className="store-card p-5 space-y-4">
+            <>
+              <section className="store-glass p-2.5 md:p-3.5 store-fade-up" style={{ animationDelay: "80ms" }}>
+                <div className="dashboard-menu-row">
+                  {([
+                    ["overview", "Overview"],
+                    ["storefront", "Storefront"],
+                    ["pricing", "Bundle pricing"],
+                    ["wallet", "Wallet"],
+                    ["withdrawals", "Withdrawals"],
+                  ] as const).map(([key, label]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => jumpTo(key)}
+                      className={`dashboard-menu-btn rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                        activeSection === key
+                          ? "bg-[var(--store-accent)] text-white shadow-[0_10px_20px_rgba(91,92,230,0.28)]"
+                          : "store-outline text-slate-600"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_1.2fr]">
+                <div className="space-y-6">
+                  <section id="agent-storefront" className="store-card p-4 md:p-5 space-y-4 store-fade-up" style={{ animationDelay: "130ms" }}>
                   <div className="flex items-center justify-between">
                     <h2 className="font-sora text-xl text-slate-900">Storefront settings</h2>
                     <span className="store-pill px-2 py-0.5 text-[10px]">{data.stats.badge}</span>
@@ -181,20 +291,20 @@ export default function AgentDashboardPage() {
                   >
                     {saveStoreMutation.isLoading ? "Saving..." : "Save storefront"}
                   </button>
-                </section>
+                  </section>
 
-                <section className="store-card p-5 space-y-3">
+                  <section id="agent-wallet" className="store-card p-4 md:p-5 space-y-3 store-fade-up" style={{ animationDelay: "180ms" }}>
                   <h2 className="font-sora text-xl text-slate-900">Agent wallet</h2>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="store-outline rounded-2xl px-3 py-2">
+                    <div className="store-outline store-tile-lift rounded-2xl px-3 py-2">
                       <div className="text-[11px] text-slate-500">Available</div>
                       <div className="font-semibold text-slate-900">{formatCurrency(data.wallet.balance)}</div>
                     </div>
-                    <div className="store-outline rounded-2xl px-3 py-2">
+                    <div className="store-outline store-tile-lift rounded-2xl px-3 py-2">
                       <div className="text-[11px] text-slate-500">Commissions</div>
                       <div className="font-semibold text-slate-900">{formatCurrency(data.wallet.totalCommissions)}</div>
                     </div>
-                    <div className="store-outline rounded-2xl px-3 py-2">
+                    <div className="store-outline store-tile-lift rounded-2xl px-3 py-2">
                       <div className="text-[11px] text-slate-500">Reserved</div>
                       <div className="font-semibold text-slate-900">{formatCurrency(data.wallet.totalWithdrawalsReserved)}</div>
                     </div>
@@ -222,68 +332,139 @@ export default function AgentDashboardPage() {
                   {withdrawMutation.isError && (
                     <div className="text-xs text-rose-600">{withdrawMutation.error instanceof Error ? withdrawMutation.error.message : "Unable to request withdrawal"}</div>
                   )}
-                </section>
-              </div>
+                  </section>
+                </div>
 
-              <div className="space-y-6">
-                <section className="store-card p-5 space-y-3">
-                  <h2 className="font-sora text-xl text-slate-900">Bundle markup pricing</h2>
-                  {(["mtn", "telecel", "airteltigo"] as const).map((network) => (
-                    <div key={network} className="space-y-2">
-                      <div className="text-xs uppercase text-slate-500">{network}</div>
-                      {(bundlesByNetwork[network] || []).map((bundle) => (
-                        <div key={bundle.id} className="store-outline rounded-xl px-3 py-2.5 grid grid-cols-[1fr_auto] gap-2 items-center">
-                          <div>
-                            <div className="text-sm font-medium text-slate-900">{bundle.volume}</div>
-                            <div className="text-[11px] text-slate-500">Base: {formatCurrency(bundle.basePrice)} · Final: {formatCurrency(bundle.finalPrice)}</div>
-                          </div>
-                          <input
-                            type="number"
-                            step="0.1"
-                            min={0}
-                            value={markups[bundle.id] ?? 0}
-                            onChange={(event) =>
-                              setMarkups((prev) => ({
-                                ...prev,
-                                [bundle.id]: Number(event.target.value || 0),
-                              }))
-                            }
-                            className="store-outline px-2 py-1 text-sm w-[90px]"
-                          />
-                        </div>
-                      ))}
+                <div className="space-y-6">
+                  <section id="agent-pricing" className="store-card p-4 md:p-5 space-y-3 store-fade-up" style={{ animationDelay: "210ms" }}>
+                    <div className="flex items-center justify-between gap-2">
+                      <h2 className="font-sora text-xl text-slate-900">Bundle markup pricing</h2>
+                      <span className="text-xs text-slate-500">{pricingRows.length} bundle(s)</span>
                     </div>
-                  ))}
-                </section>
-
-                <section className="store-card p-5 space-y-2">
-                  <h2 className="font-sora text-xl text-slate-900">Withdrawal history</h2>
-                  {data.withdrawals.length === 0 ? (
-                    <div className="text-sm text-slate-500">No withdrawals yet.</div>
-                  ) : (
-                    data.withdrawals.map((item) => (
-                      <div key={item.id} className="store-outline rounded-xl px-3 py-2 flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-medium text-slate-900">{formatCurrency(item.amount)}</div>
-                          <div className="text-[11px] text-slate-500">{item.momoNetwork} · {item.momoNumber}</div>
-                        </div>
-                        <span
-                          className={`text-[10px] px-2 py-1 rounded-full ${
-                            item.status === "SUCCESS"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : item.status === "FAILED"
-                                ? "bg-rose-100 text-rose-700"
-                                : "bg-amber-100 text-amber-700"
-                          }`}
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                      <label className="space-y-1.5">
+                        <span className="text-[11px] text-slate-500">Filter network</span>
+                        <select
+                          value={networkFilter}
+                          onChange={(event) => setNetworkFilter(event.target.value as NetworkFilter)}
+                          className="w-full store-outline px-3 py-2 text-sm"
                         >
-                          {item.status}
-                        </span>
+                          <option value="all">All networks</option>
+                          <option value="mtn">MTN</option>
+                          <option value="telecel">Telecel</option>
+                          <option value="airteltigo">AirtelTigo</option>
+                        </select>
+                      </label>
+                      <label className="space-y-1.5">
+                        <span className="text-[11px] text-slate-500">Search bundle</span>
+                        <input
+                          value={pricingSearch}
+                          onChange={(event) => setPricingSearch(event.target.value)}
+                          className="w-full store-outline px-3 py-2 text-sm"
+                          placeholder="e.g. 5GB, weekly"
+                        />
+                      </label>
+                      <label className="space-y-1.5">
+                        <span className="text-[11px] text-slate-500">Sort by</span>
+                        <select
+                          value={bundleSortKey}
+                          onChange={(event) => setBundleSortKey(event.target.value as BundleSortKey)}
+                          className="w-full store-outline px-3 py-2 text-sm"
+                        >
+                          <option value="volume">Volume</option>
+                          <option value="basePrice">Base price</option>
+                          <option value="markup">Markup</option>
+                          <option value="finalPrice">Final price</option>
+                        </select>
+                      </label>
+                      <label className="space-y-1.5">
+                        <span className="text-[11px] text-slate-500">Order</span>
+                        <select
+                          value={bundleSortDirection}
+                          onChange={(event) => setBundleSortDirection(event.target.value as "asc" | "desc")}
+                          className="w-full store-outline px-3 py-2 text-sm"
+                        >
+                          <option value="asc">Ascending</option>
+                          <option value="desc">Descending</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    {pricingRows.length === 0 ? (
+                      <div className="store-outline rounded-2xl px-4 py-3 text-sm text-slate-500">No bundles match your current filters.</div>
+                    ) : (
+                      <div className="space-y-2">
+                        {pricingRows.map((bundle) => (
+                          <div key={bundle.id} className="store-outline store-tile-lift rounded-2xl px-3 py-2.5 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 items-center">
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <div className="text-sm font-medium text-slate-900">{bundle.volume}</div>
+                                <span className="store-pill px-2 py-0.5 text-[10px]">{networkLabel[bundle.network]}</span>
+                              </div>
+                              <div className="text-[11px] text-slate-500">{bundle.name} · {bundle.validity}</div>
+                              <div className="text-[11px] text-slate-500">
+                                Base: {formatCurrency(bundle.basePrice)} · Final: {formatCurrency(bundle.liveFinalPrice)}
+                              </div>
+                            </div>
+                            <label className="flex items-center gap-2">
+                              <span className="text-[11px] text-slate-500">Markup</span>
+                              <input
+                                type="number"
+                                step="0.1"
+                                min={0}
+                                value={markups[bundle.id] ?? 0}
+                                onChange={(event) =>
+                                  setMarkups((prev) => ({
+                                    ...prev,
+                                    [bundle.id]: Number(event.target.value || 0),
+                                  }))
+                                }
+                                className="store-outline px-2 py-1 text-sm w-[100px]"
+                              />
+                            </label>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  )}
-                </section>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => saveStoreMutation.mutate()}
+                      disabled={saveStoreMutation.isLoading}
+                      className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
+                    >
+                      {saveStoreMutation.isLoading ? "Saving pricing..." : "Save pricing changes"}
+                    </button>
+                  </section>
+
+                  <section id="agent-withdrawals" className="store-card p-4 md:p-5 space-y-2 store-fade-up" style={{ animationDelay: "260ms" }}>
+                    <h2 className="font-sora text-xl text-slate-900">Withdrawal history</h2>
+                    {data.withdrawals.length === 0 ? (
+                      <div className="text-sm text-slate-500">No withdrawals yet.</div>
+                    ) : (
+                      data.withdrawals.map((item) => (
+                        <div key={item.id} className="store-outline store-tile-lift rounded-xl px-3 py-2 flex items-center justify-between">
+                          <div>
+                            <div className="text-sm font-medium text-slate-900">{formatCurrency(item.amount)}</div>
+                            <div className="text-[11px] text-slate-500">{item.momoNetwork} · {item.momoNumber}</div>
+                          </div>
+                          <span
+                            className={`text-[10px] px-2 py-1 rounded-full ${
+                              item.status === "SUCCESS"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : item.status === "FAILED"
+                                  ? "bg-rose-100 text-rose-700"
+                                  : "bg-amber-100 text-amber-700"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </section>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </>
       )}
