@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { useCartStore } from "@/store/cart";
+import ThemeToggle from "../(shell)/components/ThemeToggle";
 
 const navItems = [
   { label: "Explore", href: "/", icon: "✨" },
@@ -104,7 +105,7 @@ export default function StoreShell({
       {!isAgentStorefront && (
         <>
           <header
-            className={`sticky top-0 z-50 bg-[linear-gradient(180deg,rgba(246,244,255,0.96),rgba(246,244,255,0.84)_74%,rgba(246,244,255,0))] backdrop-blur-md transition-transform duration-300 ${
+            className={`store-header-fade sticky top-0 z-50 backdrop-blur-md transition-transform duration-300 ${
               showHeader ? "translate-y-0" : "-translate-y-full"
             }`}
           >
@@ -144,6 +145,7 @@ export default function StoreShell({
                   </div>
 
                   <div className="flex items-center justify-start lg:justify-end gap-2 md:gap-2.5 overflow-x-auto lg:overflow-visible no-scrollbar max-w-full pb-1">
+                    <ThemeToggle className="store-outline px-3 py-1.5 text-xs font-medium shrink-0" />
                     {isAdmin && (
                       <Link href="/admin/dashboard" className="store-outline px-3 py-1.5 text-xs font-medium shrink-0">
                         Admin

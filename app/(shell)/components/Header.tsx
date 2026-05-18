@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import ThemeToggle from "./ThemeToggle";
 
 type HeaderProps = {
   onMenu: () => void;
@@ -38,6 +39,7 @@ export default function Header({ onMenu }: HeaderProps) {
           </div>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle className="admin-btn-outline text-xs" />
             <button className="admin-btn-outline text-xs">
               🇬🇧 EN
             </button>
