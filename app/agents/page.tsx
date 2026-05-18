@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 
 type LeaderboardAgent = {
@@ -16,30 +16,9 @@ type LeaderboardAgent = {
 };
 
 export default function AgentsPage() {
-  const queryClient = useQueryClient();
-  const [storefrontName, setStorefrontName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-
   const leaderboardQuery = useQuery<LeaderboardAgent[]>({
     queryKey: ["agents-leaderboard"],
     queryFn: () => apiFetch<LeaderboardAgent[]>("/api/agents/leaderboard"),
-  });
-
-  const applyMutation = useMutation({
-    mutationFn: () =>
-      apiFetch<{ storefrontSlug: string; status: string }>("/api/agents/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          storefrontName: storefrontName.trim(),
-          contactPhone: contactPhone.trim(),
-          whatsappNumber: whatsappNumber.trim(),
-        }),
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["agent-dashboard"] });
-    },
   });
 
   const tierRanges = [
@@ -54,7 +33,7 @@ export default function AgentsPage() {
       <section className="store-hero p-6 md:p-8 space-y-3">
         <h1 className="font-sora text-3xl text-slate-900">Corelly Agent Hub</h1>
         <p className="text-sm text-slate-600 max-w-2xl">
-          Apply to become a data agent, set your own bundle markup, and earn commission per successful sale.
+          Top-performing data agents and badge tiers across the Corelly network.
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {tierRanges.map((tier) => (
@@ -69,56 +48,16 @@ export default function AgentsPage() {
       <section className="grid gap-6 lg:grid-cols-[1.05fr_1.3fr]">
         <div className="store-card p-5 space-y-4">
           <div>
-            <h2 className="font-sora text-xl text-slate-900">Apply as an agent</h2>
-            <p className="text-sm text-slate-600">Once approved, you get a special storefront link and agent dashboard access.</p>
+            <h2 className="font-sora text-xl text-slate-900">Become an agent</h2>
+            <p className="text-sm text-slate-600">Agent applications now live in your user dashboard for signed-in users.</p>
           </div>
-
-          <div className="space-y-2">
-            <label className="text-xs text-slate-500">Storefront name</label>
-            <input
-              className="w-full store-outline px-3 py-2 text-sm"
-              value={storefrontName}
-              onChange={(event) => setStorefrontName(event.target.value)}
-              placeholder="Kwame Data Deals"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs text-slate-500">Phone number</label>
-            <input
-              className="w-full store-outline px-3 py-2 text-sm"
-              value={contactPhone}
-              onChange={(event) => setContactPhone(event.target.value)}
-              placeholder="0240000000"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs text-slate-500">WhatsApp number</label>
-            <input
-              className="w-full store-outline px-3 py-2 text-sm"
-              value={whatsappNumber}
-              onChange={(event) => setWhatsappNumber(event.target.value)}
-              placeholder="0240000000"
-            />
-          </div>
-
-          {applyMutation.isError && (
-            <div className="text-xs text-rose-600">{applyMutation.error instanceof Error ? applyMutation.error.message : "Unable to submit application"}</div>
-          )}
-          {applyMutation.isSuccess && (
-            <div className="text-xs text-emerald-700">Application submitted. You can track status on your agent dashboard.</div>
-          )}
 
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => applyMutation.mutate()}
-              disabled={applyMutation.isLoading || !storefrontName.trim() || !contactPhone.trim() || !whatsappNumber.trim()}
-              className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
-            >
-              {applyMutation.isLoading ? "Submitting..." : "Submit application"}
-            </button>
-            <Link href="/agent/dashboard" className="store-outline px-4 py-2 text-sm">
-              Open agent dashboard
+            <Link href="/profile" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm">
+              Open profile dashboard
+            </Link>
+            <Link href="/login" className="store-outline px-4 py-2 text-sm">
+              Sign in
             </Link>
           </div>
         </div>

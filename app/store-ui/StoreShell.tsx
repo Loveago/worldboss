@@ -12,15 +12,12 @@ const navItems = [
   { label: "Shop", href: "/shop", icon: "🛍️" },
   { label: "Categories", href: "/categories", icon: "🧭" },
   { label: "Data", href: "/data", icon: "📶" },
-  { label: "Agents", href: "/agents", icon: "🏪" },
-  { label: "Profile", href: "/profile", icon: "👤" },
   { label: "Request Design", href: "/request-design", icon: "🎨" },
 ];
 
 const bottomNav = [
   { label: "Home", href: "/", icon: "🏠" },
   { label: "Shop", href: "/shop", icon: "🛍️" },
-  { label: "Agents", href: "/agents", icon: "🏪" },
   { label: "Data", href: "/data", icon: "📶" },
   { label: "Cart", href: "/cart", icon: "🧺" },
 ];
@@ -32,6 +29,7 @@ type AuthProfile = {
   name?: string | null;
   phone?: string | null;
   createdAt?: string;
+  agentStatus?: "PENDING" | "APPROVED" | "REJECTED" | null;
 };
 
 export default function StoreShell({
@@ -86,6 +84,19 @@ export default function StoreShell({
 
   const user = profileQuery.isSuccess ? profileQuery.data : null;
   const isAdmin = user?.role === "ADMIN";
+  const showAgentNav = Boolean(user && user.agentStatus && user.agentStatus !== "REJECTED");
+
+  const desktopNavItems = [
+    ...navItems,
+    ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "🏪" }] : []),
+    ...(user ? [{ label: "Profile", href: "/profile", icon: "👤" }] : []),
+  ];
+
+  const mobileNavItems = [
+    ...bottomNav,
+    ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "🏪" }] : []),
+    ...(user ? [{ label: "Profile", href: "/profile", icon: "👤" }] : []),
+  ];
 
   return (
     <div className="store-shell min-h-screen">
@@ -121,7 +132,7 @@ export default function StoreShell({
                 </label>
 
                 <div className="hidden 2xl:flex items-center gap-1.5 text-sm text-slate-600">
-                  {navItems.map((item) => (
+                  {desktopNavItems.map((item) => (
                     <Link key={`top-${item.href}`} href={item.href} className="px-2.5 py-1.5 rounded-full hover:bg-white transition">
                       {item.label}
                     </Link>
@@ -185,7 +196,7 @@ export default function StoreShell({
 
           <nav className="hidden md:flex items-center justify-center gap-2 text-sm mt-3 px-1 relative z-10">
             <div className="store-glass px-2 py-1.5 flex items-center gap-2 w-fit">
-              {navItems.map((item) => (
+              {desktopNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -215,7 +226,7 @@ export default function StoreShell({
 
       <div className="md:hidden fixed bottom-3 left-3 right-3 z-40">
         <div className="store-glass px-3 py-2.5 flex items-center justify-around text-[11px] shadow-[0_18px_35px_rgba(75,86,140,0.22)]">
-          {bottomNav.map((item) => (
+          {mobileNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

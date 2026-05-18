@@ -2,11 +2,14 @@ import { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { profileUpdateSchema } from "@/lib/validators";
+import { getAgentProfile } from "@/lib/agents";
 import { fail, ok, unauthorized } from "@/lib/response";
 
 export async function GET(req: NextRequest) {
   const { user } = await getUserFromRequest(req);
   if (!user) return unauthorized();
+  const agentProfile = getAgentProfile(user.addresses);
+
   return ok({
     id: user.id,
     email: user.email,
@@ -14,6 +17,7 @@ export async function GET(req: NextRequest) {
     name: user.name,
     phone: user.phone,
     createdAt: user.createdAt,
+    agentStatus: agentProfile?.status || null,
   });
 }
 

@@ -15,6 +15,17 @@ type ProfilePayload = {
   createdAt: string;
 };
 
+type AgentDashboardOverview = {
+  hasApplication: boolean;
+  isApproved: boolean;
+  profile: {
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    storefrontSlug: string;
+    storefrontName: string;
+  } | null;
+  storefrontLink: string | null;
+};
+
 type WalletTransaction = {
   id: string;
   amount: number;
@@ -92,6 +103,9 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [depositAmount, setDepositAmount] = useState("");
+  const [storefrontName, setStorefrontName] = useState("");
+  const [agentPhone, setAgentPhone] = useState("");
+  const [agentWhatsapp, setAgentWhatsapp] = useState("");
 
   const profileQuery = useQuery<ProfileOverview>({
     queryKey: ["profile-overview"],
@@ -101,6 +115,12 @@ export default function ProfilePage() {
   const profile = profileQuery.data?.profile;
   const wallet = profileQuery.data?.wallet;
   const orderData = profileQuery.data?.orders;
+
+  const agentDashboardQuery = useQuery<AgentDashboardOverview>({
+    queryKey: ["agent-dashboard"],
+    queryFn: () => apiFetch<AgentDashboardOverview>("/api/agent/dashboard"),
+    enabled: Boolean(profile),
+  });
 
   useEffect(() => {
     if (!profile) return;
@@ -133,6 +153,19 @@ export default function ProfilePage() {
     },
   });
 
+  const applyAgentMutation = useMutation({
+    mutationFn: (payload: { storefrontName: string; contactPhone: string; whatsappNumber: string }) =>
+      apiFetch<{ storefrontSlug: string; status: string }>("/api/agents/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agent-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["auth-profile"] });
+    },
+  });
+
   const errorMessage = profileQuery.isError
     ? profileQuery.error instanceof Error
       ? profileQuery.error.message
@@ -161,6 +194,7 @@ export default function ProfilePage() {
   };
 
   const parsedDepositAmount = Number(depositAmount);
+  const agentData = agentDashboardQuery.data;
 
   return (
     <div className="space-y-6">
@@ -374,6 +408,86 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </section>
+
+            <section className="store-card p-5 space-y-3">
+              <h2 className="font-sora text-lg text-slate-900">Agent program</h2>
+
+              {agentDashboardQuery.isLoading && <div className="text-sm text-slate-500">Loading agent status...</div>}
+
+              {agentDashboardQuery.isError && (
+                <div className="text-xs text-rose-600">
+                  {agentDashboardQuery.error instanceof Error ? agentDashboardQuery.error.message : "Unable to load agent status."}
+                </div>
+              )}
+
+              {!agentDashboardQuery.isLoading && !agentDashboardQuery.isError && agentData && !agentData.hasApplication && (
+                <div className="space-y-3">
+                  <p className="text-sm text-slate-600">Apply here to become a Corelly data agent and get your storefront link.</p>
+                  <div className="space-y-2">
+                    <label className="text-xs text-slate-500">Storefront name</label>
+                    <input
+                      className="w-full store-outline px-3 py-2 text-sm"
+                      value={storefrontName}
+                      onChange={(event) => setStorefrontName(event.target.value)}
+                      placeholder="Kwame Data Deals"
+                    />
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      className="w-full store-outline px-3 py-2 text-sm"
+                      value={agentPhone}
+                      onChange={(event) => setAgentPhone(event.target.value)}
+                      placeholder="Phone number"
+                    />
+                    <input
+                      className="w-full store-outline px-3 py-2 text-sm"
+                      value={agentWhatsapp}
+                      onChange={(event) => setAgentWhatsapp(event.target.value)}
+                      placeholder="WhatsApp number"
+                    />
+                  </div>
+                  {applyAgentMutation.isError && (
+                    <div className="text-xs text-rose-600">
+                      {applyAgentMutation.error instanceof Error ? applyAgentMutation.error.message : "Unable to submit application."}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      applyAgentMutation.mutate({
+                        storefrontName: storefrontName.trim(),
+                        contactPhone: agentPhone.trim(),
+                        whatsappNumber: agentWhatsapp.trim(),
+                      })
+                    }
+                    disabled={
+                      applyAgentMutation.isLoading || !storefrontName.trim() || !agentPhone.trim() || !agentWhatsapp.trim()
+                    }
+                    className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
+                  >
+                    {applyAgentMutation.isLoading ? "Submitting..." : "Apply to become an agent"}
+                  </button>
+                </div>
+              )}
+
+              {!agentDashboardQuery.isLoading && !agentDashboardQuery.isError && agentData?.hasApplication && (
+                <div className="space-y-2 text-sm text-slate-600">
+                  <div>
+                    Status: <span className="font-semibold text-slate-900">{agentData.profile?.status}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link href="/agent/dashboard" className="store-outline px-3 py-1.5 text-xs">
+                      Open agent dashboard
+                    </Link>
+                    {agentData.storefrontLink && (
+                      <Link href={agentData.storefrontLink} className="store-outline px-3 py-1.5 text-xs">
+                        Open storefront
+                      </Link>
+                    )}
+                  </div>
                 </div>
               )}
             </section>
