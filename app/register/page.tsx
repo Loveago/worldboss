@@ -53,7 +53,7 @@ export default function RegisterPage() {
         <div className="absolute -bottom-24 right-10 h-36 w-36 rounded-full bg-amber-100 blur-3xl opacity-70 store-glow" />
         <div className="relative z-10 space-y-4">
           <span className="store-pill px-3 py-1 text-xs">Join the club</span>
-          <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Create your Boss Market account</h1>
+          <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Create your Corelly account</h1>
           <p className="text-sm text-slate-600">
             Save carts, unlock concierge support, and access members-only drops.
           </p>

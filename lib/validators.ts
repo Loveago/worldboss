@@ -73,6 +73,36 @@ export const dataPurchaseSchema = z.object({
   network: z.enum(["mtn", "telecel", "airteltigo"]),
   bundleId: z.string(),
   phone: z.string().min(9),
+  agentSlug: z.string().min(3).max(40).optional(),
+});
+
+export const agentApplySchema = z.object({
+  storefrontName: z.string().min(2),
+  contactPhone: z.string().min(9),
+  whatsappNumber: z.string().min(9),
+});
+
+export const agentStorefrontUpdateSchema = z.object({
+  storefrontName: z.string().min(2),
+  contactPhone: z.string().min(9),
+  whatsappNumber: z.string().min(9),
+  markups: z.record(z.string(), z.number().min(0).max(200)).optional(),
+});
+
+export const agentApplicationReviewSchema = z.object({
+  userId: z.string(),
+  action: z.enum(["APPROVE", "REJECT"]),
+});
+
+export const agentWithdrawalCreateSchema = z.object({
+  amount: z.number().min(50),
+  momoNumber: z.string().min(9),
+  momoName: z.string().min(2),
+  momoNetwork: z.enum(["mtn", "telecel", "airteltigo"]),
+});
+
+export const agentWithdrawalUpdateSchema = z.object({
+  action: z.enum(["PROCESS", "REJECT"]),
 });
 
 export const dataBundleSchema = z.object({

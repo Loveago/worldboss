@@ -169,7 +169,7 @@ export default function Page() {
         <div className="absolute -bottom-24 right-10 h-40 w-40 rounded-full bg-sky-200 blur-3xl opacity-70 store-glow" />
         <div className="relative z-10 grid gap-6 xl:gap-7 xl:grid-cols-[1fr_minmax(340px,0.92fr)_minmax(260px,0.72fr)] xl:items-stretch">
           <div className="space-y-5">
-            <span className="store-pill px-3 py-1 text-xs">Welcome to Boss Market 👋</span>
+            <span className="store-pill px-3 py-1 text-xs">Welcome to Corelly 👋</span>
             <h1 className="font-sora text-4xl md:text-5xl text-slate-900 leading-[1.06]">
               Discover. Download.
               <br />

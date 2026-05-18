@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import GridLayout from "../../(templates)/GridLayout";
 import { apiFetch } from "@/lib/api-client";
@@ -194,9 +195,14 @@ export default function AdminDataOrdersPage() {
     <GridLayout
       title="Data"
       actions={
-        <div className="text-xs text-slate-500">
-          <span>{filteredBundles.length}</span> <span>offers</span>
-        </div>
+        <>
+          <div className="text-xs text-slate-500">
+            <span>{filteredBundles.length}</span> <span>offers</span>
+          </div>
+          <Link href="/admin/agents" className="text-xs border border-slate-200 rounded-full px-3 py-1 bg-white hover:bg-slate-50">
+            Agent pricing & withdrawals
+          </Link>
+        </>
       }
     >
       <section className="card p-5 bg-white space-y-4 lg:col-span-2">

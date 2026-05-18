@@ -12,6 +12,7 @@ const navItems = [
   { label: "Shop", href: "/shop", icon: "🛍️" },
   { label: "Categories", href: "/categories", icon: "🧭" },
   { label: "Data", href: "/data", icon: "📶" },
+  { label: "Agents", href: "/agents", icon: "🏪" },
   { label: "Profile", href: "/profile", icon: "👤" },
   { label: "Request Design", href: "/request-design", icon: "🎨" },
 ];
@@ -19,7 +20,7 @@ const navItems = [
 const bottomNav = [
   { label: "Home", href: "/", icon: "🏠" },
   { label: "Shop", href: "/shop", icon: "🛍️" },
-  { label: "Profile", href: "/profile", icon: "�" },
+  { label: "Agents", href: "/agents", icon: "🏪" },
   { label: "Data", href: "/data", icon: "📶" },
   { label: "Cart", href: "/cart", icon: "🧺" },
 ];
@@ -104,7 +105,7 @@ export default function StoreShell({
                   <span className="text-base" aria-hidden>
                     ⚡
                   </span>
-                  <span>Boss Market</span>
+                  <span>Corelly</span>
                 </Link>
                 <span className="store-pill px-2 py-0.5 text-[10px]">Live</span>
               </div>
@@ -204,6 +205,13 @@ export default function StoreShell({
       </header>
 
       <main className="mx-auto max-w-6xl px-3 sm:px-4 py-6 md:py-8 pb-28">{children}</main>
+
+      <footer className="mx-auto max-w-6xl px-3 sm:px-4 pb-24 md:pb-8">
+        <div className="store-glass px-4 py-4 text-xs sm:text-sm text-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>Corelly · Contact: +233 24 000 0000</div>
+          <div>Email: support@corelly.app · WhatsApp: +233 24 000 0000</div>
+        </div>
+      </footer>
 
       <div className="md:hidden fixed bottom-3 left-3 right-3 z-40">
         <div className="store-glass px-3 py-2.5 flex items-center justify-around text-[11px] shadow-[0_18px_35px_rgba(75,86,140,0.22)]">

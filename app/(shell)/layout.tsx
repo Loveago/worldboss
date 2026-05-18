@@ -18,6 +18,7 @@ const navItems: NavItem[] = [
   { label: "Products", href: "/admin/products", icon: "🛍️" },
   { label: "Orders", href: "/admin/orders", icon: "🧾", badge: "+3" },
   { label: "Data Orders", href: "/admin/data", icon: "📶" },
+  { label: "Agents", href: "/admin/agents", icon: "🏪" },
   { label: "Categories", href: "/admin/categories", icon: "🗂️" },
   { label: "Users", href: "/admin/users", icon: "👥" },
   { label: "Payments", href: "/admin/payments", icon: "💳" },
