@@ -271,6 +271,7 @@ enum Channel {
 
 ## Paystack Setup
 - Env: `DATABASE_URL`, `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_WEBHOOK_SECRET` (for signature).
+- Optional env: `PAYSTACK_CALLBACK_BASE_URL` to force callback origin (recommended for Vercel preview/custom domain consistency).
 - Initiate: create Payment doc with `status='initiated'`, call Paystack initialize, return `authorization_url` + `reference`.
 - Verify: call Paystack verify, update Payment + Order status to `paid` on success.
 - Webhook: validate signature, log PaystackEvent, idempotently update Payment/Order.
@@ -283,6 +284,7 @@ PAYSTACK_PUBLIC_KEY=pk_test_xxx
 PAYSTACK_SECRET_KEY=sk_test_xxx
 PAYSTACK_WEBHOOK_SECRET=whsec_xxx
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+PAYSTACK_CALLBACK_BASE_URL=http://localhost:3000
 ```
 
 ## Seed Data (sample)

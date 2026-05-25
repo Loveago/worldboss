@@ -6,12 +6,9 @@ import { ok, fail } from "@/lib/response";
 import { getUserFromRequest } from "@/lib/auth";
 
 function resolveCallbackUrl(orderId: string, req: NextRequest) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL;
-  const base = appUrl
-    ? appUrl.startsWith("http")
-      ? appUrl
-      : `https://${appUrl}`
-    : req.nextUrl.origin;
+  const explicitBase = process.env.PAYSTACK_CALLBACK_BASE_URL;
+  const normalizeBase = (value: string) => (value.startsWith("http") ? value : `https://${value}`);
+  const base = explicitBase ? normalizeBase(explicitBase) : req.nextUrl.origin;
   return `${base}/payments/callback?orderId=${orderId}`;
 }
 
