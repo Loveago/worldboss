@@ -14,14 +14,28 @@ export async function POST(req: NextRequest) {
     return fail(verification.message || "Unable to verify payment", 400);
   }
   const status = verification.data.status === "success" ? "SUCCESS" : "FAILED";
-  await prisma.payment.update({ where: { reference }, data: { status } });
+  const payment = await prisma.payment.update({
+    where: { reference },
+    data: { status },
+    include: {
+      order: {
+        select: {
+          id: true,
+          deliveryInfo: true,
+        },
+      },
+    },
+  });
+  const metadataOrderId = verification.data.metadata?.orderId as string | undefined;
+  const orderId = metadataOrderId || payment.orderId;
+  const deliveryInfo = (payment.order?.deliveryInfo || {}) as Record<string, unknown>;
+  const storefrontSlug = typeof deliveryInfo.agentSlug === "string" ? deliveryInfo.agentSlug : undefined;
   if (status === "SUCCESS") {
-    const orderId = verification.data.metadata?.orderId as string | undefined;
     if (orderId) {
       await prisma.order.update({ where: { id: orderId }, data: { status: "PAID" } });
       await creditAgentCommissionForOrder(orderId, prisma);
       await submitDataOrderToEncart(orderId, prisma);
     }
   }
-  return ok({ status, verification });
+  return ok({ status, verification, storefrontSlug });
 }

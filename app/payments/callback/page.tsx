@@ -6,6 +6,7 @@ import { apiFetch } from "@/lib/api-client";
 
 type VerifyResponse = {
   status: "SUCCESS" | "FAILED";
+  storefrontSlug?: string;
   verification?: {
     data?: {
       reference?: string;
@@ -67,7 +68,7 @@ function PaymentCallbackContent() {
         if (!active) return;
 
         const verifiedOrderId = result.verification?.data?.metadata?.orderId || orderIdFromQuery;
-        const storefrontSlug = result.verification?.data?.metadata?.agentSlug;
+        const storefrontSlug = result.verification?.data?.metadata?.agentSlug || result.storefrontSlug;
         const currency = result.verification?.data?.currency || "GHS";
         const amount = typeof result.verification?.data?.amount === "number" ? result.verification.data.amount / 100 : undefined;
         const params = new URLSearchParams();
