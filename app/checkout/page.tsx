@@ -104,7 +104,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({ orderId: order.id }),
         });
         clear();
-        router.push("/orders?paid=wallet");
+        router.push(`/receipts?orderId=${order.id}&payment=wallet&status=success`);
         return;
       }
 

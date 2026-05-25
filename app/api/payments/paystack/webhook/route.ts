@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyWebhookSignature } from "@/lib/paystack";
 import { creditAgentCommissionForOrder } from "@/lib/agent-commission";
+import { submitDataOrderToEncart } from "@/lib/encart";
 import { ok, fail } from "@/lib/response";
 
 export async function POST(req: NextRequest) {
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
     if (orderId) {
       await prisma.order.update({ where: { id: orderId }, data: { status: "PAID" } }).catch(() => null);
       await creditAgentCommissionForOrder(orderId, prisma).catch(() => null);
+      await submitDataOrderToEncart(orderId, prisma).catch(() => null);
     }
   }
   return ok({ received: true });

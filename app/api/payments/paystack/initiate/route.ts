@@ -5,6 +5,16 @@ import { paystack } from "@/lib/paystack";
 import { ok, fail } from "@/lib/response";
 import { getUserFromRequest } from "@/lib/auth";
 
+function resolveCallbackUrl(orderId: string, req: NextRequest) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL;
+  const base = appUrl
+    ? appUrl.startsWith("http")
+      ? appUrl
+      : `https://${appUrl}`
+    : req.nextUrl.origin;
+  return `${base}/payments/callback?orderId=${orderId}`;
+}
+
 export async function POST(req: NextRequest) {
   const { user, payload } = await getUserFromRequest(req);
   const body = await req.json().catch(() => null);
@@ -23,11 +33,13 @@ export async function POST(req: NextRequest) {
   }
 
   const amountKobo = Math.round(Number(order.total) * 100);
+  const callbackUrl = resolveCallbackUrl(order.id, req);
   const init = await paystack.transaction.initialize({
     amount: amountKobo.toString(),
     email,
     currency: "GHS",
     reference: `BM-${order.id}-${Date.now()}`,
+    callback_url: callbackUrl,
     metadata: {
       orderId: order.id,
       userId: user?.id || order.userId,
