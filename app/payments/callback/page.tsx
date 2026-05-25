@@ -14,6 +14,7 @@ type VerifyResponse = {
       paid_at?: string;
       metadata?: {
         orderId?: string;
+        agentSlug?: string;
       };
       customer?: {
         email?: string;
@@ -66,6 +67,7 @@ function PaymentCallbackContent() {
         if (!active) return;
 
         const verifiedOrderId = result.verification?.data?.metadata?.orderId || orderIdFromQuery;
+        const storefrontSlug = result.verification?.data?.metadata?.agentSlug;
         const currency = result.verification?.data?.currency || "GHS";
         const amount = typeof result.verification?.data?.amount === "number" ? result.verification.data.amount / 100 : undefined;
         const params = new URLSearchParams();
@@ -77,6 +79,11 @@ function PaymentCallbackContent() {
         if (typeof amount === "number" && !Number.isNaN(amount)) params.set("amount", amount.toString());
         if (result.verification?.data?.paid_at) params.set("paidAt", result.verification.data.paid_at);
         if (result.verification?.data?.customer?.email) params.set("email", result.verification.data.customer.email);
+
+        if (storefrontSlug) {
+          router.replace(`/agents/storefront/${storefrontSlug}/receipt?${params.toString()}`);
+          return;
+        }
 
         router.replace(`/receipts?${params.toString()}`);
       } catch (err) {

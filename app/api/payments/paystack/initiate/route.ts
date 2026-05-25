@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) return fail("Order not found", 404);
   const deliveryInfo = (order.deliveryInfo || {}) as Record<string, unknown>;
+  const storefrontSlug = typeof deliveryInfo.agentSlug === "string" ? deliveryInfo.agentSlug : undefined;
   const isGuestStorefrontDataOrder =
     deliveryInfo.type === "DATA" && typeof deliveryInfo.agentSlug === "string" && Boolean(deliveryInfo.agentSlug);
 
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
       orderId: order.id,
       userId: user?.id || order.userId,
       guestCheckout: isGuestStorefrontDataOrder,
+      ...(storefrontSlug ? { agentSlug: storefrontSlug } : {}),
     },
   });
   if (!init.data) {
