@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api-client";
 
@@ -23,7 +23,19 @@ type VerifyResponse = {
   };
 };
 
-export default function PaymentCallbackPage() {
+function PaymentCallbackCard({ error }: { error?: string | null }) {
+  return (
+    <div className="mx-auto max-w-xl px-4 py-14">
+      <div className="store-card p-6 space-y-3 text-center">
+        <h1 className="font-sora text-xl text-slate-900">Confirming your payment</h1>
+        <p className="text-sm text-slate-600">Please wait while we verify your transaction and prepare your receipt.</p>
+        {error && <p className="text-sm text-rose-600">{error}</p>}
+      </div>
+    </div>
+  );
+}
+
+function PaymentCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -80,13 +92,13 @@ export default function PaymentCallbackPage() {
     };
   }, [reference, orderIdFromQuery, router]);
 
+  return <PaymentCallbackCard error={error} />;
+}
+
+export default function PaymentCallbackPage() {
   return (
-    <div className="mx-auto max-w-xl px-4 py-14">
-      <div className="store-card p-6 space-y-3 text-center">
-        <h1 className="font-sora text-xl text-slate-900">Confirming your payment</h1>
-        <p className="text-sm text-slate-600">Please wait while we verify your transaction and prepare your receipt.</p>
-        {error && <p className="text-sm text-rose-600">{error}</p>}
-      </div>
-    </div>
+    <Suspense fallback={<PaymentCallbackCard />}>
+      <PaymentCallbackContent />
+    </Suspense>
   );
 }
