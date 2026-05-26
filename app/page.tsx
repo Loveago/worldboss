@@ -76,6 +76,33 @@ const categoryThemes: CategoryTheme[] = [
   },
 ];
 
+const mobileWhyCards = [
+  {
+    icon: "⬇️",
+    title: "Instant Downloads",
+    copy: "Get your files immediately",
+    tint: "from-sky-50 to-indigo-50",
+  },
+  {
+    icon: "🛡️",
+    title: "Secure Checkout",
+    copy: "100% safe payments",
+    tint: "from-emerald-50 to-teal-50",
+  },
+  {
+    icon: "🏅",
+    title: "Top Quality",
+    copy: "Trusted & verified",
+    tint: "from-violet-50 to-fuchsia-50",
+  },
+  {
+    icon: "💗",
+    title: "Creator Support",
+    copy: "We are here for you",
+    tint: "from-rose-50 to-pink-50",
+  },
+];
+
 const heroHighlights = [
   {
     badge: "NEW",
@@ -163,8 +190,78 @@ export default function Page() {
   }, [themedCategories.length]);
 
   return (
-    <div className="space-y-12">
-      <section className="store-hero p-5 md:p-8 xl:p-10 relative overflow-hidden">
+    <div className="space-y-10 md:space-y-12">
+      <section className="md:hidden space-y-4">
+        <div className="store-hero p-4 relative overflow-hidden">
+          <div className="absolute -top-10 -left-8 h-24 w-24 rounded-full bg-fuchsia-200/70 blur-3xl" aria-hidden />
+          <div className="absolute -bottom-10 -right-6 h-24 w-24 rounded-full bg-sky-200/70 blur-3xl" aria-hidden />
+
+          <div className="relative z-10 space-y-3.5">
+            <span className="store-pill px-3 py-1 text-[11px] inline-flex">👋 Welcome to Corelly</span>
+
+            <div className="grid grid-cols-[1.1fr_0.9fr] gap-2 items-center">
+              <div className="space-y-2">
+                <h1 className="font-sora text-[2.1rem] leading-[0.95] text-slate-900">
+                  Discover.
+                  <br />
+                  Download.
+                  <br />
+                  <span className="text-[var(--store-accent)]">Level up.</span>
+                </h1>
+                <p className="text-[13px] leading-relaxed text-slate-600">
+                  Curated gadgets, digital kits, templates, and data bundles delivered fast.
+                </p>
+              </div>
+              <div className="relative h-[170px] rounded-[28px] bg-gradient-to-b from-violet-100 via-white to-orange-100 border border-white/80 shadow-[0_18px_36px_rgba(98,102,241,0.2)]">
+                <div className="absolute inset-0 flex items-center justify-center text-[76px]">🚀</div>
+                <span className="absolute top-3 right-3 text-xl">⭐</span>
+                <span className="absolute bottom-3 left-4 text-base">✨</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-[11px] text-slate-600">
+              <span className="store-outline px-3 py-1">⚡ Instant downloads</span>
+              <span className="store-outline px-3 py-1">🔒 Secure checkout</span>
+              <span className="store-outline px-3 py-1">⭐ Top quality</span>
+              <span className="store-outline px-3 py-1">💜 Creator support</span>
+            </div>
+
+            <Link
+              href="/shop"
+              className="w-full rounded-full bg-gradient-to-r from-[var(--store-accent)] to-violet-500 text-white px-4 py-3 text-sm font-semibold shadow-[0_16px_30px_rgba(91,92,230,0.3)] inline-flex items-center justify-between"
+            >
+              <span>Shop products</span>
+              <span className="h-7 w-7 rounded-full bg-white/90 text-[var(--store-accent)] inline-flex items-center justify-center">→</span>
+            </Link>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/request-design" className="store-outline px-3.5 py-2.5 text-sm text-center bg-white/92">
+                ✨ Request a design
+              </Link>
+              <Link href="/data" className="store-outline px-3.5 py-2.5 text-sm text-center bg-sky-50/90">
+                📶 Buy data
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-sora text-[1.7rem] text-slate-900 leading-none px-1">Why you&apos;ll love Corelly</h2>
+          <div className="grid grid-cols-4 gap-2">
+            {mobileWhyCards.map((card) => (
+              <div key={card.title} className={`store-card p-2.5 text-center bg-gradient-to-b ${card.tint}`}>
+                <div className="text-2xl mb-1" aria-hidden>
+                  {card.icon}
+                </div>
+                <div className="text-[11px] font-semibold text-slate-900 leading-tight">{card.title}</div>
+                <div className="text-[10px] text-slate-600 mt-1 leading-tight">{card.copy}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="store-hero p-5 md:p-8 xl:p-10 relative overflow-hidden hidden md:block">
         <div className="absolute -top-16 -left-10 h-32 w-32 rounded-full bg-fuchsia-200 blur-3xl opacity-70 store-glow" />
         <div className="absolute -bottom-24 right-10 h-40 w-40 rounded-full bg-sky-200 blur-3xl opacity-70 store-glow" />
         <div className="relative z-10 grid gap-6 xl:gap-7 xl:grid-cols-[1fr_minmax(340px,0.92fr)_minmax(260px,0.72fr)] xl:items-stretch">
@@ -393,7 +490,7 @@ export default function Page() {
         )}
       </section>
 
-      <section className="store-card px-4 py-4 md:px-6 md:py-5 grid gap-4 md:grid-cols-[1fr_auto] items-center">
+      <section className="store-card px-4 py-4 md:px-6 md:py-5 hidden md:grid gap-4 md:grid-cols-[1fr_auto] items-center">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center md:text-left">
           <div>
             <div className="text-sm font-semibold text-slate-900">🚚 Fast delivery</div>

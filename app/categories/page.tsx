@@ -141,30 +141,30 @@ export default function CategoriesPage() {
     : null;
 
   return (
-    <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+    <div className="space-y-5 md:space-y-6">
+      <section className="store-glass p-4 md:p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <span className="store-pill px-3 py-1 text-xs">Storefront categories</span>
-            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Discover collections made for your workflow.</h1>
-            <p className="text-sm md:text-base text-slate-600">
+            <span className="store-pill px-3 py-1 text-[11px] md:text-xs">Storefront categories</span>
+            <h1 className="font-sora text-[1.7rem] leading-[1.04] md:text-3xl text-slate-900">Discover collections made for your workflow.</h1>
+            <p className="text-[13px] md:text-base text-slate-600">
               Explore curated bundles for creators, teams, and everyday essentials. Browse the collections or jump
               straight into the shop.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/shop" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm">
+          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
+            <Link href="/shop" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2.5 text-sm text-center">
               Browse all products
             </Link>
-            <Link href="/request-design" className="store-outline px-4 py-2 text-sm bg-white/80">
+            <Link href="/request-design" className="store-outline px-4 py-2.5 text-sm bg-white/80 text-center">
               Request a design
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
+      <section className="store-card p-0 overflow-hidden hidden md:block">
         <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           <div className="px-4 py-4">
             <div className="text-[11px] uppercase tracking-wide text-slate-500">Top categories</div>
@@ -184,9 +184,26 @@ export default function CategoriesPage() {
         </div>
       </section>
 
+      <section className="md:hidden">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Categories</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{themedCategories.length}</div>
+          </div>
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Subgroups</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{totalSubcategories}</div>
+          </div>
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Status</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{categoriesQuery.isLoading && !hasCategories ? "..." : "Live"}</div>
+          </div>
+        </div>
+      </section>
+
       {errorMessage && <div className="store-card p-4 text-sm text-rose-600">{errorMessage}</div>}
 
-      <section className="space-y-4">
+      <section className="space-y-3 md:space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-sora text-xl text-slate-900">Browse categories</h2>
@@ -194,12 +211,12 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {themedCategories.map((category, index) => (
             <Link
               key={category.id}
               href={hasCategories ? `/categories/${category.slug}` : "/shop"}
-              className="group relative overflow-hidden store-card p-5 transition hover:-translate-y-1"
+              className="group relative overflow-hidden store-card p-4 md:p-5 transition hover:-translate-y-1"
               style={{ animationDelay: `${index * 90}ms` }}
             >
               <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition ${category.theme.gradient}`} />

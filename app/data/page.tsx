@@ -233,21 +233,26 @@ export default function DataPage() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+      <section className="store-glass p-4 md:p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <span className="store-pill px-3 py-1 text-xs">Instant data bundles</span>
-            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Buy data in minutes.</h1>
-            <p className="text-sm text-slate-600">Choose a network, pick a bundle, and complete payment securely.</p>
+            <span className="store-pill px-3 py-1 text-[11px] md:text-xs">Instant data bundles</span>
+            <h1 className="font-sora text-[1.7rem] leading-[1.04] md:text-3xl text-slate-900">Buy data in minutes.</h1>
+            <p className="text-[13px] md:text-sm text-slate-600">Choose a network, pick a bundle, and complete payment securely.</p>
           </div>
-          <Link href="/orders" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
-            View my orders
-          </Link>
+          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
+            <Link href="/orders" className="store-outline px-4 py-2.5 text-sm text-center bg-white/85">
+              View my orders
+            </Link>
+            <Link href="/shop" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2.5 text-sm text-center">
+              Shop products
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
+      <section className="store-card p-0 overflow-hidden hidden md:block">
         <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           <div className="px-4 py-4">
             <div className="text-[11px] uppercase tracking-wide text-slate-500">Total bundles</div>
@@ -263,6 +268,23 @@ export default function DataPage() {
             <div className="text-[11px] uppercase tracking-wide text-slate-500">Available now</div>
             <div className="mt-1 text-2xl font-semibold text-slate-900">{availableBundles.length}</div>
             <div className="text-xs text-slate-500">Bundles in this network</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="md:hidden">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Bundles</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{totalBundles}</div>
+          </div>
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Network</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{networkMeta[selectedNetwork].label}</div>
+          </div>
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Available</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{availableBundles.length}</div>
           </div>
         </div>
       </section>

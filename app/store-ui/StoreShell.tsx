@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -143,6 +144,7 @@ export default function StoreShell({
 }: {
   children: React.ReactNode;
 }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const isAgentStorefront = pathname.startsWith("/agents/storefront/");
   const queryClient = useQueryClient();
@@ -175,21 +177,14 @@ export default function StoreShell({
     ...(user ? [{ label: "Profile", href: "/profile", icon: "user" as NavIcon }] : []),
   ];
 
-  const mobileNavItems = [
-    ...bottomNav,
-    ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "store" as NavIcon }] : []),
-    ...(user ? [{ label: "Profile", href: "/profile", icon: "user" as NavIcon }] : []),
-  ];
+  const mobileNavItems = [...bottomNav];
+  const mobileQuickItems = [...navItems, ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "store" as NavIcon }] : [])];
 
   const sidebarItems = [
     ...desktopNavItems,
     ...(user ? [] : [{ label: "Sign in", href: "/login", icon: "lock" as NavIcon }]),
   ];
 
-  const activeMobileIndex = Math.max(
-    0,
-    mobileNavItems.findIndex((item) => isActive(item.href))
-  );
   const showMobileMiniCart =
     cartCount > 0 &&
     !isAgentStorefront &&
@@ -252,7 +247,102 @@ export default function StoreShell({
             </aside>
 
             <div className="min-w-0 space-y-4">
-              <header className="store-card px-4 py-3 md:px-5 md:py-4">
+              <section className="md:hidden space-y-3">
+                <div className="store-card px-3.5 py-3 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        className="h-10 w-10 rounded-xl border border-[var(--store-border)] bg-white inline-flex items-center justify-center text-slate-700"
+                        aria-label="Open menu"
+                      >
+                        <span className="inline-flex flex-col gap-1" aria-hidden>
+                          <span className="h-0.5 w-4 rounded-full bg-current" />
+                          <span className="h-0.5 w-4 rounded-full bg-current" />
+                          <span className="h-0.5 w-4 rounded-full bg-current" />
+                        </span>
+                      </button>
+                      <Link href="/" className="font-sora text-[1.65rem] font-semibold flex items-center gap-2 text-slate-900 leading-none">
+                        <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
+                          <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
+                        </span>
+                        <span>Corelly</span>
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <ThemeToggle className="store-outline px-3.5 py-2.5 text-xs font-medium" />
+                      <Link href="/cart" className="relative h-10 w-10 rounded-xl border border-[var(--store-border)] bg-white inline-flex items-center justify-center text-slate-600">
+                        <NavIconGlyph name="cart" className="h-4 w-4" />
+                        {cartCount > 0 && (
+                          <span className="absolute -top-1 -right-1 rounded-full bg-[var(--store-accent)] text-white text-[10px] min-w-[17px] h-[17px] px-1 inline-flex items-center justify-center">
+                            {cartCount}
+                          </span>
+                        )}
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="store-outline flex-1 flex items-center gap-2 px-3 py-2.5 bg-white/95 rounded-2xl">
+                      <span className="text-slate-500">
+                        <NavIconGlyph name="search" className="h-4 w-4" />
+                      </span>
+                      <input className="flex-1 bg-transparent text-sm outline-none" placeholder="Search gadgets, templates, data bundles..." />
+                    </label>
+                    <button type="button" className="h-11 w-11 rounded-2xl bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white inline-flex items-center justify-center shadow-[0_12px_20px_rgba(236,72,153,0.3)]" aria-label="Quick actions">
+                      ✨
+                    </button>
+                  </div>
+
+                  {user ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link href="/profile" className="store-outline px-4 py-2.5 text-sm text-center font-medium bg-white/90">
+                        Hi, {user.name || user.email.split("@")[0]}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => logoutMutation.mutate()}
+                        disabled={logoutMutation.isLoading}
+                        className="rounded-2xl bg-[var(--store-accent)] px-4 py-2.5 text-sm text-white font-semibold"
+                      >
+                        {logoutMutation.isLoading ? "Signing out..." : "Sign out"}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link href="/login" className="store-outline px-4 py-2.5 text-sm text-center font-medium bg-white/90">
+                        Sign in
+                      </Link>
+                      <Link href="/register" className="rounded-2xl bg-gradient-to-r from-[var(--store-accent)] to-violet-500 px-4 py-2.5 text-sm text-center text-white font-semibold shadow-[0_12px_22px_rgba(91,92,230,0.32)]">
+                        Register ✨
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="store-card px-2.5 py-2.5 overflow-x-auto no-scrollbar">
+                  <div className="flex items-center gap-2 min-w-max">
+                    {mobileQuickItems.map((item) => (
+                      <Link
+                        key={`mobile-nav-${item.href}`}
+                        href={item.href}
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs border transition whitespace-nowrap ${
+                          isActive(item.href)
+                            ? "border-[var(--store-accent)] bg-[var(--store-accent-soft)] text-[var(--store-accent)] font-semibold"
+                            : "border-[var(--store-border)] text-slate-600 bg-white"
+                        }`}
+                      >
+                        <NavIconGlyph name={item.icon} className="h-3.5 w-3.5" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <header className="store-card px-4 py-3 md:px-5 md:py-4 hidden md:block">
                 <div className="flex flex-wrap items-center gap-2.5 md:gap-3">
                   <label className="store-outline flex-1 min-w-[220px] flex items-center gap-2 px-3 py-2.5 bg-white/90">
                     <span className="text-slate-500">
@@ -295,27 +385,6 @@ export default function StoreShell({
                 </div>
               </header>
 
-              <section className="md:hidden -mt-2">
-                <div className="store-card px-3 py-2.5 overflow-x-auto no-scrollbar">
-                  <div className="flex items-center gap-2 min-w-max">
-                    {desktopNavItems.map((item) => (
-                      <Link
-                        key={`quick-${item.href}`}
-                        href={item.href}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition ${
-                          isActive(item.href)
-                            ? "border-[var(--store-accent)] bg-[var(--store-accent-soft)] text-[var(--store-accent)]"
-                            : "border-[var(--store-border)] text-slate-600 bg-white"
-                        }`}
-                      >
-                        <NavIconGlyph name={item.icon} className="h-3.5 w-3.5" />
-                        <span>{item.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </section>
-
               <main className="pb-28 md:pb-6">{children}</main>
 
               <footer className="store-card px-4 py-4 text-xs sm:text-sm text-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -324,6 +393,55 @@ export default function StoreShell({
               </footer>
             </div>
           </div>
+
+          {isMobileMenuOpen && (
+            <div className="md:hidden fixed inset-0 z-50">
+              <button type="button" className="absolute inset-0 bg-slate-900/35" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu" />
+              <div className="absolute left-0 top-0 h-full w-[86%] max-w-[320px] bg-white border-r border-[var(--store-border)] shadow-[0_22px_46px_rgba(17,24,39,0.2)] p-4 flex flex-col gap-4 overflow-y-auto">
+                <div className="flex items-center justify-between">
+                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-sora text-lg font-semibold flex items-center gap-2 text-slate-900">
+                    <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
+                      <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
+                    </span>
+                    <span>Corelly</span>
+                  </Link>
+                  <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="h-9 w-9 rounded-xl border border-[var(--store-border)] inline-flex items-center justify-center text-slate-600" aria-label="Close menu">
+                    ✕
+                  </button>
+                </div>
+
+                <nav className="space-y-2">
+                  {sidebarItems.map((item) => (
+                    <Link
+                      key={`drawer-${item.href}`}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition ${
+                        isActive(item.href)
+                          ? "border-[var(--store-accent)] bg-[var(--store-accent-soft)] text-[var(--store-accent)]"
+                          : "border-[var(--store-border)] bg-white text-slate-700"
+                      }`}
+                    >
+                      <span className="h-7 w-7 rounded-lg inline-flex items-center justify-center bg-slate-100/80">
+                        <NavIconGlyph name={item.icon} className="h-4 w-4" />
+                      </span>
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </Link>
+                  ))}
+                </nav>
+
+                {!user && (
+                  <Link
+                    href="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="rounded-xl bg-[var(--store-accent)] px-3 py-2.5 text-center text-sm font-semibold text-white"
+                  >
+                    Create account
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
 
           {showMobileMiniCart && (
             <div className="md:hidden fixed bottom-[86px] left-3 right-3 z-40">
@@ -352,19 +470,12 @@ export default function StoreShell({
           )}
 
           <div className="md:hidden fixed bottom-3 left-3 right-3 z-40">
-            <div className="relative overflow-hidden store-glass px-2 py-2 flex items-center gap-1 text-[11px] shadow-[0_22px_38px_rgba(52,64,126,0.24)] border border-white/60 backdrop-blur-2xl">
-              <span
-                className="absolute top-2 bottom-2 rounded-xl bg-white/85 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]"
-                style={{
-                  width: `${100 / mobileNavItems.length}%`,
-                  transform: `translateX(${activeMobileIndex * 100}%)`,
-                }}
-              />
+            <div className="rounded-[20px] border border-[var(--store-border)] bg-white/95 px-2 py-2 grid grid-cols-4 gap-1 shadow-[0_18px_34px_rgba(44,62,128,0.14)] backdrop-blur-xl">
               {mobileNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative z-10 flex-1 flex flex-col items-center gap-1 min-w-0 rounded-xl px-1 py-1.5 transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] active:scale-95 ${
+                  className={`relative flex flex-col items-center gap-1 min-w-0 rounded-xl px-1 py-1.5 transition-all duration-300 active:scale-95 ${
                     isActive(item.href) ? "text-[var(--store-accent)]" : "text-slate-500"
                   }`}
                 >
@@ -381,6 +492,7 @@ export default function StoreShell({
                     )}
                   </span>
                   <span className={`leading-none truncate max-w-full ${isActive(item.href) ? "font-semibold" : ""}`}>{item.label}</span>
+                  {isActive(item.href) && <span className="h-0.5 w-6 rounded-full bg-[var(--store-accent)]" />}
                 </Link>
               ))}
             </div>

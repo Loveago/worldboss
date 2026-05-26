@@ -65,24 +65,29 @@ export default function ShopPage() {
     : null;
 
   return (
-    <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+    <div className="space-y-5 md:space-y-6">
+      <section className="store-glass p-4 md:p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <span className="store-pill px-3 py-1 text-xs">Shop collection</span>
-            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Build your next drop.</h1>
-            <p className="text-sm text-slate-600">
+            <span className="store-pill px-3 py-1 text-[11px] md:text-xs">Shop collection</span>
+            <h1 className="font-sora text-[1.7rem] leading-[1.04] md:text-3xl text-slate-900">Build your next drop.</h1>
+            <p className="text-[13px] md:text-sm text-slate-600">
               Curated accessories, creative kits, and instant digital bundles tailored for busy teams.
             </p>
           </div>
-          <Link href="/cart" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
-            View cart
-          </Link>
+          <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
+            <Link href="/cart" className="store-outline px-4 py-2.5 text-sm text-center bg-white/85">
+              View cart
+            </Link>
+            <Link href="/categories" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2.5 text-sm text-center">
+              Categories
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
+      <section className="store-card p-0 overflow-hidden hidden md:block">
         <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           <div className="px-4 py-4">
             <div className="text-[11px] uppercase tracking-wide text-slate-500">Total products</div>
@@ -102,6 +107,23 @@ export default function ShopPage() {
         </div>
       </section>
 
+      <section className="md:hidden">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Products</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{totalProducts}</div>
+          </div>
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Showing</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{filteredProducts.length}</div>
+          </div>
+          <div className="store-card px-2.5 py-2 text-center">
+            <div className="text-[10px] uppercase tracking-wide text-slate-500">Categories</div>
+            <div className="text-sm font-semibold text-slate-900 mt-0.5">{categoriesCount}</div>
+          </div>
+        </div>
+      </section>
+
       <section className="store-card p-4 md:p-5 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-sora text-lg text-slate-900">Filter by category</h2>
@@ -109,11 +131,11 @@ export default function ShopPage() {
             Browse categories
           </Link>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar md:flex-wrap">
           <button
             type="button"
             onClick={() => setSelectedCategory("all")}
-            className={`px-3 py-1.5 text-sm rounded-full border transition ${
+            className={`px-3 py-1.5 text-sm rounded-full border transition whitespace-nowrap ${
               selectedCategory === "all"
                 ? "bg-[var(--store-accent)] text-white border-transparent"
                 : "border-[var(--store-border)] text-slate-600 bg-white"
@@ -126,7 +148,7 @@ export default function ShopPage() {
               key={category.id}
               type="button"
               onClick={() => setSelectedCategory(category.slug)}
-              className={`px-3 py-1.5 text-sm rounded-full border transition ${
+              className={`px-3 py-1.5 text-sm rounded-full border transition whitespace-nowrap ${
                 selectedCategory === category.slug
                   ? "bg-[var(--store-accent)] text-white border-transparent"
                   : "border-[var(--store-border)] text-slate-600 bg-white"
@@ -159,7 +181,7 @@ export default function ShopPage() {
         </div>
       ) : visibleProducts.length ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {visibleProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -169,7 +191,7 @@ export default function ShopPage() {
               <button
                 type="button"
                 onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-                className="store-outline px-4 py-2 text-sm"
+                className="rounded-full bg-gradient-to-r from-[var(--store-accent)] to-violet-500 text-white px-5 py-2 text-sm"
               >
                 Load more
               </button>
