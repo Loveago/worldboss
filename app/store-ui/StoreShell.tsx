@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { useCartStore } from "@/store/cart";
+import { formatCurrency } from "@/lib/format";
 import ThemeToggle from "../(shell)/components/ThemeToggle";
 
 type NavIcon = "sparkles" | "bag" | "grid" | "signal" | "palette" | "home" | "cart" | "store" | "user" | "lock" | "search" | "bolt";
@@ -147,6 +148,7 @@ export default function StoreShell({
   const queryClient = useQueryClient();
   const items = useCartStore((state) => state.items);
   const cartCount = items.reduce((sum, item) => sum + item.qty, 0);
+  const cartSubtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
   const isActive = (href: string) => (href === "/" ? pathname === href : pathname.startsWith(href));
 
   const profileQuery = useQuery<AuthProfile>({
@@ -183,6 +185,18 @@ export default function StoreShell({
     ...desktopNavItems,
     ...(user ? [] : [{ label: "Sign in", href: "/login", icon: "lock" as NavIcon }]),
   ];
+
+  const activeMobileIndex = Math.max(
+    0,
+    mobileNavItems.findIndex((item) => isActive(item.href))
+  );
+  const showMobileMiniCart =
+    cartCount > 0 &&
+    !isAgentStorefront &&
+    !pathname.startsWith("/cart") &&
+    !pathname.startsWith("/checkout") &&
+    !pathname.startsWith("/payments") &&
+    !pathname.startsWith("/receipts");
 
   return (
     <div className="store-shell min-h-screen">
@@ -311,17 +325,54 @@ export default function StoreShell({
             </div>
           </div>
 
+          {showMobileMiniCart && (
+            <div className="md:hidden fixed bottom-[86px] left-3 right-3 z-40">
+              <div className="store-glass px-3 py-2.5 border border-white/65 shadow-[0_18px_34px_rgba(52,64,126,0.2)]">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wide text-slate-500">Cart ready</div>
+                    <div className="text-sm font-semibold text-slate-900">
+                      {cartCount} item{cartCount > 1 ? "s" : ""} · {formatCurrency(cartSubtotal)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Link href="/cart" className="store-outline px-3 py-1.5 text-xs bg-white/80 active:scale-95 transition-transform">
+                      View cart
+                    </Link>
+                    <Link
+                      href="/checkout"
+                      className="rounded-full bg-[var(--store-accent)] text-white px-3 py-1.5 text-xs active:scale-95 transition-transform"
+                    >
+                      Checkout
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="md:hidden fixed bottom-3 left-3 right-3 z-40">
-            <div className="store-glass px-2 py-2 flex items-center justify-between gap-1 text-[11px] shadow-[0_22px_38px_rgba(52,64,126,0.24)] border border-white/60 backdrop-blur-2xl">
+            <div className="relative overflow-hidden store-glass px-2 py-2 flex items-center gap-1 text-[11px] shadow-[0_22px_38px_rgba(52,64,126,0.24)] border border-white/60 backdrop-blur-2xl">
+              <span
+                className="absolute top-2 bottom-2 rounded-xl bg-white/85 transition-transform duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]"
+                style={{
+                  width: `${100 / mobileNavItems.length}%`,
+                  transform: `translateX(${activeMobileIndex * 100}%)`,
+                }}
+              />
               {mobileNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex flex-col items-center gap-1 min-w-[56px] rounded-xl px-2 py-1.5 transition ${
-                    isActive(item.href) ? "text-[var(--store-accent)] bg-white/80" : "text-slate-500"
+                  className={`relative z-10 flex-1 flex flex-col items-center gap-1 min-w-0 rounded-xl px-1 py-1.5 transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] active:scale-95 ${
+                    isActive(item.href) ? "text-[var(--store-accent)]" : "text-slate-500"
                   }`}
                 >
-                  <span className={`relative leading-none rounded-lg p-1.5 ${isActive(item.href) ? "bg-[var(--store-accent-soft)]" : "bg-slate-100/70"}`}>
+                  <span
+                    className={`relative leading-none rounded-lg p-1.5 transition-colors duration-300 ${
+                      isActive(item.href) ? "bg-[var(--store-accent-soft)]" : "bg-slate-100/70"
+                    }`}
+                  >
                     <NavIconGlyph name={item.icon} className="h-[17px] w-[17px]" />
                     {item.href === "/cart" && cartCount > 0 && (
                       <span className="absolute -top-1 -right-2 rounded-full bg-[var(--store-accent)] text-white text-[9px] min-w-[15px] h-[15px] px-1 inline-flex items-center justify-center">
@@ -329,7 +380,7 @@ export default function StoreShell({
                       </span>
                     )}
                   </span>
-                  <span className={`leading-none ${isActive(item.href) ? "font-semibold" : ""}`}>{item.label}</span>
+                  <span className={`leading-none truncate max-w-full ${isActive(item.href) ? "font-semibold" : ""}`}>{item.label}</span>
                 </Link>
               ))}
             </div>
