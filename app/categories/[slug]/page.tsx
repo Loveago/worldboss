@@ -40,6 +40,7 @@ export default function CategoryDetailPage() {
     if (!category) return [];
     return products.filter((product) => product.category?.slug === category.slug);
   }, [category, products]);
+  const totalProducts = relatedProducts.length;
 
   const errorMessage = categoriesQuery.isError
     ? categoriesQuery.error instanceof Error
@@ -49,19 +50,35 @@ export default function CategoryDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="font-sora text-2xl text-slate-900">
-            {category ? category.name : "Category"}
-          </h1>
-          <p className="text-sm text-slate-600">
-            {category ? "Browse the latest picks in this category." : "Select a category to explore products."}
-          </p>
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="font-sora text-2xl text-slate-900">{category ? category.name : "Category"}</h1>
+            <p className="text-sm text-slate-600">
+              {category ? "Browse the latest picks in this category." : "Select a category to explore products."}
+            </p>
+          </div>
+          <Link href="/categories" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+            All categories
+          </Link>
         </div>
-        <Link href="/categories" className="store-outline px-4 py-2 text-sm w-fit">
-          All categories
-        </Link>
-      </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Category status</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{category ? "Found" : "Missing"}</div>
+            <div className="text-xs text-slate-500">Slug: {slug || "-"}</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Products in category</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalProducts}</div>
+            <div className="text-xs text-slate-500">Matching storefront items</div>
+          </div>
+        </div>
+      </section>
 
       {errorMessage && <div className="store-card p-4 text-sm text-rose-600">{errorMessage}</div>}
 

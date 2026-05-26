@@ -46,11 +46,12 @@ export default function RequestDesignPage() {
 
   return (
     <div className="space-y-6">
-      <div className="store-card p-6 md:p-8">
-        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Request a design</div>
-        <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="font-sora text-2xl text-slate-900">Need a bespoke look for your brand?</h1>
+            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Request a design</div>
+            <h1 className="font-sora text-2xl text-slate-900 mt-2">Need a bespoke look for your brand?</h1>
             <p className="text-sm text-slate-600 mt-2 max-w-xl">
               Share your vision and assets. Our design concierge will respond within 1 business day with next steps.
             </p>
@@ -60,7 +61,27 @@ export default function RequestDesignPage() {
             <span className="store-chip px-3 py-1 text-xs">Custom quotes</span>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Response time</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">1 business day</div>
+            <div className="text-xs text-slate-500">Average first reply</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Channels</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">2</div>
+            <div className="text-xs text-slate-500">WhatsApp & Telegram</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Service mode</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">Concierge</div>
+            <div className="text-xs text-slate-500">Tailored design support</div>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <div className="store-card p-6 space-y-5">
@@ -80,7 +101,7 @@ export default function RequestDesignPage() {
             <label className="block text-sm text-slate-600 space-y-2">
               <span>Name</span>
               <input
-                className="w-full rounded-2xl border border-[var(--store-border)] bg-white px-4 py-3 text-sm outline-none"
+                className="w-full store-outline bg-white px-4 py-3 text-sm outline-none"
                 value={form.name}
                 onChange={(event) => updateField("name", event.target.value)}
                 placeholder="Ama Mensah"
@@ -90,7 +111,7 @@ export default function RequestDesignPage() {
             <label className="block text-sm text-slate-600 space-y-2">
               <span>Phone or email</span>
               <input
-                className="w-full rounded-2xl border border-[var(--store-border)] bg-white px-4 py-3 text-sm outline-none"
+                className="w-full store-outline bg-white px-4 py-3 text-sm outline-none"
                 value={form.contact}
                 onChange={(event) => updateField("contact", event.target.value)}
                 placeholder="+233 54 000 0000"
@@ -108,7 +129,7 @@ export default function RequestDesignPage() {
                     className={`px-4 py-2 text-xs rounded-full border transition ${
                       form.channel === channel
                         ? "bg-[var(--store-accent)] text-white border-transparent"
-                        : "border-[var(--store-border)] text-slate-600"
+                        : "border-[var(--store-border)] text-slate-600 bg-white"
                     }`}
                   >
                     {channel === "whatsapp" ? "WhatsApp" : "Telegram"}

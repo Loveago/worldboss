@@ -50,6 +50,7 @@ export default function CheckoutPage() {
     () => items.reduce((sum, item) => sum + item.price * item.qty, 0),
     [items]
   );
+  const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
 
   const walletBalance = profileOverviewQuery.data?.wallet.balance ?? 0;
   const savedEmail = profileOverviewQuery.data?.profile.email ?? "";
@@ -129,15 +130,38 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="font-sora text-2xl text-slate-900">Checkout</h1>
-          <p className="text-sm text-slate-600">Confirm your details and pay securely.</p>
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="font-sora text-2xl text-slate-900">Checkout</h1>
+            <p className="text-sm text-slate-600">Confirm your details and pay securely.</p>
+          </div>
+          <Link href="/cart" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+            Back to cart
+          </Link>
         </div>
-        <Link href="/cart" className="store-outline px-4 py-2 text-sm w-fit">
-          Back to cart
-        </Link>
-      </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Items</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalItems}</div>
+            <div className="text-xs text-slate-500">Total quantity in cart</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total amount</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(subtotal)}</div>
+            <div className="text-xs text-slate-500">Checkout subtotal</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet balance</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(walletBalance)}</div>
+            <div className="text-xs text-slate-500">Available for wallet checkout</div>
+          </div>
+        </div>
+      </section>
 
       {items.length === 0 ? (
         <div className="store-card p-6 text-sm text-slate-600 space-y-3">

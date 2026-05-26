@@ -45,9 +45,8 @@ export default function LoginPage() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-start">
-      <section className="store-hero p-6 md:p-8 relative overflow-hidden">
-        <div className="absolute -top-16 left-6 h-28 w-28 rounded-full bg-emerald-100 blur-3xl opacity-70 store-glow" />
-        <div className="absolute -bottom-24 right-10 h-36 w-36 rounded-full bg-amber-100 blur-3xl opacity-70 store-glow" />
+      <section className="store-glass p-6 md:p-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
         <div className="relative z-10 space-y-4">
           <span className="store-pill px-3 py-1 text-xs">Welcome back</span>
           <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Sign in to Corelly</h1>
@@ -85,7 +84,7 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-2xl border border-[var(--store-border)] px-3 py-2 text-sm"
+            className="w-full store-outline px-3 py-2 text-sm"
             placeholder="you@email.com"
           />
         </div>
@@ -95,7 +94,7 @@ export default function LoginPage() {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-2xl border border-[var(--store-border)] px-3 py-2 text-sm"
+            className="w-full store-outline px-3 py-2 text-sm"
             placeholder="••••••••"
           />
         </div>

@@ -143,6 +143,7 @@ export default function DataPage() {
     () => bundles.filter((bundle) => bundle.network === selectedNetwork),
     [bundles, selectedNetwork]
   );
+  const totalBundles = bundles.length;
 
   const showBundleSkeleton = bundlesQuery.isLoading && !hasRemoteBundles;
 
@@ -232,7 +233,41 @@ export default function DataPage() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <section className="rounded-2xl md:rounded-3xl bg-[#1f2a44] border border-slate-700 p-2 md:p-3 overflow-x-auto">
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2 max-w-2xl">
+            <span className="store-pill px-3 py-1 text-xs">Instant data bundles</span>
+            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Buy data in minutes.</h1>
+            <p className="text-sm text-slate-600">Choose a network, pick a bundle, and complete payment securely.</p>
+          </div>
+          <Link href="/orders" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+            View my orders
+          </Link>
+        </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total bundles</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalBundles}</div>
+            <div className="text-xs text-slate-500">Across all networks</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Selected network</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{networkMeta[selectedNetwork].label}</div>
+            <div className="text-xs text-slate-500">Currently active tab</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Available now</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{availableBundles.length}</div>
+            <div className="text-xs text-slate-500">Bundles in this network</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="store-card p-3 overflow-x-auto">
         <div className="flex items-center gap-2 min-w-max">
           {networkTabs.map((network) => {
             const active = selectedNetwork === network.id;
@@ -243,8 +278,8 @@ export default function DataPage() {
                 onClick={() => setSelectedNetwork(network.id)}
                 className={`rounded-xl px-3 py-2 text-xs md:text-sm font-medium border transition flex items-center gap-2 ${
                   active
-                    ? "bg-white text-slate-900 border-emerald-400 shadow-[0_10px_20px_rgba(15,23,42,0.22)]"
-                    : "bg-slate-700/45 text-slate-200 border-slate-600 hover:bg-slate-700"
+                    ? "bg-[var(--store-accent)] text-white border-[var(--store-accent)]"
+                    : "bg-white text-slate-700 border-[var(--store-border)] hover:bg-slate-50"
                 }`}
               >
                 <span>{networkMeta[network.id].tabIcon}</span>

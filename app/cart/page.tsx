@@ -15,18 +15,42 @@ export default function CartPage() {
     () => items.reduce((sum, item) => sum + item.price * item.qty, 0),
     [items]
   );
+  const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="font-sora text-2xl text-slate-900">Your cart</h1>
-          <p className="text-sm text-slate-600">Review items and proceed to checkout.</p>
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="font-sora text-2xl text-slate-900">Your cart</h1>
+            <p className="text-sm text-slate-600">Review items and proceed to checkout.</p>
+          </div>
+          <Link href="/shop" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+            Continue shopping
+          </Link>
         </div>
-        <Link href="/shop" className="store-outline px-4 py-2 text-sm w-fit">
-          Continue shopping
-        </Link>
-      </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Line items</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{items.length}</div>
+            <div className="text-xs text-slate-500">Unique products</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total quantity</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalItems}</div>
+            <div className="text-xs text-slate-500">Items in basket</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Subtotal</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(subtotal)}</div>
+            <div className="text-xs text-slate-500">Before checkout fees</div>
+          </div>
+        </div>
+      </section>
 
       {items.length === 0 ? (
         <div className="store-card p-6 text-sm text-slate-600 space-y-3">

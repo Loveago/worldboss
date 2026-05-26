@@ -132,6 +132,7 @@ export default function CategoriesPage() {
       }),
     [displayCategories]
   );
+  const totalSubcategories = themedCategories.reduce((sum, category) => sum + category.childCount, 0);
 
   const errorMessage = categoriesQuery.isError
     ? categoriesQuery.error instanceof Error
@@ -140,49 +141,45 @@ export default function CategoriesPage() {
     : null;
 
   return (
-    <div className="space-y-8">
-      <section className="relative overflow-hidden store-card p-6 md:p-8">
-        <div className="absolute -top-20 right-4 h-40 w-40 rounded-full bg-amber-100 blur-3xl opacity-70 store-glow" />
-        <div className="absolute -bottom-24 left-10 h-48 w-48 rounded-full bg-emerald-100 blur-3xl opacity-70 store-glow" />
-        <div className="relative z-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div className="space-y-4">
+    <div className="space-y-6">
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2 max-w-2xl">
             <span className="store-pill px-3 py-1 text-xs">Storefront categories</span>
-            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">
-              Discover collections made for your workflow.
-            </h1>
+            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Discover collections made for your workflow.</h1>
             <p className="text-sm md:text-base text-slate-600">
               Explore curated bundles for creators, teams, and everyday essentials. Browse the collections or jump
               straight into the shop.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/shop" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm">
-                Browse all products
-              </Link>
-              <Link href="/request-design" className="store-outline px-4 py-2 text-sm">
-                Request a design
-              </Link>
-            </div>
-            {categoriesQuery.isLoading && !hasCategories && (
-              <div className="text-xs text-slate-500">Syncing live categories...</div>
-            )}
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div
-              className="store-card p-4 bg-white/80 space-y-2 store-fade-up"
-              style={{ animationDelay: "120ms" }}
-            >
-              <div className="text-xs text-slate-500">Spotlight</div>
-              <div className="text-lg font-semibold text-slate-900">Creator-ready drops</div>
-              <div className="text-xs text-slate-500">Updated weekly with new merch.</div>
-            </div>
-            <div
-              className="store-card p-4 bg-white/80 space-y-2 store-fade-up"
-              style={{ animationDelay: "220ms" }}
-            >
-              <div className="text-xs text-slate-500">Data hub</div>
-              <div className="text-lg font-semibold text-slate-900">Instant bundles</div>
-              <div className="text-xs text-slate-500">Top up MTN, Telecel &amp; AirtelTigo.</div>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/shop" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm">
+              Browse all products
+            </Link>
+            <Link href="/request-design" className="store-outline px-4 py-2 text-sm bg-white/80">
+              Request a design
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Top categories</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{themedCategories.length}</div>
+            <div className="text-xs text-slate-500">Primary collections</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Subcategories</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalSubcategories}</div>
+            <div className="text-xs text-slate-500">Nested groups available</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Catalog status</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{categoriesQuery.isLoading && !hasCategories ? "..." : "Live"}</div>
+            <div className="text-xs text-slate-500">Synced from storefront</div>
           </div>
         </div>
       </section>

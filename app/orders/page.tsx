@@ -27,18 +27,43 @@ export default function OrdersPage() {
       : "Unable to load orders right now."
     : null;
   const isUnauthorized = errorMessage?.toLowerCase().includes("unauthorized");
+  const paidOrders = orders.filter((order) => order.status === "PAID" || order.status === "SHIPPED" || order.status === "DELIVERED").length;
+  const totalSpent = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="font-sora text-2xl text-slate-900">Your orders</h1>
-          <p className="text-sm text-slate-600">Track purchases and delivery updates.</p>
+      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+        <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="font-sora text-2xl text-slate-900">Your orders</h1>
+            <p className="text-sm text-slate-600">Track purchases and delivery updates.</p>
+          </div>
+          <Link href="/shop" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+            Continue shopping
+          </Link>
         </div>
-        <Link href="/shop" className="store-outline px-4 py-2 text-sm w-fit">
-          Continue shopping
-        </Link>
-      </div>
+      </section>
+
+      <section className="store-card p-0 overflow-hidden">
+        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total orders</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{orders.length}</div>
+            <div className="text-xs text-slate-500">Orders recorded</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Completed / in progress</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{paidOrders}</div>
+            <div className="text-xs text-slate-500">Paid, shipped, delivered</div>
+          </div>
+          <div className="px-4 py-4">
+            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total spend</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(totalSpent)}</div>
+            <div className="text-xs text-slate-500">Across all orders</div>
+          </div>
+        </div>
+      </section>
 
       {ordersQuery.isLoading && <div className="store-card p-4 text-sm text-slate-500">Loading orders...</div>}
 
