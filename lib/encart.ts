@@ -102,13 +102,23 @@ async function encartFetch(path: string, init?: RequestInit) {
   return body;
 }
 
+/**
+ * Submit a data order to Encart.
+ *
+ * Status flow (dataStatus set independently from order.status):
+ *   PENDING   → order placed, awaiting payment
+ *   PLACED    → submitted to Encart, waiting for provider
+ *   PROCESSING→ Encart webhook confirms provider is processing
+ *   DELIVERED → Encart webhook confirms delivery
+ *   FAILED    → Encart webhook confirms failure
+ */
 export async function submitDataOrderToEncart(orderId: string, prisma: PrismaClient) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) return;
 
   const deliveryInfo = ((order.deliveryInfo || {}) as JsonMap) || {};
   if (deliveryInfo.type !== "DATA") return;
-  if (order.status === "DELIVERED" || order.status === "CANCELED") return;
+  if (order.dataStatus === "DELIVERED" || order.dataStatus === "FAILED") return;
   if (typeof deliveryInfo.encartReference === "string" && deliveryInfo.encartReference) return;
 
   const bundleId = typeof deliveryInfo.bundleId === "string" ? deliveryInfo.bundleId : "";
@@ -166,7 +176,7 @@ export async function submitDataOrderToEncart(orderId: string, prisma: PrismaCli
     await prisma.order.update({
       where: { id: order.id },
       data: {
-        status: "SHIPPED",
+        dataStatus: "PLACED",
         deliveryInfo: nextInfo,
       },
     });
@@ -195,6 +205,15 @@ export function isValidEncartWebhookSignature(rawBody: string, signature?: strin
   return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
 }
 
+/**
+ * Apply an Encart webhook event to a data order.
+ *
+ * Maps Encart events to dataStatus (not order.status):
+ *   order.placed     → PLACED
+ *   order.processing → PROCESSING
+ *   order.delivered  → DELIVERED
+ *   order.failed     → FAILED
+ */
 export async function applyEncartWebhookEvent(event: EncartEvent, prisma: PrismaClient) {
   const eventName = event.event || "";
   const reference = event.data?.reference || "";
@@ -214,6 +233,31 @@ export async function applyEncartWebhookEvent(event: EncartEvent, prisma: Prisma
   const deliveryInfo = ((order.deliveryInfo || {}) as JsonMap) || {};
   if (deliveryInfo.type !== "DATA") return;
 
+  const eventStatus = event.data?.status || "";
+  // Determine next dataStatus from the Encart provider status
+  let nextDataStatus: "PLACED" | "PROCESSING" | "DELIVERED" | "FAILED" | null = null;
+  if (
+    eventStatus === "delivered" ||
+    eventName === "order.delivered"
+  ) {
+    nextDataStatus = "DELIVERED";
+  } else if (
+    eventStatus === "failed" ||
+    eventName === "order.failed"
+  ) {
+    nextDataStatus = "FAILED";
+  } else if (
+    eventStatus === "processing" ||
+    eventName === "order.processing"
+  ) {
+    nextDataStatus = "PROCESSING";
+  } else if (
+    eventStatus === "placed" ||
+    eventName === "order.placed"
+  ) {
+    nextDataStatus = "PLACED";
+  }
+
   const nextInfo: JsonMap = {
     ...deliveryInfo,
     encartWebhookEvent: eventName,
@@ -223,11 +267,11 @@ export async function applyEncartWebhookEvent(event: EncartEvent, prisma: Prisma
     encartLastWebhook: asInputJson(event),
   };
 
-  if (eventName === "order.delivered") {
+  if (nextDataStatus === "DELIVERED") {
     await prisma.order.update({
       where: { id: order.id },
       data: {
-        status: "DELIVERED",
+        dataStatus: "DELIVERED",
         deliveryInfo: {
           ...nextInfo,
           encartDeliveredAt: event.timestamp || new Date().toISOString(),
@@ -237,11 +281,11 @@ export async function applyEncartWebhookEvent(event: EncartEvent, prisma: Prisma
     return;
   }
 
-  if (eventName === "order.failed") {
+  if (nextDataStatus === "FAILED") {
     await prisma.order.update({
       where: { id: order.id },
       data: {
-        status: "CANCELED",
+        dataStatus: "FAILED",
         deliveryInfo: {
           ...nextInfo,
           encartFailedAt: event.timestamp || new Date().toISOString(),
@@ -251,11 +295,11 @@ export async function applyEncartWebhookEvent(event: EncartEvent, prisma: Prisma
     return;
   }
 
-  if (eventName === "order.processing" || eventName === "order.placed") {
+  if (nextDataStatus) {
     await prisma.order.update({
       where: { id: order.id },
       data: {
-        status: "SHIPPED",
+        dataStatus: nextDataStatus,
         deliveryInfo: nextInfo as Prisma.InputJsonValue,
       },
     });

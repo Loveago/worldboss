@@ -28,10 +28,10 @@ export default function MobileDrawer({ open, onClose, navItems }: MobileDrawerPr
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-lg font-semibold text-slate-800">
             <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-[0_10px_20px_rgba(79,70,229,0.24)]">
-              BM
+              KL
             </span>
             <div>
-              <div>Boss Market</div>
+              <div>Korelly</div>
               <div className="text-xs text-slate-500">Team 1 · Free</div>
             </div>
           </div>

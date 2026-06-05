@@ -1,6 +1,6 @@
-# Boss Market – Architecture & Implementation Plan
+# Korelly – Architecture & Implementation Plan
 
-> UI adoption brief: reuse the provided dashboard shell (sidebar + header + cards + table styles) as the visual system. Replace content/logic with Boss Market features. Mobile-first with slide-in drawer on small screens. No new design systems.
+> UI adoption brief: reuse the provided dashboard shell (sidebar + header + cards + table styles) as the visual system. Replace content/logic with Korelly features. Mobile-first with slide-in drawer on small screens. No new design systems.
 
 ## Tech Stack (free-tier)
 - Next.js (App Router) + TypeScript

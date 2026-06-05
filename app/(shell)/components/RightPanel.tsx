@@ -16,7 +16,7 @@ export default function RightPanel() {
       <div className="card p-4 gradient-purple border border-[var(--admin-border)]">
         <div className="text-sm font-semibold text-slate-900">Upgrade plan</div>
         <p className="text-xs text-slate-700 mt-1">
-          Unlock analytics, automation, and priority support for Boss Market.
+          Unlock analytics, automation, and priority support for Korelly.
         </p>
         <button className="mt-3 w-full admin-btn justify-center">
           View plans

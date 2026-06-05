@@ -4,7 +4,7 @@ export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().min(2),
-  phone: z.string().optional(),
+  phone: z.string().min(9, "Phone number is required"),
 });
 
 export const adminUserCreateSchema = registerSchema.extend({
@@ -14,7 +14,7 @@ export const adminUserCreateSchema = registerSchema.extend({
 export const adminUserUpdateSchema = z.object({
   role: z.enum(["USER", "ADMIN"]).optional(),
   name: z.string().min(2).optional(),
-  phone: z.string().optional(),
+  phone: z.string().min(9).optional(),
 });
 
 export const loginSchema = z.object({
@@ -24,7 +24,7 @@ export const loginSchema = z.object({
 
 export const profileUpdateSchema = z.object({
   name: z.string().min(2),
-  phone: z.string().optional(),
+  phone: z.string().min(9).optional(),
 });
 
 export const walletDepositSchema = z.object({

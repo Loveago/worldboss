@@ -91,12 +91,15 @@ export default function RegisterPage() {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-xs text-slate-500">Phone (optional)</label>
+          <label className="text-xs text-slate-500">
+            Phone <span className="text-rose-500">*</span>
+          </label>
           <input
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
             className="w-full store-outline px-3 py-2 text-sm"
             placeholder="024 000 0000"
+            required
           />
         </div>
         <div className="space-y-2">
@@ -124,7 +127,7 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || !name.trim() || !email.trim() || !phone.trim() || !password}
           className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm w-full disabled:opacity-60"
         >
           {submitting ? "Creating account..." : "Create account"}

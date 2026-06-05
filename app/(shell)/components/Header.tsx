@@ -20,7 +20,7 @@ export default function Header({ onMenu }: HeaderProps) {
             ☰
           </button>
           <div className="hidden md:flex items-center gap-2 text-sm text-slate-500">
-            <span className="font-semibold text-slate-800">Boss Market Admin</span>
+            <span className="font-semibold text-slate-800">Korelly Admin</span>
             <span>•</span>
             <span>Team 1</span>
             <span className="admin-pill px-2 py-0.5 text-[10px]">Free</span>
@@ -47,7 +47,7 @@ export default function Header({ onMenu }: HeaderProps) {
               🔔
             </button>
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center font-semibold shadow-[0_10px_20px_rgba(79,70,229,0.28)]">
-              BM
+              KL
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-// Prisma schema for Boss Market (Postgres)
+// Prisma schema for Korelly (Postgres)
 
 generator client {
   provider = "prisma-client-js"
@@ -27,6 +27,14 @@ enum OrderStatus {
   CANCELED
 }
 
+enum DataOrderStatus {
+  PLACED
+  PENDING
+  PROCESSING
+  DELIVERED
+  FAILED
+}
+
 enum PaymentStatus {
   INITIATED
   SUCCESS
@@ -50,7 +58,7 @@ model User {
   passwordHash String
   role         Role     @default(USER)
   name         String
-  phone        String?
+  phone        String
   addresses    Json?
   orders       Order[]
   createdAt    DateTime @default(now())
@@ -85,15 +93,16 @@ model Product {
 }
 
 model Order {
-  id           String      @id @default(cuid())
+  id           String          @id @default(cuid())
   userId       String
-  user         User        @relation(fields: [userId], references: [id])
+  user         User            @relation(fields: [userId], references: [id])
   items        OrderItem[]
   total        Decimal
-  status       OrderStatus @default(PENDING)
+  status       OrderStatus     @default(PENDING)
+  dataStatus   DataOrderStatus?
   payment      Payment?
   deliveryInfo Json?
-  createdAt    DateTime    @default(now())
+  createdAt    DateTime        @default(now())
 }
 
 model OrderItem {
