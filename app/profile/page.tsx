@@ -35,6 +35,7 @@ type WalletTransaction = {
 };
 
 type OrderStatus = "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
+type DataOrderStatus = "PLACED" | "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED";
 
 type ProfileOverview = {
   profile: ProfilePayload;
@@ -63,6 +64,22 @@ type ProfileOverview = {
       itemCount: number;
     }>;
   };
+  dataOrders?: {
+    summary: {
+      total: number;
+      placed: number;
+      processing: number;
+      delivered: number;
+      failed: number;
+      pending: number;
+    };
+    recent: Array<{
+      id: string;
+      total: number;
+      dataStatus: DataOrderStatus;
+      createdAt: string;
+    }>;
+  };
 };
 
 const statusTone: Record<OrderStatus, string> = {
@@ -71,6 +88,30 @@ const statusTone: Record<OrderStatus, string> = {
   SHIPPED: "bg-sky-100 text-sky-700",
   DELIVERED: "bg-emerald-100 text-emerald-700",
   CANCELED: "bg-rose-100 text-rose-700",
+};
+
+const dataStatusTone: Record<DataOrderStatus, string> = {
+  PLACED: "bg-blue-100 text-blue-700",
+  PENDING: "bg-amber-100 text-amber-700",
+  PROCESSING: "bg-indigo-100 text-indigo-700",
+  DELIVERED: "bg-emerald-100 text-emerald-700",
+  FAILED: "bg-rose-100 text-rose-700",
+};
+
+const dataStatusProgress: Record<DataOrderStatus, number> = {
+  PLACED: 20,
+  PENDING: 40,
+  PROCESSING: 70,
+  DELIVERED: 100,
+  FAILED: 100,
+};
+
+const dataStatusProgressTone: Record<DataOrderStatus, string> = {
+  PLACED: "from-blue-400 to-blue-500",
+  PENDING: "from-amber-400 to-amber-500",
+  PROCESSING: "from-indigo-500 to-indigo-600",
+  DELIVERED: "from-emerald-500 to-emerald-600",
+  FAILED: "from-rose-500 to-rose-600",
 };
 
 const orderProgress: Record<OrderStatus, number> = {
@@ -117,6 +158,7 @@ export default function ProfilePage() {
   const profile = profileQuery.data?.profile;
   const wallet = profileQuery.data?.wallet;
   const orderData = profileQuery.data?.orders;
+  const dataOrderData = profileQuery.data?.dataOrders;
 
   const agentDashboardQuery = useQuery<AgentDashboardOverview>({
     queryKey: ["agent-dashboard"],
@@ -520,9 +562,14 @@ export default function ProfilePage() {
             <section className="store-card p-4 md:p-5 space-y-4 store-fade-up" style={{ animationDelay: "210ms" }}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-sora text-lg text-slate-900">Order tracking</h2>
-                <Link href="/orders" className="text-sm text-[var(--store-accent)]">
-                  View all orders
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/orders" className="text-sm text-[var(--store-accent)]">
+                    Product orders
+                  </Link>
+                  <Link href="/data-orders" className="text-sm text-[var(--store-accent)]">
+                    Data purchases
+                  </Link>
+                </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {orderCards.map((card) => (
@@ -538,34 +585,72 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-3">
-                {orderData.recent.length === 0 ? (
-                  <div className="text-sm text-slate-500">No orders yet. Start shopping to track your progress here.</div>
-                ) : (
-                  orderData.recent.map((order) => (
-                    <div key={order.id} className="store-outline rounded-2xl px-4 py-3 space-y-2.5 bg-white/75">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div>
-                          <div className="text-[11px] text-slate-500">Order ID</div>
-                          <div className="text-sm font-semibold text-slate-900">{order.id}</div>
-                        </div>
-                        <span className={`text-[10px] px-2 py-1 rounded-full ${statusTone[order.status]}`}>{order.status}</span>
+                {/* Product orders */}
+                {orderData.recent.length === 0 && (
+                  <div className="text-sm text-slate-500">No product orders yet. Start shopping to track your progress here.</div>
+                )}
+                {orderData.recent.map((order) => (
+                  <div key={order.id} className="store-outline rounded-2xl px-4 py-3 space-y-2.5 bg-white/75">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <div className="text-[11px] text-slate-500">Order ID</div>
+                        <div className="text-sm font-semibold text-slate-900">{order.id}</div>
                       </div>
-
-                      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full bg-gradient-to-r ${orderProgressTone[order.status]}`}
-                          style={{ width: `${orderProgress[order.status]}%` }}
-                        />
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
-                        <span>{order.itemCount} item(s)</span>
-                        <span>{formatCurrency(order.total)}</span>
-                        <span>{formatDate(order.createdAt)}</span>
-                        <span>Payment: {order.paymentStatus}</span>
-                      </div>
+                      <span className={`text-[10px] px-2 py-1 rounded-full ${statusTone[order.status]}`}>{order.status}</span>
                     </div>
-                  ))
+
+                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full bg-gradient-to-r ${orderProgressTone[order.status]}`}
+                        style={{ width: `${orderProgress[order.status]}%` }}
+                      />
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                      <span>{order.itemCount} item(s)</span>
+                      <span>{formatCurrency(order.total)}</span>
+                      <span>{formatDate(order.createdAt)}</span>
+                      <span>Payment: {order.paymentStatus}</span>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Data orders */}
+                {dataOrderData && dataOrderData.recent.length > 0 && (
+                  <>
+                    <div className="pt-2">
+                      <div className="text-sm font-semibold text-slate-900">Data purchases</div>
+                      <div className="text-xs text-slate-500">Status is updated automatically by the provider.</div>
+                    </div>
+                    {dataOrderData.recent.map((order) => (
+                      <div key={order.id} className="store-outline rounded-2xl px-4 py-3 space-y-2.5 bg-white/75">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <div className="text-[11px] text-slate-500">Data Order ID</div>
+                            <div className="text-sm font-semibold text-slate-900">{order.id}</div>
+                          </div>
+                          <span className={`text-[10px] px-2 py-1 rounded-full ${dataStatusTone[order.dataStatus]}`}>{order.dataStatus}</span>
+                        </div>
+
+                        <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full bg-gradient-to-r ${dataStatusProgressTone[order.dataStatus]}`}
+                            style={{ width: `${dataStatusProgress[order.dataStatus]}%` }}
+                          />
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+                          <span>Data bundle</span>
+                          <span>{formatCurrency(order.total)}</span>
+                          <span>{formatDate(order.createdAt)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {orderData.recent.length === 0 && (!dataOrderData || dataOrderData.recent.length === 0) && (
+                  <div className="text-sm text-slate-500">No orders yet. Start shopping to track your progress here.</div>
                 )}
               </div>
             </section>

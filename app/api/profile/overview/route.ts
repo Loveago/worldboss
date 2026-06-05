@@ -6,6 +6,12 @@ import { ok, unauthorized } from "@/lib/response";
 
 const successfulOrderStatuses = new Set(["PAID", "SHIPPED", "DELIVERED"]);
 
+/** Check if the order is a data-only purchase (not a physical product order) */
+function isDataOrder(deliveryInfo: unknown): boolean {
+  if (!deliveryInfo || typeof deliveryInfo !== "object") return false;
+  return (deliveryInfo as Record<string, unknown>).type === "DATA";
+}
+
 export async function GET(req: NextRequest) {
   const { user } = await getUserFromRequest(req);
   if (!user) return unauthorized();
@@ -29,7 +35,12 @@ export async function GET(req: NextRequest) {
     }))
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
-  const shoppingOrders = orders.filter((order) => !isWalletTopupOrder(order.deliveryInfo));
+  // Separate data orders from product orders for stats
+  const shoppingOrders = orders.filter(
+    (order) => !isWalletTopupOrder(order.deliveryInfo) && !isDataOrder(order.deliveryInfo)
+  );
+  const dataOrders = orders.filter((order) => isDataOrder(order.deliveryInfo));
+
   const totalSpent = shoppingOrders.reduce((sum, order) => {
     const hasPaidStatus = successfulOrderStatuses.has(order.status);
     const paymentSuccess = order.payment?.status === "SUCCESS";
@@ -44,12 +55,31 @@ export async function GET(req: NextRequest) {
     canceled: shoppingOrders.filter((order) => order.status === "CANCELED").length,
   };
 
+  // Include data orders in the response with their dataStatus
+  const dataOrderSummary = {
+    total: dataOrders.length,
+    placed: dataOrders.filter((o) => o.dataStatus === "PLACED").length,
+    processing: dataOrders.filter((o) => o.dataStatus === "PROCESSING").length,
+    delivered: dataOrders.filter((o) => o.dataStatus === "DELIVERED").length,
+    failed: dataOrders.filter((o) => o.dataStatus === "FAILED").length,
+    pending: dataOrders.filter((o) => !o.dataStatus || o.dataStatus === "PENDING").length,
+  };
+
   const recentOrders = shoppingOrders.slice(0, 8).map((order) => ({
     id: order.id,
     total: Number(order.total),
     status: order.status,
     createdAt: order.createdAt,
     itemCount: order.items.reduce((sum, item) => sum + item.qty, 0),
+    paymentStatus: order.payment?.status || "INITIATED",
+  }));
+
+  const dataRecent = dataOrders.slice(0, 8).map((order) => ({
+    id: order.id,
+    total: Number(order.total),
+    status: order.status,
+    dataStatus: order.dataStatus,
+    createdAt: order.createdAt,
     paymentStatus: order.payment?.status || "INITIATED",
   }));
 
@@ -74,6 +104,10 @@ export async function GET(req: NextRequest) {
       summary: orderSummary,
       totalSpent,
       recent: recentOrders,
+    },
+    dataOrders: {
+      summary: dataOrderSummary,
+      recent: dataRecent,
     },
   });
 }

@@ -13,7 +13,18 @@ export async function GET(req: NextRequest) {
     include: { items: true, payment: true, user: true },
     orderBy: { createdAt: "desc" },
   });
-  return ok(orders);
+
+  // Attach computed data for frontend — all orders include deliveryInfo.type + dataStatus
+  const enriched = orders.map((o) => {
+    const info = (o.deliveryInfo || {}) as Record<string, unknown>;
+    return {
+      ...o,
+      _orderType: info.type === "DATA" ? "DATA" : "PRODUCT",
+      _dataStatus: o.dataStatus || null,
+    };
+  });
+
+  return ok(enriched);
 }
 
 export async function POST(req: NextRequest) {

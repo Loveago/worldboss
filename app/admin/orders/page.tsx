@@ -13,6 +13,8 @@ type AdminOrder = {
   status: "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
   createdAt: string;
   user?: { name?: string | null; email: string } | null;
+  _orderType?: "DATA" | "PRODUCT";
+  _dataStatus?: string | null;
 };
 
 const statusOptions: AdminOrder["status"][] = ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELED"];
@@ -41,6 +43,7 @@ export default function AdminOrdersPage() {
   const ordersQuery = useQuery<AdminOrder[]>({
     queryKey: ["admin-orders"],
     queryFn: () => apiFetch<AdminOrder[]>("/api/orders"),
+    select: (data) => data.filter((o: AdminOrder) => o._orderType !== "DATA"),
   });
 
   const updateStatusMutation = useMutation({

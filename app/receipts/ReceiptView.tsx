@@ -10,6 +10,7 @@ type Order = {
   id: string;
   total: number;
   status: "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
+  dataStatus?: "PLACED" | "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED" | null;
   createdAt: string;
   payment?: {
     provider?: string;
@@ -121,7 +122,11 @@ export default function ReceiptView({
 
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Order status</span>
-              <span className="text-slate-900">{humanize(orderStatus)}</span>
+              <span className="text-slate-900">
+                {order?.deliveryInfo?.type === "DATA" && order?.dataStatus
+                  ? humanize(order.dataStatus)
+                  : humanize(orderStatus)}
+              </span>
             </div>
 
             <div className="flex items-center justify-between">

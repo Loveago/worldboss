@@ -19,6 +19,13 @@ const navItems = [
   { label: "Request Design", href: "/request-design", icon: "palette" as NavIcon },
 ];
 
+/** Signed-in user utility links shown in sidebar below main nav */
+const userNavItems = [
+  { label: "Profile", href: "/profile", icon: "user" as NavIcon },
+  { label: "Orders", href: "/orders", icon: "bag" as NavIcon },
+  { label: "Data Orders", href: "/data-orders", icon: "signal" as NavIcon },
+];
+
 const bottomNav = [
   { label: "Home", href: "/", icon: "home" as NavIcon },
   { label: "Shop", href: "/shop", icon: "bag" as NavIcon },
@@ -174,11 +181,15 @@ export default function StoreShell({
   const desktopNavItems = [
     ...navItems,
     ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "store" as NavIcon }] : []),
-    ...(user ? [{ label: "Profile", href: "/profile", icon: "user" as NavIcon }] : []),
+    ...(user ? userNavItems : []),
   ];
 
   const mobileNavItems = [...bottomNav];
-  const mobileQuickItems = [...navItems, ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "store" as NavIcon }] : [])];
+  const mobileQuickItems = [
+    ...navItems,
+    ...(user ? userNavItems : []),
+    ...(showAgentNav ? [{ label: "Agents", href: "/agent/dashboard", icon: "store" as NavIcon }] : []),
+  ];
 
   const sidebarItems = [
     ...desktopNavItems,

@@ -22,10 +22,13 @@ type DataBundle = {
 
 const EMPTY_BUNDLES: DataBundle[] = [];
 
+type DataOrderStatus = "PLACED" | "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED";
+
 type DataOrder = {
   id: string;
   total: number | string;
   status: "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
+  dataStatus?: DataOrderStatus | null;
   createdAt: string;
   deliveryInfo?: {
     type?: string;
@@ -67,13 +70,13 @@ const toNumber = (value?: number | string | null) => {
   return typeof value === "string" ? Number(value) : value;
 };
 
-const statusBadge = (status: DataOrder["status"]) => {
-  const tones: Record<DataOrder["status"], string> = {
+const dataStatusBadge = (status: DataOrderStatus) => {
+  const tones: Record<DataOrderStatus, string> = {
+    PLACED: "bg-blue-100 text-blue-700",
     PENDING: "bg-amber-100 text-amber-700",
-    PAID: "bg-emerald-100 text-emerald-700",
-    SHIPPED: "bg-blue-100 text-blue-700",
-    DELIVERED: "bg-slate-900 text-white",
-    CANCELED: "bg-rose-100 text-rose-700",
+    PROCESSING: "bg-indigo-100 text-indigo-700",
+    DELIVERED: "bg-emerald-100 text-emerald-700",
+    FAILED: "bg-rose-100 text-rose-700",
   };
   return <span className={`px-2 py-1 text-xs rounded-full ${tones[status]}`}>{status}</span>;
 };
@@ -165,7 +168,7 @@ export default function AdminDataOrdersPage() {
           Bundle: bundle ? `${bundle.name} (${bundle.volume})` : order.deliveryInfo?.bundleId ?? "-",
           Phone: order.deliveryInfo?.phone ?? "-",
           Total: formatCurrency(toNumber(order.total)),
-          Status: statusBadge(order.status),
+          Status: dataStatusBadge(order.dataStatus ?? "PENDING"),
         };
       }),
     [orders, bundles]

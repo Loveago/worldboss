@@ -19,6 +19,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const json = await req.json().catch(() => null);
   const status = json?.status as any;
   if (!status) return fail("Status required", 400);
+
+  // Prevent admin from overwriting data order status — dataStatus is managed by Encart
+  const existing = await prisma.order.findUnique({ where: { id: params.id }, select: { deliveryInfo: true } });
+  const deliveryInfo = (existing?.deliveryInfo || {}) as Record<string, unknown>;
+  if (deliveryInfo.type === "DATA") {
+    return fail("Data order status is managed automatically by the provider", 400);
+  }
+
   const updated = await prisma.order.update({ where: { id: params.id }, data: { status } });
   return ok(updated);
 }

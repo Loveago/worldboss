@@ -13,6 +13,8 @@ type AdminOrder = {
   status: "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
   createdAt: string;
   user?: { name?: string | null; email: string } | null;
+  _orderType?: "DATA" | "PRODUCT";
+  _dataStatus?: string | null;
 };
 
 type AdminPayment = {
@@ -47,6 +49,8 @@ export default function AdminDashboardPage() {
     queryFn: () => apiFetch<AdminOrder[]>("/api/orders"),
   });
 
+  const productOrders = useMemo(() => (ordersQuery.data ?? []).filter((o) => o._orderType !== "DATA"), [ordersQuery.data]);
+
   const paymentsQuery = useQuery<AdminPayment[]>({
     queryKey: ["admin-payments"],
     queryFn: () => apiFetch<AdminPayment[]>("/api/payments"),
@@ -62,7 +66,7 @@ export default function AdminDashboardPage() {
     queryFn: () => apiFetch<AdminUser[]>("/api/users"),
   });
 
-  const orders = ordersQuery.data ?? [];
+  const orders = productOrders;
   const payments = paymentsQuery.data ?? [];
   const products = productsQuery.data ?? [];
   const users = usersQuery.data ?? [];

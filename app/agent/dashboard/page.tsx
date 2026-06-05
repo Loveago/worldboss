@@ -52,6 +52,37 @@ type DashboardPayload = {
   storefrontLink: string | null;
 };
 
+type StorefrontOrder = {
+  id: string;
+  total: number;
+  dataStatus: "PLACED" | "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED" | null;
+  createdAt: string;
+  deliveryInfo: {
+    network?: string | null;
+    bundleId?: string | null;
+    phone?: string | null;
+    basePrice?: number | null;
+    agentMarkup?: number | null;
+    guestCheckout?: boolean;
+  };
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+  } | null;
+  payment: {
+    reference: string;
+    status: string;
+  } | null;
+};
+
+const humanize = (value?: string | null) => {
+  if (!value) return "-";
+  return value
+    .replace(/[_-]/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 const networkLabel: Record<Exclude<NetworkFilter, "all">, string> = {
   mtn: "MTN",
   telecel: "Telecel",
@@ -74,7 +105,7 @@ export default function AgentDashboardPage() {
   const [momoNumber, setMomoNumber] = useState("");
   const [momoName, setMomoName] = useState("");
   const [momoNetwork, setMomoNetwork] = useState<"mtn" | "telecel" | "airteltigo">("mtn");
-  const [activeSection, setActiveSection] = useState<"overview" | "storefront" | "pricing" | "wallet" | "withdrawals">("overview");
+  const [activeSection, setActiveSection] = useState<"overview" | "storefront" | "pricing" | "wallet" | "withdrawals" | "orders">("overview");
   const [networkFilter, setNetworkFilter] = useState<NetworkFilter>("all");
   const [pricingSearch, setPricingSearch] = useState("");
   const [bundleSortKey, setBundleSortKey] = useState<BundleSortKey>("volume");
@@ -177,7 +208,13 @@ export default function AgentDashboardPage() {
     return rows;
   }, [bundleSortDirection, bundleSortKey, data?.bundles, markups, networkFilter, pricingSearch]);
 
-  const jumpTo = (section: "overview" | "storefront" | "pricing" | "wallet" | "withdrawals") => {
+  const ordersQuery = useQuery<StorefrontOrder[]>({
+    queryKey: ["agent-orders"],
+    queryFn: () => apiFetch<StorefrontOrder[]>("/api/agent/orders"),
+    enabled: Boolean(data?.isApproved),
+  });
+
+  const jumpTo = (section: "overview" | "storefront" | "pricing" | "wallet" | "withdrawals" | "orders") => {
     setActiveSection(section);
     const target = document.getElementById(`agent-${section}`);
     if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -241,6 +278,7 @@ export default function AgentDashboardPage() {
                     ["pricing", "Bundle pricing"],
                     ["wallet", "Wallet"],
                     ["withdrawals", "Withdrawals"],
+                    ["orders", "Orders"],
                   ] as const).map(([key, label]) => (
                     <button
                       key={key}
@@ -460,6 +498,87 @@ export default function AgentDashboardPage() {
                           </span>
                         </div>
                       ))
+                    )}
+                  </section>
+
+                  <section id="agent-orders" className="store-card p-4 md:p-5 space-y-3 store-fade-up" style={{ animationDelay: "310ms" }}>
+                    <h2 className="font-sora text-xl text-slate-900">Storefront orders</h2>
+                    <p className="text-xs text-slate-500">Orders placed on your storefront – status updates automatically.</p>
+
+                    {ordersQuery.isLoading && <div className="text-sm text-slate-500">Loading orders...</div>}
+                    {ordersQuery.isError && (
+                      <div className="text-xs text-rose-600">
+                        {ordersQuery.error instanceof Error ? ordersQuery.error.message : "Unable to load orders."}
+                      </div>
+                    )}
+
+                    {ordersQuery.isSuccess && ordersQuery.data.length === 0 && (
+                      <div className="text-sm text-slate-500">No orders yet. Share your storefront link to start receiving orders.</div>
+                    )}
+
+                    {ordersQuery.isSuccess && ordersQuery.data.length > 0 && (
+                      <div className="space-y-2">
+                        {ordersQuery.data.map((order) => (
+                          <div key={order.id} className="store-outline store-tile-lift rounded-2xl px-3 py-2.5 space-y-2">
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div>
+                                <div className="text-[11px] text-slate-500">Order ID</div>
+                                <div className="text-sm font-medium text-slate-900">#{order.id.slice(0, 8)}</div>
+                              </div>
+                              <span
+                                className={`text-[10px] px-2 py-1 rounded-full ${
+                                  order.dataStatus === "DELIVERED"
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : order.dataStatus === "FAILED"
+                                      ? "bg-rose-100 text-rose-700"
+                                      : order.dataStatus === "PROCESSING"
+                                        ? "bg-indigo-100 text-indigo-700"
+                                        : order.dataStatus === "PLACED"
+                                          ? "bg-blue-100 text-blue-700"
+                                          : "bg-amber-100 text-amber-700"
+                                }`}
+                              >
+                                {order.dataStatus || "PENDING"}
+                              </span>
+                            </div>
+                            <div className="grid gap-1.5 text-xs text-slate-600 sm:grid-cols-2">
+                              <div>
+                                <span className="text-slate-500">Customer: </span>
+                                <span className="font-medium text-slate-900">
+                                  {order.customer?.name || order.customer?.email || "Guest"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500">Phone: </span>
+                                <span className="font-medium text-slate-900">{order.customer?.phone || order.deliveryInfo.phone || "-"}</span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500">Network: </span>
+                                <span className="font-medium text-slate-900">{humanize(order.deliveryInfo.network)}</span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500">Amount: </span>
+                                <span className="font-medium text-slate-900">{formatCurrency(order.total)}</span>
+                              </div>
+                              <div>
+                                <span className="text-slate-500">Date: </span>
+                                <span className="font-medium text-slate-900">{new Date(order.createdAt).toLocaleDateString("en-GH", { year: "numeric", month: "short", day: "numeric" })}</span>
+                              </div>
+                              {order.payment && (
+                                <div>
+                                  <span className="text-slate-500">Payment: </span>
+                                  <span className="font-medium text-slate-900">{order.payment.status}</span>
+                                </div>
+                              )}
+                            </div>
+                            {order.deliveryInfo.agentMarkup != null && Number(order.deliveryInfo.agentMarkup) > 0 && (
+                              <div className="text-[11px] text-emerald-700 border-t border-slate-100 pt-1.5">
+                                Markup earned: +{formatCurrency(Number(order.deliveryInfo.agentMarkup))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </section>
                 </div>

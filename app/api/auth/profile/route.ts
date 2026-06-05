@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
     where: { id: user.id },
     data: {
       name: parsed.data.name,
-      phone: parsed.data.phone?.trim() || null,
+      ...(parsed.data.phone ? { phone: parsed.data.phone.trim() } : {}),
     },
     select: {
       id: true,

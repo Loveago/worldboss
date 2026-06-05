@@ -6,12 +6,16 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api-client";
 import { formatCurrency } from "@/lib/format";
 
+type DataOrderStatus = "PLACED" | "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED";
+
 type StoreOrder = {
   id: string;
   total: number;
   status: "PENDING" | "PAID" | "SHIPPED" | "DELIVERED" | "CANCELED";
   createdAt: string;
   items: Array<{ id: string; qty: number }>;
+  _orderType?: "DATA" | "PRODUCT";
+  _dataStatus?: DataOrderStatus | null;
 };
 
 export default function OrdersPage() {
@@ -27,8 +31,10 @@ export default function OrdersPage() {
       : "Unable to load orders right now."
     : null;
   const isUnauthorized = errorMessage?.toLowerCase().includes("unauthorized");
-  const paidOrders = orders.filter((order) => order.status === "PAID" || order.status === "SHIPPED" || order.status === "DELIVERED").length;
-  const totalSpent = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+  const productOrders = orders.filter((o) => o._orderType !== "DATA");
+  const dataOrders = orders.filter((o) => o._orderType === "DATA");
+  const paidOrders = productOrders.filter((order) => order.status === "PAID" || order.status === "SHIPPED" || order.status === "DELIVERED").length;
+  const totalSpent = productOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -102,8 +108,20 @@ export default function OrdersPage() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-sm">
-                <span className="store-pill px-3 py-1 text-xs">{order.status}</span>
-                <span className="text-slate-500">{order.items.length} items</span>
+                {order._orderType === "DATA" ? (
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    order._dataStatus === "DELIVERED" ? "bg-emerald-100 text-emerald-700" :
+                    order._dataStatus === "FAILED" ? "bg-rose-100 text-rose-700" :
+                    order._dataStatus === "PROCESSING" ? "bg-indigo-100 text-indigo-700" :
+                    order._dataStatus === "PLACED" ? "bg-blue-100 text-blue-700" :
+                    "bg-amber-100 text-amber-700"
+                  }`}>
+                    {order._dataStatus || "PENDING"}
+                  </span>
+                ) : (
+                  <span className="store-pill px-3 py-1 text-xs">{order.status}</span>
+                )}
+                <span className="text-slate-500">{order._orderType === "DATA" ? "Data bundle" : `${order.items.length} items`}</span>
                 <span className="font-semibold text-slate-900">{formatCurrency(Number(order.total))}</span>
               </div>
             </div>
