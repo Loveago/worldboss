@@ -91,6 +91,14 @@ export default function AdminDataOrdersPage() {
   const ordersQuery = useQuery<DataOrder[]>({
     queryKey: ["admin-data-orders"],
     queryFn: () => apiFetch<DataOrder[]>("/api/data/orders"),
+    refetchInterval: (data) => {
+      const orders = data ?? [];
+      const hasActiveOrder = orders.some(
+        (order: DataOrder) => (order.dataStatus ?? "PENDING") !== "DELIVERED" && (order.dataStatus ?? "PENDING") !== "FAILED"
+      );
+      return hasActiveOrder ? 5000 : 15000;
+    },
+    refetchIntervalInBackground: true,
   });
 
   const bundlesQuery = useQuery<DataBundle[]>({

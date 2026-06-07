@@ -52,6 +52,12 @@ export default function DataOrdersPage() {
   const ordersQuery = useQuery<DataOrder[]>({
     queryKey: ["data-orders"],
     queryFn: () => apiFetch<DataOrder[]>("/api/data-orders"),
+    refetchInterval: (data) => {
+      const orders = data ?? [];
+      const hasActiveOrder = orders.some((order: DataOrder) => order.dataStatus !== "DELIVERED" && order.dataStatus !== "FAILED");
+      return hasActiveOrder ? 5000 : 15000;
+    },
+    refetchIntervalInBackground: true,
   });
 
   const orders = ordersQuery.data ?? [];
