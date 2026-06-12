@@ -399,8 +399,14 @@ export default function StoreShell({
               <main className="pb-28 md:pb-6">{children}</main>
 
               <footer className="store-card px-4 py-4 text-xs sm:text-sm text-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div>Corelly · Contact: +233 24 000 0000</div>
-                <div>Email: support@corelly.app · WhatsApp: +233 24 000 0000</div>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="font-medium text-slate-800">Corelly</span>
+                  <a href="tel:0547419727" className="hover:text-[var(--store-accent)] transition">0547419727</a>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <a href="mailto:officialkorelly@gmail.com" className="hover:text-[var(--store-accent)] transition">officialkorelly@gmail.com</a>
+                  <a href="https://chat.whatsapp.com/GbPWhbaiybQLFgDwcx2182?s=cl&p=a&mlu=1" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--store-accent)] transition">WhatsApp</a>
+                </div>
               </footer>
             </div>
           </div>

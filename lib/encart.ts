@@ -196,6 +196,98 @@ export async function submitDataOrderToEncart(orderId: string, prisma: PrismaCli
   }
 }
 
+/**
+ * Poll Encart for the current status of a single order by its provider reference.
+ *
+ * Expected endpoint: GET /purchase/{reference}
+ * Expected response shape: { status: "queued" | "placed" | "processing" | "delivered" | "failed", ... }
+ */
+export async function checkEncartOrderStatus(encartReference: string) {
+  try {
+    const body = await encartFetch(`/purchase/${encodeURIComponent(encartReference)}`);
+    const status = extractProviderStatus(body) || "";
+    return { status: status.toLowerCase(), raw: body };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Bulk-sync all outstanding data orders with Encart.
+ * Queries every order with dataStatus PLACED or PROCESSING that has an encartReference,
+ * polls Encart for the latest status, and updates the order.
+ */
+export async function syncOutstandingDataOrders(prisma: PrismaClient) {
+  const orders = await prisma.order.findMany({
+    where: {
+      dataStatus: { in: ["PLACED", "PROCESSING"] },
+      deliveryInfo: { path: ["encartReference"], not: Prisma.JsonNull },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 50,
+  });
+
+  const results = { checked: 0, updated: 0, failed: 0 };
+
+  for (const order of orders) {
+    const deliveryInfo = ((order.deliveryInfo || {}) as JsonMap) || {};
+    const ref = typeof deliveryInfo.encartReference === "string" ? deliveryInfo.encartReference : "";
+    if (!ref) continue;
+
+    results.checked++;
+    const poll = await checkEncartOrderStatus(ref);
+    if (!poll) {
+      results.failed++;
+      continue;
+    }
+
+    const s = poll.status;
+    let nextDataStatus: "PLACED" | "PROCESSING" | "DELIVERED" | "FAILED" | null = null;
+    if (s === "delivered") nextDataStatus = "DELIVERED";
+    else if (s === "failed") nextDataStatus = "FAILED";
+    else if (s === "processing") nextDataStatus = "PROCESSING";
+    else if (s === "placed" || s === "queued") nextDataStatus = "PLACED";
+
+    if (!nextDataStatus || nextDataStatus === order.dataStatus) continue;
+
+    const nextInfo: JsonMap = {
+      ...deliveryInfo,
+      encartStatus: s,
+      encartPolledAt: new Date().toISOString(),
+      encartPollResponse: asInputJson(poll.raw),
+    };
+
+    if (nextDataStatus === "DELIVERED") {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          dataStatus: "DELIVERED",
+          deliveryInfo: { ...nextInfo, encartDeliveredAt: new Date().toISOString() },
+        },
+      });
+    } else if (nextDataStatus === "FAILED") {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          dataStatus: "FAILED",
+          deliveryInfo: { ...nextInfo, encartFailedAt: new Date().toISOString() },
+        },
+      });
+    } else {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          dataStatus: nextDataStatus,
+          deliveryInfo: nextInfo as Prisma.InputJsonValue,
+        },
+      });
+    }
+    results.updated++;
+  }
+
+  return results;
+}
+
 export function isValidEncartWebhookSignature(rawBody: string, signature?: string | null) {
   if (!signature) return false;
   const expected = `sha256=${crypto.createHmac("sha256", ENCART_WEBHOOK_SECRET).update(rawBody).digest("hex")}`;
