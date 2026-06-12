@@ -218,13 +218,17 @@ export async function checkEncartOrderStatus(encartReference: string) {
  * polls Encart for the latest status, and updates the order.
  */
 export async function syncOutstandingDataOrders(prisma: PrismaClient) {
-  const orders = await prisma.order.findMany({
+  const candidates = await prisma.order.findMany({
     where: {
       dataStatus: { in: ["PLACED", "PROCESSING"] },
-      deliveryInfo: { path: ["encartReference"], not: Prisma.JsonNull },
     },
     orderBy: { createdAt: "asc" },
-    take: 50,
+    take: 100,
+  });
+
+  const orders = candidates.filter((o) => {
+    const info = (o.deliveryInfo || {}) as JsonMap;
+    return typeof info.encartReference === "string" && info.encartReference;
   });
 
   const results = { checked: 0, updated: 0, failed: 0 };
@@ -288,13 +292,29 @@ export async function syncOutstandingDataOrders(prisma: PrismaClient) {
   return results;
 }
 
-export function isValidEncartWebhookSignature(rawBody: string, signature?: string | null) {
-  if (!signature) return false;
-  const expected = `sha256=${crypto.createHmac("sha256", ENCART_WEBHOOK_SECRET).update(rawBody).digest("hex")}`;
+function computeWebhookSignature(rawBody: string) {
+  return crypto.createHmac("sha256", ENCART_WEBHOOK_SECRET).update(rawBody).digest("hex");
+}
+
+export function isValidEncartWebhookSignature(rawBody: string, signature?: string | null, opts?: { warn?: boolean }) {
+  if (!signature) {
+    if (opts?.warn) console.warn("[encart] Missing webhook signature");
+    return false;
+  }
+  const computed = computeWebhookSignature(rawBody);
+  const expected = `sha256=${computed}`;
+  const sig = signature.startsWith("sha256=") ? signature : `sha256=${signature}`;
   const expectedBuffer = Buffer.from(expected);
-  const signatureBuffer = Buffer.from(signature);
-  if (expectedBuffer.length !== signatureBuffer.length) return false;
-  return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+  const signatureBuffer = Buffer.from(sig);
+  if (expectedBuffer.length !== signatureBuffer.length) {
+    if (opts?.warn) console.warn("[encart] Webhook signature length mismatch");
+    return false;
+  }
+  const valid = crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+  if (!valid && opts?.warn) {
+    console.warn("[encart] Webhook signature mismatch. Expected:", expected, "Got:", sig);
+  }
+  return valid;
 }
 
 /**
@@ -309,45 +329,59 @@ export function isValidEncartWebhookSignature(rawBody: string, signature?: strin
 export async function applyEncartWebhookEvent(event: EncartEvent, prisma: PrismaClient) {
   const eventName = event.event || "";
   const reference = event.data?.reference || "";
-  if (!eventName || !reference) return;
+  if (!eventName || !reference) {
+    console.log("[encart-webhook] Ignored: missing eventName or reference", { eventName, reference });
+    return;
+  }
 
-  const order = await prisma.order.findFirst({
+  // Look up by encartReference without relying on Prisma JSON path equality,
+  // which can behave differently across DBs/versions.
+  const candidates = await prisma.order.findMany({
     where: {
-      deliveryInfo: {
-        path: ["encartReference"],
-        equals: reference,
-      },
+      dataStatus: { in: ["PLACED", "PROCESSING", "PENDING"] },
     },
+    orderBy: { createdAt: "desc" },
+    take: 100,
   });
 
-  if (!order) return;
+  const order = candidates.find((o) => {
+    const info = (o.deliveryInfo || {}) as JsonMap;
+    return info.encartReference === reference;
+  });
+
+  if (!order) {
+    console.warn("[encart-webhook] No matching order for reference:", reference, "event:", eventName);
+    return;
+  }
+
+  console.log("[encart-webhook] Found order", order.id, "for reference", reference, "event:", eventName);
 
   const deliveryInfo = ((order.deliveryInfo || {}) as JsonMap) || {};
-  if (deliveryInfo.type !== "DATA") return;
+  if (deliveryInfo.type !== "DATA") {
+    console.log("[encart-webhook] Order", order.id, "is not a DATA order, skipping.");
+    return;
+  }
 
   const eventStatus = event.data?.status || "";
-  // Determine next dataStatus from the Encart provider status
   let nextDataStatus: "PLACED" | "PROCESSING" | "DELIVERED" | "FAILED" | null = null;
-  if (
-    eventStatus === "delivered" ||
-    eventName === "order.delivered"
-  ) {
+  if (eventStatus === "delivered" || eventName === "order.delivered") {
     nextDataStatus = "DELIVERED";
-  } else if (
-    eventStatus === "failed" ||
-    eventName === "order.failed"
-  ) {
+  } else if (eventStatus === "failed" || eventName === "order.failed") {
     nextDataStatus = "FAILED";
-  } else if (
-    eventStatus === "processing" ||
-    eventName === "order.processing"
-  ) {
+  } else if (eventStatus === "processing" || eventName === "order.processing") {
     nextDataStatus = "PROCESSING";
-  } else if (
-    eventStatus === "placed" ||
-    eventName === "order.placed"
-  ) {
+  } else if (eventStatus === "placed" || eventName === "order.placed") {
     nextDataStatus = "PLACED";
+  }
+
+  if (!nextDataStatus) {
+    console.log("[encart-webhook] Unrecognized status/event for order", order.id, "— status:", eventStatus, "event:", eventName);
+    return;
+  }
+
+  if (nextDataStatus === order.dataStatus) {
+    console.log("[encart-webhook] Order", order.id, "already", order.dataStatus, "— no update needed.");
+    return;
   }
 
   const nextInfo: JsonMap = {
@@ -370,6 +404,7 @@ export async function applyEncartWebhookEvent(event: EncartEvent, prisma: Prisma
         },
       },
     });
+    console.log("[encart-webhook] Order", order.id, "updated to DELIVERED");
     return;
   }
 
@@ -384,16 +419,16 @@ export async function applyEncartWebhookEvent(event: EncartEvent, prisma: Prisma
         },
       },
     });
+    console.log("[encart-webhook] Order", order.id, "updated to FAILED");
     return;
   }
 
-  if (nextDataStatus) {
-    await prisma.order.update({
-      where: { id: order.id },
-      data: {
-        dataStatus: nextDataStatus,
-        deliveryInfo: nextInfo as Prisma.InputJsonValue,
-      },
-    });
-  }
+  await prisma.order.update({
+    where: { id: order.id },
+    data: {
+      dataStatus: nextDataStatus,
+      deliveryInfo: nextInfo as Prisma.InputJsonValue,
+    },
+  });
+  console.log("[encart-webhook] Order", order.id, "updated to", nextDataStatus);
 }

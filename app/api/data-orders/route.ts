@@ -7,16 +7,18 @@ export async function GET(req: NextRequest) {
   const { user } = await getUserFromRequest(req);
   if (!user) return unauthorized();
 
-  const orders = await prisma.order.findMany({
+  const candidates = await prisma.order.findMany({
     where: {
       userId: user.id,
-      deliveryInfo: {
-        path: ["type"],
-        equals: "DATA",
-      },
     },
     include: { payment: true },
     orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+
+  const orders = candidates.filter((o) => {
+    const info = (o.deliveryInfo || {}) as Record<string, unknown>;
+    return info.type === "DATA";
   });
 
   const enriched = orders.map((order) => {
@@ -25,7 +27,7 @@ export async function GET(req: NextRequest) {
       id: order.id,
       total: Number(order.total),
       status: order.status,
-      dataStatus: (order as any).dataStatus || null,
+      dataStatus: order.dataStatus || null,
       createdAt: order.createdAt,
       deliveryInfo: {
         network: info.network || null,

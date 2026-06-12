@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-webhook-signature");
 
-  if (!isValidEncartWebhookSignature(rawBody, signature)) {
+  if (!isValidEncartWebhookSignature(rawBody, signature, { warn: true })) {
+    console.warn("[encart-webhook-route] Invalid signature — returning 401");
     return fail("Invalid Encart webhook signature", 401);
   }
 
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
       amount?: number;
     };
   };
+
+  console.log("[encart-webhook-route] Event:", event.event, "ref:", event.data?.reference, "status:", event.data?.status);
 
   await applyEncartWebhookEvent(event, prisma);
 

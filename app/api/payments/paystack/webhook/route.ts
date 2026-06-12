@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
     if (orderId) {
       await prisma.order.update({ where: { id: orderId }, data: { status: "PAID" } }).catch(() => null);
       await creditAgentCommissionForOrder(orderId, prisma).catch(() => null);
-      await submitDataOrderToEncart(orderId, prisma).catch(() => null);
+      await submitDataOrderToEncart(orderId, prisma).catch((err) => {
+        console.error("[paystack-webhook] submitDataOrderToEncart failed:", err);
+      });
     }
   }
   return ok({ received: true });

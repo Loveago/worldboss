@@ -13,16 +13,16 @@ export async function GET(req: NextRequest) {
     return fail("Only approved agents can view storefront orders", 403);
   }
 
-  // Find all data orders where deliveryInfo.agentUserId matches this agent
-  const orders = await prisma.order.findMany({
-    where: {
-      deliveryInfo: {
-        path: ["agentUserId"],
-        equals: user.id,
-      },
-    },
-    include: { user: true, payment: true },
+  // Find recent orders and filter in JS to avoid Prisma JSON path quirks
+  const candidates = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
+    take: 300,
+    include: { user: true, payment: true },
+  });
+
+  const orders = candidates.filter((o) => {
+    const info = (o.deliveryInfo || {}) as Record<string, unknown>;
+    return info.agentUserId === user.id;
   });
 
   const enriched = orders.map((order) => {
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       id: order.id,
       total: Number(order.total),
       status: order.status,
-      dataStatus: (order as any).dataStatus || null,
+      dataStatus: order.dataStatus || null,
       createdAt: order.createdAt,
       deliveryInfo: {
         network: info.network || null,

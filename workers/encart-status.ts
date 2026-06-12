@@ -23,11 +23,18 @@ async function tick() {
 async function run() {
   console.log(`[${new Date().toISOString()}] Encart status worker started — polling every ${POLL_INTERVAL_MS / 1000}s`);
 
+  // Quick DB connectivity sanity check
+  try {
+    const count = await prisma.order.count({ where: { dataStatus: { in: ["PLACED", "PROCESSING"] } } });
+    console.log(`[${new Date().toISOString()}] DB connected. Outstanding data orders: ${count}`);
+  } catch (e) {
+    console.error(`[${new Date().toISOString()}] DB connectivity check failed:`, e);
+  }
+
   // Run immediately on startup
   await tick();
 
   while (running) {
-    const start = Date.now();
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
     if (!running) break;
     await tick();

@@ -38,31 +38,20 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   const profile = getAgentProfile(agent.addresses);
   if (!profile || profile.status !== "APPROVED") return fail("Storefront unavailable", 404);
 
-  // Find data orders for this agent + phone
-  const orders = await prisma.order.findMany({
-    where: {
-      deliveryInfo: {
-        path: ["type"],
-        equals: "DATA",
-      },
-      AND: [
-        {
-          deliveryInfo: {
-            path: ["agentSlug"],
-            equals: slug,
-          },
-        },
-        {
-          deliveryInfo: {
-            path: ["phone"],
-            equals: phone.trim(),
-          },
-        },
-      ],
-    },
+  // Find recent data orders and filter in JS to avoid Prisma JSON path quirks
+  const candidates = await prisma.order.findMany({
     include: { payment: true },
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 200,
+  });
+
+  const orders = candidates.filter((o) => {
+    const info = (o.deliveryInfo || {}) as Record<string, unknown>;
+    return (
+      info.type === "DATA" &&
+      info.agentSlug === slug &&
+      info.phone === phone.trim()
+    );
   });
 
   // Also try normalized phone variants
