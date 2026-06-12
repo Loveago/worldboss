@@ -81,7 +81,8 @@ async function encartFetch(path: string, init?: RequestInit) {
     throw new Error("ENCART_API_KEY is missing");
   }
 
-  const response = await fetch(`${ENCART_BASE_URL}${path}`, {
+  const url = `${ENCART_BASE_URL}${path}`;
+  const response = await fetch(url, {
     ...init,
     headers: {
       "X-API-Key": ENCART_API_KEY,
@@ -92,10 +93,11 @@ async function encartFetch(path: string, init?: RequestInit) {
 
   const body = await response.json().catch(() => null);
   if (!response.ok) {
+    console.error("[encart] HTTP error:", response.status, url, "body:", body);
     const message =
       (body && typeof body === "object" && "message" in body && typeof (body as JsonMap).message === "string"
         ? ((body as JsonMap).message as string)
-        : null) || `Encart purchase request failed with status ${response.status}`;
+        : null) || `Encart request failed with status ${response.status}`;
     throw new Error(message);
   }
 
@@ -207,7 +209,13 @@ export async function checkEncartOrderStatus(encartReference: string) {
     const body = await encartFetch(`/purchase/${encodeURIComponent(encartReference)}`);
     const status = extractProviderStatus(body) || "";
     return { status: status.toLowerCase(), raw: body };
-  } catch {
+  } catch (err) {
+    console.error(
+      "[encart] checkEncartOrderStatus failed for ref:",
+      encartReference,
+      "error:",
+      err instanceof Error ? err.message : err
+    );
     return null;
   }
 }
@@ -220,30 +228,56 @@ export async function checkEncartOrderStatus(encartReference: string) {
 export async function syncOutstandingDataOrders(prisma: PrismaClient) {
   const candidates = await prisma.order.findMany({
     where: {
-      dataStatus: { in: ["PLACED", "PROCESSING"] },
+      OR: [
+        { dataStatus: { in: ["PLACED", "PROCESSING"] } },
+        { dataStatus: null },
+        { dataStatus: "PENDING" },
+      ],
     },
     orderBy: { createdAt: "asc" },
     take: 100,
   });
 
-  const orders = candidates.filter((o) => {
+  // Separate: orders already submitted to Encart (poll for status)
+  const pollOrders = candidates.filter((o) => {
     const info = (o.deliveryInfo || {}) as JsonMap;
     return typeof info.encartReference === "string" && info.encartReference;
   });
 
+  // Separate: paid orders that were never submitted to Encart (retry submission)
+  const retryOrders = candidates.filter((o) => {
+    const info = (o.deliveryInfo || {}) as JsonMap;
+    return o.status === "PAID" && info.type === "DATA" && !info.encartReference;
+  });
+
+  console.log(`[encart] sync: ${pollOrders.length} to poll, ${retryOrders.length} to retry`);
+
+  // Retry unpaid submissions first
+  for (const order of retryOrders) {
+    console.log("[encart] Retrying submission for order", order.id);
+    try {
+      await submitDataOrderToEncart(order.id, prisma);
+    } catch (err) {
+      console.error("[encart] Retry submission failed for order", order.id, "error:", err instanceof Error ? err.message : err);
+    }
+  }
+
   const results = { checked: 0, updated: 0, failed: 0 };
 
-  for (const order of orders) {
+  for (const order of pollOrders) {
     const deliveryInfo = ((order.deliveryInfo || {}) as JsonMap) || {};
     const ref = typeof deliveryInfo.encartReference === "string" ? deliveryInfo.encartReference : "";
     if (!ref) continue;
 
     results.checked++;
+    console.log("[encart] Checking order", order.id, "ref:", ref);
     const poll = await checkEncartOrderStatus(ref);
     if (!poll) {
       results.failed++;
+      console.log("[encart] Poll failed for order", order.id, "ref:", ref);
       continue;
     }
+    console.log("[encart] Poll success for order", order.id, "status:", poll.status);
 
     const s = poll.status;
     let nextDataStatus: "PLACED" | "PROCESSING" | "DELIVERED" | "FAILED" | null = null;
