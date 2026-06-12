@@ -1,9 +1,7 @@
-import { spawn } from "child_process";
-import path from "path";
-
 let workerStarted = false;
 
 export function register() {
+  if (typeof window !== "undefined") return;
   if (workerStarted) return;
   workerStarted = true;
 
@@ -21,6 +19,10 @@ export function register() {
   }
 
   setTimeout(() => {
+    // Dynamic require keeps webpack from bundling Node built-ins
+    const { spawn } = require("child_process");
+    const path = require("path");
+
     const workerPath = path.resolve(process.cwd(), "workers", "encart-status.ts");
 
     console.log(`[instrumentation] Starting Encart worker: ${workerPath}`);
@@ -31,11 +33,11 @@ export function register() {
       shell: true,
     });
 
-    child.on("error", (err) => {
+    child.on("error", (err: Error) => {
       console.error("[instrumentation] Failed to start Encart worker:", err.message);
     });
 
-    child.on("exit", (code) => {
+    child.on("exit", (code: number | null) => {
       if (code !== 0 && code !== null) {
         console.error(`[instrumentation] Encart worker exited with code ${code}`);
       }
