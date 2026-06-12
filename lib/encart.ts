@@ -57,10 +57,21 @@ function resolveCapacityGb(volume: string) {
 function extractReference(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
   const root = payload as JsonMap;
-  if (typeof root.reference === "string") return root.reference;
+
+  // Check multiple possible field names for the purchase reference
+  const candidates = [root.reference, root.id, root.orderId, root.purchaseId, root.provider_reference];
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate) return candidate;
+  }
+
+  // Also check nested data object
   const data = root.data;
-  if (data && typeof data === "object" && typeof (data as JsonMap).reference === "string") {
-    return (data as JsonMap).reference as string;
+  if (data && typeof data === "object") {
+    const dataObj = data as JsonMap;
+    const dataCandidates = [dataObj.reference, dataObj.id, dataObj.orderId, dataObj.purchaseId, dataObj.provider_reference];
+    for (const candidate of dataCandidates) {
+      if (typeof candidate === "string" && candidate) return candidate;
+    }
   }
   return null;
 }
@@ -76,19 +87,56 @@ function extractProviderStatus(payload: unknown) {
   return null;
 }
 
+async function tryStatusEndpoints(encartReference: string): Promise<{ status: string; raw: unknown } | null> {
+  const paths = [
+    `/purchase/${encodeURIComponent(encartReference)}`,
+    `/purchase/status/${encodeURIComponent(encartReference)}`,
+    `/orders/${encodeURIComponent(encartReference)}`,
+    `/transactions/${encodeURIComponent(encartReference)}`,
+  ];
+
+  for (const path of paths) {
+    try {
+      const body = await encartFetch(path);
+      const status = extractProviderStatus(body) || "";
+      if (status) {
+        console.log("[encart] Status check succeeded via", path, "status:", status);
+        return { status: status.toLowerCase(), raw: body };
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (!msg.includes("404")) {
+        // Non-404 error — log and stop trying
+        console.error("[encart] Status check failed for", path, "error:", msg);
+        break;
+      }
+      // 404 — try next endpoint
+      console.log("[encart] 404 on", path, "— trying next endpoint pattern");
+    }
+  }
+  return null;
+}
+
 async function encartFetch(path: string, init?: RequestInit) {
   if (!ENCART_API_KEY) {
     throw new Error("ENCART_API_KEY is missing");
   }
 
   const url = `${ENCART_BASE_URL}${path}`;
+  const isGet = !init?.method || init.method.toUpperCase() === "GET";
+
+  const headers = new Headers(init?.headers);
+  headers.set("X-API-Key", ENCART_API_KEY);
+  // Don't send Content-Type on GET requests (no body) — some APIs reject this
+  if (!isGet) {
+    headers.set("Content-Type", "application/json");
+  } else {
+    headers.delete("Content-Type");
+  }
+
   const response = await fetch(url, {
     ...init,
-    headers: {
-      "X-API-Key": ENCART_API_KEY,
-      "Content-Type": "application/json",
-      ...(init?.headers || {}),
-    },
+    headers,
   });
 
   const body = await response.json().catch(() => null);
@@ -166,6 +214,8 @@ export async function submitDataOrderToEncart(orderId: string, prisma: PrismaCli
     const encartReference = extractReference(providerResponse);
     const encartStatus = extractProviderStatus(providerResponse) || "queued";
 
+    console.log("[encart] Order", order.id, "submitted. Extracted ref:", encartReference, "status:", encartStatus, "raw response:", JSON.stringify(providerResponse).slice(0, 500));
+
     const nextInfo: Prisma.InputJsonValue = {
       ...deliveryInfo,
       encartStatus,
@@ -205,19 +255,11 @@ export async function submitDataOrderToEncart(orderId: string, prisma: PrismaCli
  * Expected response shape: { status: "queued" | "placed" | "processing" | "delivered" | "failed", ... }
  */
 export async function checkEncartOrderStatus(encartReference: string) {
-  try {
-    const body = await encartFetch(`/purchase/${encodeURIComponent(encartReference)}`);
-    const status = extractProviderStatus(body) || "";
-    return { status: status.toLowerCase(), raw: body };
-  } catch (err) {
-    console.error(
-      "[encart] checkEncartOrderStatus failed for ref:",
-      encartReference,
-      "error:",
-      err instanceof Error ? err.message : err
-    );
-    return null;
+  const result = await tryStatusEndpoints(encartReference);
+  if (!result) {
+    console.error("[encart] All status endpoints failed for ref:", encartReference);
   }
+  return result;
 }
 
 /**
