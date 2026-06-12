@@ -88,14 +88,15 @@ function extractProviderStatus(payload: unknown) {
 }
 
 async function tryStatusEndpoints(encartReference: string): Promise<{ status: string; raw: unknown } | null> {
-  const getPaths = [
+  // Per API docs: GET /api/orders?reference=XXX
+  const paths = [
+    `/orders?reference=${encodeURIComponent(encartReference)}`,
+    // Fallbacks in case the documented endpoint doesn't match reality
     `/purchase/${encodeURIComponent(encartReference)}`,
-    `/purchase/status/${encodeURIComponent(encartReference)}`,
-    `/orders/${encodeURIComponent(encartReference)}`,
     `/transactions/${encodeURIComponent(encartReference)}`,
   ];
 
-  for (const path of getPaths) {
+  for (const path of paths) {
     try {
       const body = await encartFetch(path);
       const status = extractProviderStatus(body) || "";
@@ -110,35 +111,6 @@ async function tryStatusEndpoints(encartReference: string): Promise<{ status: st
         break;
       }
       console.log("[encart] 404 on GET", path, "— trying next");
-    }
-  }
-
-  // Some providers require POST for status check
-  const postPaths = [
-    `/purchase/status`,
-    `/purchase/check`,
-    `/orders/status`,
-    `/transactions/status`,
-  ];
-
-  for (const path of postPaths) {
-    try {
-      const body = await encartFetch(path, {
-        method: "POST",
-        body: JSON.stringify({ reference: encartReference }),
-      });
-      const status = extractProviderStatus(body) || "";
-      if (status) {
-        console.log("[encart] Status check succeeded via POST", path, "status:", status);
-        return { status: status.toLowerCase(), raw: body };
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      if (!msg.includes("404")) {
-        console.error("[encart] Status check failed for POST", path, "error:", msg);
-        break;
-      }
-      console.log("[encart] 404 on POST", path, "— trying next");
     }
   }
 

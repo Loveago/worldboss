@@ -11,7 +11,17 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-webhook-signature");
 
-  console.log("[encart-webhook-route] Received POST. Signature header:", signature?.slice(0, 30) || "(none)");
+  // Very verbose logging so we never miss a webhook
+  console.log("[encart-webhook-route] ===== INCOMING WEBHOOK =====");
+  console.log("[encart-webhook-route] URL:", req.url);
+  console.log("[encart-webhook-route] Method:", req.method);
+  console.log("[encart-webhook-route] Content-Type:", req.headers.get("content-type"));
+  console.log("[encart-webhook-route] Content-Length:", req.headers.get("content-length"));
+  console.log("[encart-webhook-route] X-Webhook-Event:", req.headers.get("x-webhook-event"));
+  console.log("[encart-webhook-route] X-Webhook-Source:", req.headers.get("x-webhook-source"));
+  console.log("[encart-webhook-route] X-Webhook-Timestamp:", req.headers.get("x-webhook-timestamp"));
+  console.log("[encart-webhook-route] X-Webhook-Signature:", signature?.slice(0, 60) || "(none)");
+  console.log("[encart-webhook-route] Raw body (first 500 chars):", rawBody.slice(0, 500));
 
   if (!isValidEncartWebhookSignature(rawBody, signature, { warn: true })) {
     console.warn("[encart-webhook-route] Invalid signature — returning 401");
