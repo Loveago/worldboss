@@ -31,9 +31,9 @@ export default function AgentsPage() {
   return (
     <div className="space-y-6">
       <section className="store-hero p-6 md:p-8 space-y-3">
-        <h1 className="font-sora text-3xl text-slate-900">Korrelly Agent Hub</h1>
+        <h1 className="font-sora text-3xl text-slate-900">Korrely Agent Hub</h1>
         <p className="text-sm text-slate-600 max-w-2xl">
-          Top-performing data agents and badge tiers across the Korrelly network.
+          Top-performing data agents and badge tiers across the Korrely network.
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {tierRanges.map((tier) => (

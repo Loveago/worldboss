@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 
 export const metadata: Metadata = {
-  title: "Korrelly",
-  description: "Korrelly admin & storefront",
+  title: "Korrely",
+  description: "Korrely admin & storefront",
 };
 
 export default function RootLayout({

@@ -54,7 +54,7 @@ const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 const buildSyntheticEmail = (value: string) => {
   const normalized = value.replace(/\D/g, "");
   if (!normalized) return "";
-  return `storefront+${normalized}@korrelly.local`;
+  return `storefront+${normalized}@korrely.local`;
 };
 
 const networkMeta: Record<Bundle["network"], { label: string; short: string; color: string }> = {

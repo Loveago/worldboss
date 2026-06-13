@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   const dataOrders = orders.filter((order) => {
     const info = (order.deliveryInfo || {}) as Record<string, unknown>;
-    return info.type === "DATA";
+    return info.type === "DATA" && order.status === "PAID";
   });
 
   let updated = 0;
