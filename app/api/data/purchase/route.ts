@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   if (!orderUserId) {
     const normalizedPhone = phone.replace(/\D/g, "");
     if (!normalizedPhone) return fail("Invalid phone number", 400);
-    const guestEmail = `guest+${normalizedPhone}@corelly.local`;
+    const guestEmail = `guest+${normalizedPhone}@korrelly.local`;
     const guest = await prisma.user.upsert({
       where: { email: guestEmail },
       update: { phone: phone.trim() },

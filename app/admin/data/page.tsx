@@ -128,6 +128,21 @@ export default function AdminDataOrdersPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-data-bundles"] }),
   });
 
+  const [statusDrafts, setStatusDrafts] = useState<Record<string, DataOrderStatus>>({});
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+
+  const updateDataStatusMutation = useMutation({
+    mutationFn: async ({ id, dataStatus }: { id: string; dataStatus: DataOrderStatus }) =>
+      apiFetch<{ id: string; dataStatus: string }>(`/api/admin/orders/${id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dataStatus }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-data-orders"] });
+    },
+  });
+
   const orders = ordersQuery.data ?? EMPTY_ORDERS;
   const bundles = bundlesQuery.data ?? EMPTY_BUNDLES;
   const errorMessage = ordersQuery.isError
@@ -157,12 +172,18 @@ export default function AdminDataOrdersPage() {
     });
   }, [bundles, bundleSearch, networkFilter]);
 
+  const dataStatusOptions: DataOrderStatus[] = ["PENDING", "PLACED", "PROCESSING", "DELIVERED", "FAILED"];
+
   const rows = useMemo(
     () =>
       orders.map((order) => {
         const bundle = order.deliveryInfo?.bundleId
           ? bundles.find((item) => item.id === order.deliveryInfo?.bundleId)
           : null;
+        const currentStatus = order.dataStatus ?? "PENDING";
+        const draft = statusDrafts[order.id] ?? currentStatus;
+        const isUpdating = updatingStatusId === order.id;
+
         return {
           key: order.id,
           Order: (
@@ -176,10 +197,41 @@ export default function AdminDataOrdersPage() {
           Bundle: bundle ? `${bundle.name} (${bundle.volume})` : order.deliveryInfo?.bundleId ?? "-",
           Phone: order.deliveryInfo?.phone ?? "-",
           Total: formatCurrency(toNumber(order.total)),
-          Status: dataStatusBadge(order.dataStatus ?? "PENDING"),
+          Status: (
+            <div className="flex flex-wrap items-center gap-2">
+              {dataStatusBadge(currentStatus)}
+              <select
+                className="border border-slate-200 rounded-lg px-2 py-1 text-xs"
+                value={draft}
+                disabled={isUpdating}
+                onChange={(event) =>
+                  setStatusDrafts((prev) => ({ ...prev, [order.id]: event.target.value as DataOrderStatus }))
+                }
+              >
+                {dataStatusOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="text-xs px-2 py-1 rounded-lg border border-slate-200 disabled:opacity-50"
+                disabled={isUpdating || draft === currentStatus}
+                onClick={() => {
+                  setUpdatingStatusId(order.id);
+                  updateDataStatusMutation.mutate(
+                    { id: order.id, dataStatus: draft },
+                    { onSettled: () => setUpdatingStatusId(null) }
+                  );
+                }}
+              >
+                {isUpdating ? "Updating..." : "Update"}
+              </button>
+            </div>
+          ),
         };
       }),
-    [orders, bundles]
+    [orders, bundles, statusDrafts, updatingStatusId, updateDataStatusMutation]
   );
 
   const bundleFormDisabled = saveBundleMutation.isLoading;

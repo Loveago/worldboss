@@ -13,7 +13,7 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const THEME_STORAGE_KEY = "corelly-theme";
+const THEME_STORAGE_KEY = "korrelly-theme";
 
 function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;

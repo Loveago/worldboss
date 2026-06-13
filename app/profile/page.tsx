@@ -670,7 +670,7 @@ export default function ProfilePage() {
 
               {!agentDashboardQuery.isLoading && !agentDashboardQuery.isError && agentData && !agentData.hasApplication && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600">Apply here to become a Corelly data agent and get your storefront link.</p>
+                  <p className="text-sm text-slate-600">Apply here to become a Korrelly data agent and get your storefront link.</p>
                   <div className="space-y-2">
                     <label className="text-xs text-slate-500">Storefront name</label>
                     <input
