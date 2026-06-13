@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import GridLayout from "../../(templates)/GridLayout";
@@ -87,6 +87,8 @@ export default function AdminDataOrdersPage() {
   const [bundleForm, setBundleForm] = useState<DataBundleFormState>(emptyBundleForm());
   const [bundleSearch, setBundleSearch] = useState("");
   const [networkFilter, setNetworkFilter] = useState<"all" | DataBundle["network"]>("all");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 10;
 
   const ordersQuery = useQuery<DataOrder[]>({
     queryKey: ["admin-data-orders"],
@@ -246,6 +248,13 @@ export default function AdminDataOrdersPage() {
     [orders, bundles, statusDrafts, updatingStatusId, updateDataStatusMutation]
   );
 
+  useEffect(() => {
+    setPage((p) => {
+      const max = Math.max(0, Math.ceil(rows.length / PAGE_SIZE) - 1);
+      return p > max ? max : p;
+    });
+  }, [rows.length]);
+
   const stats = useMemo(() => {
     const total = orders.length;
     const pending = orders.filter((o) => (o.dataStatus ?? "PENDING") === "PENDING").length;
@@ -273,6 +282,9 @@ export default function AdminDataOrdersPage() {
 
     saveBundleMutation.mutate(payload);
   };
+
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const pagedRows = rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <GridLayout
@@ -337,33 +349,56 @@ export default function AdminDataOrdersPage() {
         ) : rows.length === 0 ? (
           <div className="rounded-lg border border-slate-200 p-3 text-xs text-slate-500">No data orders yet.</div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-200">
-            <table className="min-w-full text-xs">
-              <thead className="bg-slate-50 text-slate-500">
-                <tr>
-                  <th className="text-left font-medium px-2 py-1.5">Order</th>
-                  <th className="text-left font-medium px-2 py-1.5">Customer</th>
-                  <th className="text-left font-medium px-2 py-1.5">Network</th>
-                  <th className="text-left font-medium px-2 py-1.5">Bundle</th>
-                  <th className="text-left font-medium px-2 py-1.5">Phone</th>
-                  <th className="text-left font-medium px-2 py-1.5">Total</th>
-                  <th className="text-left font-medium px-2 py-1.5">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {rows.map((row) => (
-                  <tr key={row.key} className="text-slate-700">
-                    <td className="px-2 py-1.5">{row.Order}</td>
-                    <td className="px-2 py-1.5">{row.Customer}</td>
-                    <td className="px-2 py-1.5">{row.Network}</td>
-                    <td className="px-2 py-1.5">{row.Bundle}</td>
-                    <td className="px-2 py-1.5">{row.Phone}</td>
-                    <td className="px-2 py-1.5">{row.Total}</td>
-                    <td className="px-2 py-1.5">{row.Status}</td>
+          <div className="space-y-2">
+            <div className="overflow-x-auto rounded-lg border border-slate-200">
+              <table className="min-w-full text-xs">
+                <thead className="bg-slate-50 text-slate-500">
+                  <tr>
+                    <th className="text-left font-medium px-2 py-1.5">Order</th>
+                    <th className="text-left font-medium px-2 py-1.5">Customer</th>
+                    <th className="text-left font-medium px-2 py-1.5">Network</th>
+                    <th className="text-left font-medium px-2 py-1.5">Bundle</th>
+                    <th className="text-left font-medium px-2 py-1.5">Phone</th>
+                    <th className="text-left font-medium px-2 py-1.5">Total</th>
+                    <th className="text-left font-medium px-2 py-1.5">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {pagedRows.map((row) => (
+                    <tr key={row.key} className="text-slate-700">
+                      <td className="px-2 py-1.5">{row.Order}</td>
+                      <td className="px-2 py-1.5">{row.Customer}</td>
+                      <td className="px-2 py-1.5">{row.Network}</td>
+                      <td className="px-2 py-1.5">{row.Bundle}</td>
+                      <td className="px-2 py-1.5">{row.Phone}</td>
+                      <td className="px-2 py-1.5">{row.Total}</td>
+                      <td className="px-2 py-1.5">{row.Status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span>
+                Page <strong className="text-slate-900">{page + 1}</strong> of <strong className="text-slate-900">{totalPages}</strong> &middot; {rows.length} total
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  className="rounded-lg border border-slate-200 px-2 py-1 disabled:opacity-40 hover:bg-slate-50"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 0}
+                >
+                  Prev
+                </button>
+                <button
+                  className="rounded-lg border border-slate-200 px-2 py-1 disabled:opacity-40 hover:bg-slate-50"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page >= totalPages - 1}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </section>

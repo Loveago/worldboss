@@ -490,36 +490,42 @@ export default function Page() {
         )}
       </section>
 
-      <section className="store-card px-4 py-4 md:px-6 md:py-5 hidden md:grid gap-4 md:grid-cols-[1fr_auto] items-center">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center md:text-left">
-          <div>
-            <div className="text-sm font-semibold text-slate-900">🚚 Fast delivery</div>
-            <div className="text-xs text-slate-500">Delivered instantly to you</div>
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-900">🛡️ Secure & safe</div>
-            <div className="text-xs text-slate-500">Your data is protected</div>
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-900">💎 Premium quality</div>
-            <div className="text-xs text-slate-500">Handpicked by experts</div>
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-900">🫶 Creator support</div>
-            <div className="text-xs text-slate-500">We&apos;re here to help</div>
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-900">🌍 Global access</div>
-            <div className="text-xs text-slate-500">Shop from anywhere</div>
+      <section className="grid gap-3 md:gap-4 md:grid-cols-[1fr_280px]">
+        {/* Benefit cards */}
+        <div className="store-card p-4 md:p-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {[
+              { icon: "🚚", title: "Fast delivery", desc: "Instant to your inbox", gradient: "from-amber-100 to-orange-100 text-amber-600" },
+              { icon: "🛡️", title: "Secure & safe", desc: "End-to-end protection", gradient: "from-emerald-100 to-teal-100 text-emerald-600" },
+              { icon: "💎", title: "Premium quality", desc: "Handpicked by experts", gradient: "from-sky-100 to-indigo-100 text-sky-600" },
+              { icon: "🫶", title: "Creator support", desc: "We&apos;re here to help", gradient: "from-rose-100 to-pink-100 text-rose-600" },
+              { icon: "🌍", title: "Global access", desc: "Shop from anywhere", gradient: "from-violet-100 to-purple-100 text-violet-600" },
+            ].map((b) => (
+              <div key={b.title} className="group rounded-2xl border border-transparent hover:border-[var(--store-border)] hover:bg-[var(--store-bg)] transition p-3 flex flex-col items-center text-center gap-2">
+                <div className={`h-10 w-10 rounded-2xl bg-gradient-to-br ${b.gradient} flex items-center justify-center text-lg shadow-sm group-hover:scale-110 transition`}>
+                  {b.icon}
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-slate-900">{b.title}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">{b.desc}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-500 text-white p-4 md:min-w-[250px]">
-          <div className="text-xs uppercase tracking-wide text-white/80">Become a creator</div>
-          <div className="text-sm font-semibold mt-1">Sell your digital products to thousands of buyers.</div>
-          <Link href="/request-design" className="mt-3 inline-flex bg-white text-indigo-600 rounded-full px-3 py-1.5 text-xs font-semibold">
-            Start selling
-          </Link>
+        {/* Creator CTA */}
+        <div className="store-card p-5 relative overflow-hidden flex flex-col justify-between min-h-[160px]">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500" />
+          <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+          <div className="relative z-10 space-y-3">
+            <div className="text-[10px] uppercase tracking-widest text-white/70 font-medium">Become a creator</div>
+            <div className="text-sm font-semibold text-white leading-snug">Sell your digital products to thousands of buyers.</div>
+            <Link href="/request-design" className="inline-flex items-center gap-1.5 bg-white/95 text-indigo-600 rounded-full px-3.5 py-1.5 text-xs font-semibold hover:bg-white transition shadow-lg">
+              Start selling <span>→</span>
+            </Link>
+          </div>
         </div>
       </section>
     </div>
