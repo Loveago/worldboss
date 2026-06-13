@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import TableLayout from "../../(templates)/TableLayout";
 import TableCard from "../../(shell)/components/TableCard";
@@ -114,31 +115,45 @@ export default function AdminOrdersPage() {
   );
 
   return (
-    <TableLayout
-      title="Orders"
-      toolbar={<button className="rounded-xl border border-slate-200 px-3 py-2 text-sm">Filter</button>}
-      table={
-        ordersQuery.isLoading ? (
-          <div className="p-4 text-sm text-slate-500">Loading orders...</div>
-        ) : errorMessage ? (
-          <div className="p-4 text-sm text-rose-600">{errorMessage}</div>
-        ) : rows.length === 0 ? (
-          <div className="p-4 text-sm text-slate-500">No orders yet.</div>
-        ) : (
-          <TableCard headers={["Order", "Customer", "Total", "Status"]} rows={rows} />
-        )
-      }
-      mobile={
-        ordersQuery.isLoading ? (
-          <div className="text-sm text-slate-500">Loading orders...</div>
-        ) : errorMessage ? (
-          <div className="text-sm text-rose-600">{errorMessage}</div>
-        ) : rows.length === 0 ? (
-          <div className="text-sm text-slate-500">No orders yet.</div>
-        ) : (
-          <TableCard headers={["Order", "Customer", "Total", "Status"]} rows={rows} />
-        )
-      }
-    />
+    <div className="space-y-4">
+      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="text-sm text-sky-900">
+          <span className="font-semibold">Data orders</span> are managed separately.
+        </div>
+        <Link
+          href="/admin/data"
+          className="inline-flex items-center justify-center rounded-lg bg-sky-600 text-white px-3 py-2 text-xs font-medium hover:bg-sky-700"
+        >
+          Go to Data Orders
+        </Link>
+      </div>
+
+      <TableLayout
+        title="Orders"
+        toolbar={<button className="rounded-xl border border-slate-200 px-3 py-2 text-sm">Filter</button>}
+        table={
+          ordersQuery.isLoading ? (
+            <div className="p-4 text-sm text-slate-500">Loading orders...</div>
+          ) : errorMessage ? (
+            <div className="p-4 text-sm text-rose-600">{errorMessage}</div>
+          ) : rows.length === 0 ? (
+            <div className="p-4 text-sm text-slate-500">No orders yet.</div>
+          ) : (
+            <TableCard headers={["Order", "Customer", "Total", "Status"]} rows={rows} />
+          )
+        }
+        mobile={
+          ordersQuery.isLoading ? (
+            <div className="text-sm text-slate-500">Loading orders...</div>
+          ) : errorMessage ? (
+            <div className="text-sm text-rose-600">{errorMessage}</div>
+          ) : rows.length === 0 ? (
+            <div className="text-sm text-slate-500">No orders yet.</div>
+          ) : (
+            <TableCard headers={["Order", "Customer", "Total", "Status"]} rows={rows} />
+          )
+        }
+      />
+    </div>
   );
 }

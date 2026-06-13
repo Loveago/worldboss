@@ -246,6 +246,14 @@ export default function AdminDataOrdersPage() {
     [orders, bundles, statusDrafts, updatingStatusId, updateDataStatusMutation]
   );
 
+  const stats = useMemo(() => {
+    const total = orders.length;
+    const pending = orders.filter((o) => (o.dataStatus ?? "PENDING") === "PENDING").length;
+    const active = orders.filter((o) => ["PLACED", "PROCESSING"].includes(o.dataStatus ?? "")).length;
+    const done = orders.filter((o) => ["DELIVERED", "FAILED"].includes(o.dataStatus ?? "")).length;
+    return { total, pending, active, done };
+  }, [orders]);
+
   const bundleFormDisabled = saveBundleMutation.isLoading;
 
   const onSubmitBundleForm = (event: React.FormEvent<HTMLFormElement>) => {
@@ -280,295 +288,279 @@ export default function AdminDataOrdersPage() {
         </>
       }
     >
-      <section className="card p-5 bg-white space-y-4 lg:col-span-2">
-        <div className="flex items-center justify-between">
+      {/* Stats strip */}
+      <section className="lg:col-span-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: "Total orders", value: stats.total, tone: "bg-slate-900 text-white" },
+            { label: "Pending", value: stats.pending, tone: "bg-amber-500 text-white" },
+            { label: "Active", value: stats.active, tone: "bg-indigo-500 text-white" },
+            { label: "Delivered / Failed", value: stats.done, tone: "bg-emerald-500 text-white" },
+          ].map((s) => (
+            <div key={s.label} className={`rounded-2xl p-4 ${s.tone} flex flex-col justify-between`}>
+              <span className="text-[11px] opacity-80 uppercase tracking-wide">{s.label}</span>
+              <span className="text-2xl font-semibold mt-1">{s.value}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="card p-5 bg-white lg:col-span-4 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <div className="text-base font-semibold text-slate-900">{editingBundleId ? "Edit data offer" : "New data offer"}</div>
-            <div className="text-xs text-slate-500">Create and update mobile data bundles your team can sell.</div>
+            <div className="text-base font-semibold text-slate-900">Data orders</div>
+            <div className="text-xs text-slate-500">Recent purchases and delivery details.</div>
           </div>
+          <div className="flex items-center gap-2">
+            <button className="rounded-lg bg-emerald-600 text-white px-3 py-2 text-xs font-medium disabled:opacity-50" onClick={() => { if (!confirm("Mark ALL data orders as DELIVERED?")) return; bulkDeliverMutation.mutate(); }} disabled={bulkDeliverMutation.isLoading}>
+              {bulkDeliverMutation.isLoading ? "Updating..." : "Mark all as Delivered"}
+            </button>
+            <button className="rounded-lg border border-slate-200 px-3 py-2 text-xs">Export</button>
+          </div>
+        </div>
+
+        {bulkDeliverMutation.isSuccess && (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-700">
+            Updated {bulkDeliverMutation.data?.updated ?? 0} of {bulkDeliverMutation.data?.total ?? 0} data orders to DELIVERED.
+          </div>
+        )}
+        {bulkDeliverMutation.isError && (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-600">
+            Bulk update failed: {bulkDeliverMutation.error instanceof Error ? bulkDeliverMutation.error.message : "Unknown error"}
+          </div>
+        )}
+
+        {ordersQuery.isLoading ? (
+          <div className="rounded-lg border border-slate-200 p-3 text-xs text-slate-500">Loading data orders...</div>
+        ) : errorMessage ? (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-600">{errorMessage}</div>
+        ) : rows.length === 0 ? (
+          <div className="rounded-lg border border-slate-200 p-3 text-xs text-slate-500">No data orders yet.</div>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <table className="min-w-full text-xs">
+              <thead className="bg-slate-50 text-slate-500">
+                <tr>
+                  <th className="text-left font-medium px-2 py-1.5">Order</th>
+                  <th className="text-left font-medium px-2 py-1.5">Customer</th>
+                  <th className="text-left font-medium px-2 py-1.5">Network</th>
+                  <th className="text-left font-medium px-2 py-1.5">Bundle</th>
+                  <th className="text-left font-medium px-2 py-1.5">Phone</th>
+                  <th className="text-left font-medium px-2 py-1.5">Total</th>
+                  <th className="text-left font-medium px-2 py-1.5">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {rows.map((row) => (
+                  <tr key={row.key} className="text-slate-700">
+                    <td className="px-2 py-1.5">{row.Order}</td>
+                    <td className="px-2 py-1.5">{row.Customer}</td>
+                    <td className="px-2 py-1.5">{row.Network}</td>
+                    <td className="px-2 py-1.5">{row.Bundle}</td>
+                    <td className="px-2 py-1.5">{row.Phone}</td>
+                    <td className="px-2 py-1.5">{row.Total}</td>
+                    <td className="px-2 py-1.5">{row.Status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="card p-5 bg-white space-y-2 lg:col-span-2">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-semibold text-slate-900">{editingBundleId ? "Edit offer" : "New offer"}</div>
           {editingBundleId && (
             <button
               type="button"
-              onClick={() => {
-                setEditingBundleId(null);
-                setBundleForm(emptyBundleForm());
-              }}
-              className="text-xs border border-slate-200 rounded-full px-3 py-1 hover:bg-slate-50"
+              onClick={() => { setEditingBundleId(null); setBundleForm(emptyBundleForm()); }}
+              className="text-[11px] border border-slate-200 rounded-full px-2 py-0.5 hover:bg-slate-50"
             >
-              Cancel edit
+              Cancel
             </button>
           )}
         </div>
 
-        <form className="space-y-4" onSubmit={onSubmitBundleForm}>
-          <div className="grid gap-3 md:grid-cols-2">
-            <label className="text-xs text-slate-500 space-y-1">
+        <form className="space-y-2" onSubmit={onSubmitBundleForm}>
+          <div className="grid gap-2 md:grid-cols-2">
+            <label className="text-[11px] text-slate-500 space-y-0.5">
               <span>Network</span>
               <select
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.network}
-                onChange={(event) =>
-                  setBundleForm((prev) => ({ ...prev, network: event.target.value as DataBundle["network"] }))
-                }
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, network: e.target.value as DataBundle["network"] }))}
               >
                 <option value="mtn">MTN</option>
                 <option value="telecel">Telecel</option>
                 <option value="airteltigo">AirtelTigo</option>
               </select>
             </label>
-            <label className="text-xs text-slate-500 space-y-1">
-              <span>Offer name</span>
+            <label className="text-[11px] text-slate-500 space-y-0.5">
+              <span>Price (GHS)</span>
+              <input type="number" step="0.01" min="0"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
+                value={bundleForm.price}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, price: e.target.value }))}
+                required
+              />
+            </label>
+            <label className="text-[11px] text-slate-500 space-y-0.5">
+              <span>Name</span>
               <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.name}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, name: event.target.value }))}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Weekend Surf"
                 required
               />
             </label>
-            <label className="text-xs text-slate-500 space-y-1">
+            <label className="text-[11px] text-slate-500 space-y-0.5">
               <span>Volume</span>
               <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.volume}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, volume: event.target.value }))}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, volume: e.target.value }))}
                 placeholder="2GB"
                 required
               />
             </label>
-            <label className="text-xs text-slate-500 space-y-1">
+            <label className="text-[11px] text-slate-500 space-y-0.5">
               <span>Validity</span>
               <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.validity}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, validity: event.target.value }))}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, validity: e.target.value }))}
                 placeholder="30 days"
                 required
               />
             </label>
-            <label className="text-xs text-slate-500 space-y-1">
-              <span>Price (GHS)</span>
+            <label className="text-[11px] text-slate-500 space-y-0.5">
+              <span>Segment</span>
               <input
-                type="number"
-                step="0.01"
-                min="0"
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                value={bundleForm.price}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, price: event.target.value }))}
-                required
-              />
-            </label>
-            <label className="text-xs text-slate-500 space-y-1">
-              <span>Segment (optional)</span>
-              <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.segment}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, segment: event.target.value }))}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, segment: e.target.value }))}
                 placeholder="daily"
               />
             </label>
-            <label className="text-xs text-slate-500 space-y-1">
-              <span>Tag (optional)</span>
+            <label className="text-[11px] text-slate-500 space-y-0.5">
+              <span>Tag</span>
               <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.tag}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, tag: event.target.value }))}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, tag: e.target.value }))}
                 placeholder="best-value"
               />
             </label>
-            <label className="text-xs text-slate-500 space-y-1">
-              <span>Badge (optional)</span>
+            <label className="text-[11px] text-slate-500 space-y-0.5">
+              <span>Badge</span>
               <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-slate-200 px-2 py-1 text-xs"
                 value={bundleForm.badge}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, badge: event.target.value }))}
+                onChange={(e) => setBundleForm((prev) => ({ ...prev, badge: e.target.value }))}
                 placeholder="Hot"
               />
             </label>
-            <label className="text-xs text-slate-500 space-y-1 md:col-span-2">
-              <span>Logo URL (optional)</span>
-              <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                value={bundleForm.logoUrl}
-                onChange={(event) => setBundleForm((prev) => ({ ...prev, logoUrl: event.target.value }))}
-                placeholder="https://"
-              />
-            </label>
           </div>
-
-          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-            <span>
-              Preview price: <strong className="text-slate-900">{bundleForm.price ? formatCurrency(Number(bundleForm.price)) : "--"}</strong>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[11px] text-slate-500">
+              Preview: <strong className="text-slate-900">{bundleForm.price ? formatCurrency(Number(bundleForm.price)) : "--"}</strong>
             </span>
-          </div>
-
-          <div className="flex justify-end">
             <button
               type="submit"
-              className="rounded-xl bg-slate-900 text-white px-4 py-2 text-sm disabled:opacity-50"
+              className="rounded-lg bg-slate-900 text-white px-3 py-1 text-xs disabled:opacity-50"
               disabled={bundleFormDisabled}
             >
-              {saveBundleMutation.isLoading ? "Saving..." : editingBundleId ? "Update offer" : "Create offer"}
+              {saveBundleMutation.isLoading ? "Saving..." : editingBundleId ? "Update" : "Create"}
             </button>
           </div>
         </form>
 
         {saveBundleMutation.isError && (
-          <div className="text-xs text-rose-600">Unable to save data offer. Please check the form fields.</div>
+          <div className="text-[11px] text-rose-600">Unable to save data offer. Please check the form fields.</div>
         )}
       </section>
 
       <section className="card p-5 bg-white space-y-3 lg:col-span-2">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="text-base font-semibold text-slate-900">Data offers</div>
-            <div className="text-xs text-slate-500">Filter and edit offers quickly without leaving this page.</div>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-semibold text-slate-900">Data offers</div>
+          <div className="flex items-center gap-2">
             <input
-              className="w-full sm:w-56 rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              placeholder="Search name/volume"
+              className="w-32 rounded-lg border border-slate-200 px-2 py-1 text-xs"
+              placeholder="Search"
               value={bundleSearch}
               onChange={(event) => setBundleSearch(event.target.value)}
             />
             <select
-              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              className="rounded-lg border border-slate-200 px-2 py-1 text-xs"
               value={networkFilter}
               onChange={(event) => setNetworkFilter(event.target.value as "all" | DataBundle["network"])}
             >
-              <option value="all">All networks</option>
+              <option value="all">All</option>
               <option value="mtn">MTN</option>
               <option value="telecel">Telecel</option>
-              <option value="airteltigo">AirtelTigo</option>
+              <option value="airteltigo">AT</option>
             </select>
           </div>
         </div>
 
-        {bundlesQuery.isLoading && <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">Loading data offers...</div>}
-        {bundlesError && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">{bundlesError}</div>}
+        {bundlesQuery.isLoading && <div className="text-xs text-slate-500">Loading...</div>}
+        {bundlesError && <div className="text-xs text-rose-600">{bundlesError}</div>}
         {!bundlesQuery.isLoading && !bundlesError && filteredBundles.length === 0 && (
-          <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">No matching data offers found.</div>
+          <div className="text-xs text-slate-500">No matching offers.</div>
         )}
 
-        {!bundlesQuery.isLoading &&
-          !bundlesError &&
-          filteredBundles.map((bundle) => (
-            <div
-              key={bundle.id}
-              className={`rounded-2xl border p-4 space-y-3 ${
-                editingBundleId === bundle.id ? "border-indigo-300 bg-indigo-50/40" : "border-slate-200"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-base font-semibold text-slate-900">{bundle.name}</div>
-                  <div className="text-xs text-slate-500 uppercase">{bundle.network}</div>
-                </div>
-                {bundle.badge && <span className="rounded-full bg-emerald-100 text-emerald-700 px-2 py-1 text-xs">{bundle.badge}</span>}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
-                <span>
-                  {bundle.volume} · {bundle.validity}
-                </span>
-                <span className="font-semibold text-slate-900">{formatCurrency(toNumber(bundle.price))}</span>
-                {bundle.tag && <span className="text-xs text-slate-500">#{bundle.tag}</span>}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  className="text-xs px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50"
-                  onClick={() => {
-                    setEditingBundleId(bundle.id);
-                    setBundleForm({
-                      network: bundle.network,
-                      name: bundle.name,
-                      price: String(toNumber(bundle.price)),
-                      volume: bundle.volume,
-                      validity: bundle.validity,
-                      segment: bundle.segment ?? "",
-                      tag: bundle.tag ?? "",
-                      badge: bundle.badge ?? "",
-                      logoUrl: bundle.logoUrl ?? "",
-                    });
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  className="text-xs px-3 py-1 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50"
-                  onClick={() => deleteBundleMutation.mutate(bundle.id)}
-                  disabled={deleteBundleMutation.isLoading}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-      </section>
-
-      <section className="card p-5 bg-white space-y-3 lg:col-span-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-base font-semibold text-slate-900">Data orders</div>
-            <div className="text-xs text-slate-500">Recent purchases and delivery details.</div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="rounded-xl bg-emerald-600 text-white px-3 py-2 text-sm disabled:opacity-50"
-              onClick={() => {
-                if (!confirm("Mark ALL data orders as DELIVERED?")) return;
-                bulkDeliverMutation.mutate();
-              }}
-              disabled={bulkDeliverMutation.isLoading}
-            >
-              {bulkDeliverMutation.isLoading ? "Updating..." : "Mark all as Delivered"}
-            </button>
-            <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm">Export</button>
-          </div>
-        </div>
-
-        {bulkDeliverMutation.isSuccess && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
-            Updated {bulkDeliverMutation.data?.updated ?? 0} of {bulkDeliverMutation.data?.total ?? 0} data orders to DELIVERED.
-          </div>
-        )}
-        {bulkDeliverMutation.isError && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
-            Bulk update failed: {bulkDeliverMutation.error instanceof Error ? bulkDeliverMutation.error.message : "Unknown error"}
-          </div>
-        )}
-
-        {ordersQuery.isLoading ? (
-          <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">Loading data orders...</div>
-        ) : errorMessage ? (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">{errorMessage}</div>
-        ) : rows.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">No data orders yet.</div>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+        {!bundlesQuery.isLoading && !bundlesError && filteredBundles.length > 0 && (
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <table className="min-w-full text-[11px]">
+              <thead className="bg-slate-50 text-slate-500">
                 <tr>
-                  <th className="text-left font-medium px-3 py-2">Order</th>
-                  <th className="text-left font-medium px-3 py-2">Customer</th>
-                  <th className="text-left font-medium px-3 py-2">Network</th>
-                  <th className="text-left font-medium px-3 py-2">Bundle</th>
-                  <th className="text-left font-medium px-3 py-2">Phone</th>
-                  <th className="text-left font-medium px-3 py-2">Total</th>
-                  <th className="text-left font-medium px-3 py-2">Status</th>
+                  <th className="text-left font-medium px-2 py-1">Offer</th>
+                  <th className="text-left font-medium px-2 py-1">Network</th>
+                  <th className="text-right font-medium px-2 py-1">Price</th>
+                  <th className="text-right font-medium px-2 py-1"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {rows.map((row) => (
-                  <tr key={row.key} className="text-slate-700">
-                    <td className="px-3 py-2">{row.Order}</td>
-                    <td className="px-3 py-2">{row.Customer}</td>
-                    <td className="px-3 py-2">{row.Network}</td>
-                    <td className="px-3 py-2">{row.Bundle}</td>
-                    <td className="px-3 py-2">{row.Phone}</td>
-                    <td className="px-3 py-2">{row.Total}</td>
-                    <td className="px-3 py-2">{row.Status}</td>
+                {filteredBundles.map((bundle) => (
+                  <tr key={bundle.id} className={`text-slate-700 ${editingBundleId === bundle.id ? "bg-indigo-50/40" : ""}`}>
+                    <td className="px-2 py-1">
+                      <div className="font-medium">{bundle.name}</div>
+                      <div className="text-slate-400">{bundle.volume} &middot; {bundle.validity}</div>
+                    </td>
+                    <td className="px-2 py-1 uppercase">{bundle.network}</td>
+                    <td className="px-2 py-1 text-right font-medium">{formatCurrency(toNumber(bundle.price))}</td>
+                    <td className="px-2 py-1 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          className="px-1.5 py-0.5 rounded border border-slate-200 hover:bg-slate-50"
+                          onClick={() => {
+                            setEditingBundleId(bundle.id);
+                            setBundleForm({
+                              network: bundle.network,
+                              name: bundle.name,
+                              price: String(toNumber(bundle.price)),
+                              volume: bundle.volume,
+                              validity: bundle.validity,
+                              segment: bundle.segment ?? "",
+                              tag: bundle.tag ?? "",
+                              badge: bundle.badge ?? "",
+                              logoUrl: bundle.logoUrl ?? "",
+                            });
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="px-1.5 py-0.5 rounded border border-rose-200 text-rose-600 hover:bg-rose-50"
+                          onClick={() => deleteBundleMutation.mutate(bundle.id)}
+                          disabled={deleteBundleMutation.isLoading}
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
