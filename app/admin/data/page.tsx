@@ -143,6 +143,18 @@ export default function AdminDataOrdersPage() {
     },
   });
 
+  const bulkDeliverMutation = useMutation({
+    mutationFn: async () =>
+      apiFetch<{ updated: number; total: number; dataStatus: string }>("/api/admin/orders/bulk-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dataStatus: "DELIVERED" }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-data-orders"] });
+    },
+  });
+
   const orders = ordersQuery.data ?? EMPTY_ORDERS;
   const bundles = bundlesQuery.data ?? EMPTY_BUNDLES;
   const errorMessage = ordersQuery.isError
@@ -501,8 +513,31 @@ export default function AdminDataOrdersPage() {
             <div className="text-base font-semibold text-slate-900">Data orders</div>
             <div className="text-xs text-slate-500">Recent purchases and delivery details.</div>
           </div>
-          <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm">Export</button>
+          <div className="flex items-center gap-2">
+            <button
+              className="rounded-xl bg-emerald-600 text-white px-3 py-2 text-sm disabled:opacity-50"
+              onClick={() => {
+                if (!confirm("Mark ALL data orders as DELIVERED?")) return;
+                bulkDeliverMutation.mutate();
+              }}
+              disabled={bulkDeliverMutation.isLoading}
+            >
+              {bulkDeliverMutation.isLoading ? "Updating..." : "Mark all as Delivered"}
+            </button>
+            <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm">Export</button>
+          </div>
         </div>
+
+        {bulkDeliverMutation.isSuccess && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+            Updated {bulkDeliverMutation.data?.updated ?? 0} of {bulkDeliverMutation.data?.total ?? 0} data orders to DELIVERED.
+          </div>
+        )}
+        {bulkDeliverMutation.isError && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
+            Bulk update failed: {bulkDeliverMutation.error instanceof Error ? bulkDeliverMutation.error.message : "Unknown error"}
+          </div>
+        )}
 
         {ordersQuery.isLoading ? (
           <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500">Loading data orders...</div>
