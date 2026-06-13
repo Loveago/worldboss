@@ -49,7 +49,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
         <div className="relative z-10 space-y-4">
           <span className="store-pill px-3 py-1 text-xs">Welcome back</span>
-          <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Sign in to Korrely</h1>
+          <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Sign in to Korelly</h1>
           <p className="text-sm text-slate-600">
             Keep your cart synced, track deliveries, and unlock concierge support.
           </p>

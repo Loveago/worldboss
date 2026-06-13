@@ -216,7 +216,7 @@ export default function StoreShell({
                 <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
                   <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
                 </span>
-                <span>Korrely</span>
+                <span>Korelly</span>
               </Link>
 
               <nav className="mt-6 flex-1 space-y-1.5 overflow-auto pr-1">
@@ -278,7 +278,7 @@ export default function StoreShell({
                         <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
                           <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
                         </span>
-                        <span>Korrely</span>
+                        <span>Korelly</span>
                       </Link>
                     </div>
 
@@ -400,7 +400,7 @@ export default function StoreShell({
 
               <footer className="store-card px-4 py-4 mb-20 md:mb-0 text-xs sm:text-sm text-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="font-medium text-slate-800">Korrely</span>
+                  <span className="font-medium text-slate-800">Korelly</span>
                   <a href="tel:0547419727" className="hover:text-[var(--store-accent)] transition">0547419727</a>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -420,7 +420,7 @@ export default function StoreShell({
                     <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
                       <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
                     </span>
-                    <span>Korrely</span>
+                    <span>Korelly</span>
                   </Link>
                   <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="h-9 w-9 rounded-xl border border-[var(--store-border)] inline-flex items-center justify-center text-slate-600" aria-label="Close menu">
                     ✕

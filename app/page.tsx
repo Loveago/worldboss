@@ -197,7 +197,7 @@ export default function Page() {
           <div className="absolute -bottom-10 -right-6 h-24 w-24 rounded-full bg-sky-200/70 blur-3xl" aria-hidden />
 
           <div className="relative z-10 space-y-3.5">
-            <span className="store-pill px-3 py-1 text-[11px] inline-flex">👋 Welcome to Korrely</span>
+            <span className="store-pill px-3 py-1 text-[11px] inline-flex">👋 Welcome to Korelly</span>
 
             <div className="grid grid-cols-[1.1fr_0.9fr] gap-2 items-center">
               <div className="space-y-2">
@@ -246,7 +246,7 @@ export default function Page() {
         </div>
 
         <div className="space-y-3">
-          <h2 className="font-sora text-[1.7rem] text-slate-900 leading-none px-1">Why you&apos;ll love Korrely</h2>
+          <h2 className="font-sora text-[1.7rem] text-slate-900 leading-none px-1">Why you&apos;ll love Korelly</h2>
           <div className="grid grid-cols-4 gap-2">
             {mobileWhyCards.map((card) => (
               <div key={card.title} className={`store-card p-2.5 text-center bg-gradient-to-b ${card.tint}`}>
@@ -266,7 +266,7 @@ export default function Page() {
         <div className="absolute -bottom-24 right-10 h-40 w-40 rounded-full bg-sky-200 blur-3xl opacity-70 store-glow" />
         <div className="relative z-10 grid gap-6 xl:gap-7 xl:grid-cols-[1fr_minmax(340px,0.92fr)_minmax(260px,0.72fr)] xl:items-stretch">
           <div className="space-y-5">
-            <span className="store-pill px-3 py-1 text-xs">Welcome to Korrely 👋</span>
+            <span className="store-pill px-3 py-1 text-xs">Welcome to Korelly 👋</span>
             <h1 className="font-sora text-4xl md:text-5xl text-slate-900 leading-[1.06]">
               Discover. Download.
               <br />
