@@ -130,43 +130,41 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="font-sora text-2xl text-slate-900">Checkout</h1>
-            <p className="text-sm text-slate-600">Confirm your details and pay securely.</p>
+          <div className="space-y-2">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Secure checkout</span>
+            <h1 className="font-sora text-2xl md:text-3xl text-white">Checkout</h1>
+            <p className="text-sm text-white/70">Confirm your details and pay securely.</p>
           </div>
-          <Link href="/cart" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+          <Link href="/cart" className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm w-fit text-white hover:bg-white/15 transition">
             Back to cart
           </Link>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Items</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalItems}</div>
-            <div className="text-xs text-slate-500">Total quantity in cart</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total amount</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(subtotal)}</div>
-            <div className="text-xs text-slate-500">Checkout subtotal</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet balance</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(walletBalance)}</div>
-            <div className="text-xs text-slate-500">Available for wallet checkout</div>
-          </div>
+      <section className="grid sm:grid-cols-3 gap-3">
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Items</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{totalItems}</div>
+          <div className="text-xs text-slate-500">Total quantity in cart</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Total amount</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(subtotal)}</div>
+          <div className="text-xs text-slate-500">Checkout subtotal</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet balance</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(walletBalance)}</div>
+          <div className="text-xs text-slate-500">Available for wallet checkout</div>
         </div>
       </section>
 
       {items.length === 0 ? (
         <div className="store-card p-6 text-sm text-slate-600 space-y-3">
           <p>Your cart is empty.</p>
-          <Link href="/shop" className="store-outline px-4 py-2 text-sm inline-flex">
+          <Link href="/shop" className="store-btn-primary px-4 py-2.5 text-sm inline-flex">
             Browse products
           </Link>
         </div>
@@ -174,14 +172,14 @@ export default function CheckoutPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
             <div className="store-card p-5 space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">Delivery details</h2>
+              <h2 className="font-sora text-lg text-slate-900">Delivery details</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-xs text-slate-500">Full name</label>
                   <input
                     value={name}
                     onChange={(event) => setName(event.target.value)}
-                    className="w-full store-outline px-3 py-2 text-sm"
+                    className="kb-input"
                     placeholder="Ama Mensah"
                   />
                 </div>
@@ -190,7 +188,7 @@ export default function CheckoutPage() {
                   <input
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                    className="w-full store-outline px-3 py-2 text-sm"
+                    className="kb-input"
                     placeholder="024 000 0000"
                   />
                 </div>
@@ -200,7 +198,7 @@ export default function CheckoutPage() {
                 <input
                   value={address}
                   onChange={(event) => setAddress(event.target.value)}
-                  className="w-full store-outline px-3 py-2 text-sm"
+                  className="kb-input"
                   placeholder="Street address, city"
                 />
               </div>
@@ -211,8 +209,10 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("paystack")}
-                      className={`store-outline px-3 py-2 text-sm text-left ${
-                        paymentMethod === "paystack" ? "ring-2 ring-[var(--store-accent)]" : ""
+                      className={`store-outline px-3 py-2.5 text-sm text-left rounded-xl transition ${
+                        paymentMethod === "paystack"
+                          ? "ring-2 ring-[var(--store-accent)] bg-[var(--store-accent-soft)]"
+                          : "hover:bg-slate-50"
                       }`}
                     >
                       <div className="font-medium text-slate-900">Paystack</div>
@@ -221,8 +221,10 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("wallet")}
-                      className={`store-outline px-3 py-2 text-sm text-left ${
-                        paymentMethod === "wallet" ? "ring-2 ring-[var(--store-accent)]" : ""
+                      className={`store-outline px-3 py-2.5 text-sm text-left rounded-xl transition ${
+                        paymentMethod === "wallet"
+                          ? "ring-2 ring-[var(--store-accent)] bg-[var(--store-accent-soft)]"
+                          : "hover:bg-slate-50"
                       }`}
                     >
                       <div className="font-medium text-slate-900">Wallet</div>
@@ -237,7 +239,7 @@ export default function CheckoutPage() {
                     <input
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="w-full store-outline px-3 py-2 text-sm"
+                      className="kb-input"
                       type="email"
                       placeholder="you@email.com"
                     />
@@ -247,10 +249,10 @@ export default function CheckoutPage() {
             </div>
 
             <div className="store-card p-5 space-y-3">
-              <h2 className="text-lg font-semibold text-slate-900">Order summary</h2>
+              <h2 className="font-sora text-lg text-slate-900">Order summary</h2>
               <div className="space-y-3 text-sm">
                 {items.map((item) => (
-                  <div key={`${item.productId}-${item.variant ?? "base"}`} className="flex items-center justify-between">
+                  <div key={`${item.productId}-${item.variant ?? "base"}`} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
                     <div>
                       <div className="font-medium text-slate-900">{item.name}</div>
                       {item.variant && <div className="text-xs text-slate-500">{item.variant}</div>}
@@ -276,12 +278,12 @@ export default function CheckoutPage() {
                 : "You will be redirected to Paystack to complete payment."}
             </p>
             {paymentMethod === "wallet" && (
-              <div className="store-outline px-3 py-2 text-xs text-slate-600">
+              <div className="store-outline px-3 py-2 text-xs text-slate-600 rounded-xl">
                 Wallet balance: <span className="font-semibold text-slate-900">{formatCurrency(walletBalance)}</span>
               </div>
             )}
             {error && (
-              <div className="store-card p-3 text-xs text-rose-600">
+              <div className="store-card p-3 text-xs text-rose-600 border border-rose-200 bg-rose-50">
                 {isUnauthorized ? (
                   <div className="space-y-2">
                     <p>Sign in to complete checkout.</p>
@@ -298,7 +300,7 @@ export default function CheckoutPage() {
               type="button"
               onClick={handleCheckout}
               disabled={submitting}
-              className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
+              className="store-btn-primary px-4 py-2.5 text-sm w-full disabled:opacity-60"
             >
               {submitting ? "Processing..." : paymentMethod === "wallet" ? "Pay with Wallet" : "Pay with Paystack"}
             </button>

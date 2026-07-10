@@ -134,36 +134,34 @@ export default function ProductDetailPage() {
 
   return (
     <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="font-sora text-2xl text-slate-900">{product?.name ?? "Product"}</h1>
-            <p className="text-sm text-slate-600">{product?.category?.name ?? "Store item"}</p>
+          <div className="space-y-2">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">{product?.category?.name ?? "Store item"}</span>
+            <h1 className="font-sora text-2xl md:text-3xl text-white">{product?.name ?? "Product"}</h1>
+            <p className="text-sm text-white/70">Product details, variants, and secure cart checkout.</p>
           </div>
-          <Link href="/shop" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+          <Link href="/shop" className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm w-fit text-white hover:bg-white/15 transition">
             Back to shop
           </Link>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Current price</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(priceValue)}</div>
-            <div className="text-xs text-slate-500">Product rate</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Stock status</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{isOutOfStock ? "Out" : "In"}</div>
-            <div className="text-xs text-slate-500">{stockLabel}</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Type</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{product?.type === "DIGITAL" ? "Digital" : "Physical"}</div>
-            <div className="text-xs text-slate-500">Fulfillment mode</div>
-          </div>
+      <section className="grid sm:grid-cols-3 gap-3">
+        <div className="store-metric">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Current price</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(priceValue)}</div>
+          <div className="text-xs text-slate-500">Product rate</div>
+        </div>
+        <div className="store-metric">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Stock status</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{isOutOfStock ? "Out" : "In"}</div>
+          <div className="text-xs text-slate-500">{stockLabel}</div>
+        </div>
+        <div className="store-metric">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Type</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{product?.type === "DIGITAL" ? "Digital" : "Physical"}</div>
+          <div className="text-xs text-slate-500">Fulfillment mode</div>
         </div>
       </section>
 
@@ -237,10 +235,10 @@ export default function ProductDetailPage() {
                                   [group.name]: option,
                                 }))
                               }
-                              className={`px-3 py-1 text-xs rounded-full border transition ${
+                              className={`px-3 py-1.5 text-xs rounded-full border transition ${
                                 selectedOptions[group.name] === option
-                                  ? "bg-[var(--store-accent)] text-white border-transparent"
-                                  : "border-[var(--store-border)] text-slate-600"
+                                  ? "bg-[var(--store-accent)] text-white border-transparent shadow-[0_8px_18px_rgba(99,102,241,0.28)]"
+                                  : "border-[var(--store-border)] text-slate-600 bg-white hover:border-[var(--store-accent)]/40"
                               }`}
                             >
                               {option}
@@ -257,15 +255,13 @@ export default function ProductDetailPage() {
                     type="button"
                     onClick={handleAdd}
                     disabled={isOutOfStock}
-                    className={`rounded-full px-4 py-2 text-sm text-white ${
-                      isOutOfStock
-                        ? "bg-slate-400 cursor-not-allowed"
-                        : "bg-[var(--store-accent)] hover:brightness-95"
+                    className={`store-btn-primary px-4 py-2.5 text-sm ${
+                      isOutOfStock ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
                     }`}
                   >
                     {isOutOfStock ? "Out of stock" : "Add to cart"}
                   </button>
-                  <Link href="/cart" className="store-outline px-4 py-2 text-sm text-center">
+                  <Link href="/cart" className="store-outline px-4 py-2.5 text-sm text-center">
                     Go to cart
                   </Link>
                 </div>
@@ -286,7 +282,7 @@ export default function ProductDetailPage() {
           </div>
 
           <div className="md:hidden fixed bottom-24 left-4 right-4 z-40">
-            <div className="store-glass px-4 py-3 flex items-center justify-between gap-3 border border-white/70 shadow-[0_22px_40px_rgba(52,63,126,0.22)]">
+            <div className="store-card px-4 py-3 flex items-center justify-between gap-3 border border-[var(--store-border)] shadow-[0_22px_40px_rgba(52,63,126,0.18)]">
               <div>
                 <div className="text-xs text-slate-500">Total</div>
                 <div className="text-base font-semibold text-slate-900">{formatCurrency(priceValue)}</div>
@@ -296,8 +292,8 @@ export default function ProductDetailPage() {
                 type="button"
                 onClick={handleAdd}
                 disabled={isOutOfStock}
-                className={`rounded-full px-4 py-2 text-sm text-white ${
-                  isOutOfStock ? "bg-slate-400 cursor-not-allowed" : "bg-[var(--store-accent)]"
+                className={`store-btn-primary px-4 py-2 text-sm ${
+                  isOutOfStock ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
                 }`}
               >
                 {isOutOfStock ? "Out" : "Add"}

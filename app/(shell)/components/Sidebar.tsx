@@ -17,12 +17,22 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
         active ? "admin-nav-active" : "text-slate-600"
       }`}
     >
-      <span className="flex items-center gap-2">
-        <span className="text-lg">{item.icon}</span>
+      <span className="flex items-center gap-2.5">
+        <span
+          className={`h-8 w-8 rounded-xl inline-flex items-center justify-center text-base ${
+            active ? "bg-white/20" : "bg-[var(--admin-accent-soft)]"
+          }`}
+        >
+          {item.icon}
+        </span>
         <span className="font-medium">{item.label}</span>
       </span>
       {item.badge && (
-        <span className="text-xs rounded-full bg-blue-100 text-blue-700 px-2 py-0.5">
+        <span
+          className={`text-[10px] rounded-full px-2 py-0.5 font-semibold ${
+            active ? "bg-white/20 text-white" : "bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]"
+          }`}
+        >
           {item.badge}
         </span>
       )}
@@ -35,31 +45,36 @@ export default function Sidebar({ navItems }: SidebarProps) {
 
   return (
     <aside className="admin-sidebar hidden md:flex w-64 flex-col py-6 px-4 gap-6">
-      <div className="px-2">
-        <div className="flex items-center gap-2 text-lg font-semibold text-slate-800">
-          <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-[0_10px_20px_rgba(79,70,229,0.24)]">
-            KL
-          </span>
+      <div className="px-1">
+        <div className="flex items-center gap-3">
+          <span className="admin-brand-mark">KL</span>
           <div>
-            <div>Korelly</div>
+            <div className="font-sora text-lg font-semibold text-slate-900">Korelly</div>
             <div className="text-xs text-slate-500 flex items-center gap-2">
-              Team 1
-              <span className="admin-pill px-2 py-0.5 text-[10px]">Free</span>
+              Ops console
+              <span className="admin-pill px-2 py-0.5 text-[10px]">Live</span>
             </div>
           </div>
         </div>
       </div>
 
-      <nav className="flex flex-col gap-2">
+      <nav className="flex flex-col gap-1.5">
         {navItems.map((item) => (
-          <NavLink key={item.href} item={item} active={pathname === item.href} />
+          <NavLink key={item.href} item={item} active={pathname === item.href || pathname.startsWith(`${item.href}/`)} />
         ))}
       </nav>
 
-      <div className="mt-auto card p-4 text-sm text-slate-600 gradient-blue border border-[var(--admin-border)]">
-        <div className="font-semibold text-slate-900">More features?</div>
-        <p className="mt-1 text-xs text-slate-600">Upgrade to unlock automation and advanced analytics.</p>
-        <button className="mt-3 w-full admin-btn">Upgrade</button>
+      <div className="mt-auto admin-hero p-4">
+        <div className="relative z-10 space-y-2">
+          <div className="text-[10px] uppercase tracking-[0.16em] text-white/60">Command center</div>
+          <div className="text-sm font-semibold text-white">Need deeper automation?</div>
+          <p className="text-xs text-white/70 leading-relaxed">
+            Unlock analytics, agent controls, and bulk ops for Korelly.
+          </p>
+          <button className="mt-1 w-full rounded-full bg-white/95 text-indigo-700 px-3 py-2 text-xs font-semibold">
+            Explore plans
+          </button>
+        </div>
       </div>
     </aside>
   );

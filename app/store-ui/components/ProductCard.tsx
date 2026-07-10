@@ -44,13 +44,14 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
   const imageUrl = resolveImage(product.media);
 
   return (
-    <div className="store-card p-3 sm:p-4 flex flex-col gap-3 sm:gap-4">
+    <div className="store-card store-tile-lift p-3 sm:p-4 flex flex-col gap-3 sm:gap-4 relative overflow-hidden">
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--store-accent)] via-[var(--store-violet)] to-[var(--store-pink)] opacity-70" />
       <div className="flex items-center justify-between text-xs text-slate-500">
         <span>{product.category?.name ?? "Featured"}</span>
         <span className="store-chip px-2 py-0.5">{badge}</span>
       </div>
 
-      <div className="h-28 sm:h-36 rounded-2xl border border-[var(--store-border)] bg-gradient-to-br from-amber-50 via-white to-emerald-50 flex items-center justify-center text-3xl overflow-hidden">
+      <div className="h-28 sm:h-36 rounded-2xl border border-[var(--store-border)] bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 flex items-center justify-center text-3xl overflow-hidden">
         {imageUrl ? (
           <img src={imageUrl} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
         ) : (
@@ -59,7 +60,7 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
       </div>
 
       <div className="space-y-2">
-        <Link href={`/product/${product.id}`} className="font-sora text-base font-semibold text-slate-900">
+        <Link href={`/product/${product.id}`} className="font-sora text-base font-semibold text-slate-900 hover:text-[var(--store-accent)] transition">
           {product.name}
         </Link>
         <div className="flex items-center gap-2 text-sm">
@@ -73,12 +74,12 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
       <div className="grid grid-cols-2 gap-2 text-sm">
         <Link
           href={`/product/${product.id}`}
-          className="store-outline px-2.5 sm:px-3 py-2 text-center hover:border-slate-400 transition"
+          className="store-outline px-2.5 sm:px-3 py-2 text-center hover:border-[var(--store-accent)] transition"
         >
           View
         </Link>
         <button
-          className="rounded-full bg-[var(--store-accent)] text-white px-2.5 sm:px-3 py-2"
+          className="store-btn-primary px-2.5 sm:px-3 py-2"
           onClick={() =>
             add({
               productId: product.id,

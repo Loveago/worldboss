@@ -17,57 +17,66 @@ export default function MobileDrawer({ open, onClose, navItems }: MobileDrawerPr
   return (
     <div className={`md:hidden fixed inset-0 z-30 transition ${open ? "pointer-events-auto" : "pointer-events-none"}`}>
       <div
-        className={`absolute inset-0 bg-black/30 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 bg-black/35 transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
         onClick={onClose}
       />
       <div
-        className={`absolute left-0 top-0 h-full w-72 bg-white/95 backdrop-blur border-r border-[var(--admin-border)] shadow-2xl p-4 flex flex-col gap-4 transition-transform duration-200 ${
+        className={`admin-drawer absolute left-0 top-0 h-full w-72 p-4 flex flex-col gap-4 transition-transform duration-200 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-lg font-semibold text-slate-800">
-            <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-[0_10px_20px_rgba(79,70,229,0.24)]">
-              KL
-            </span>
+          <div className="flex items-center gap-2.5">
+            <span className="admin-brand-mark">KL</span>
             <div>
-              <div>Korelly</div>
-              <div className="text-xs text-slate-500">Team 1 · Free</div>
+              <div className="font-sora font-semibold text-slate-900">Korelly</div>
+              <div className="text-xs text-slate-500">Ops console</div>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-full p-2 bg-white border border-[var(--admin-border)]" aria-label="Close menu">
+          <button onClick={onClose} className="rounded-xl p-2 bg-white border border-[var(--admin-border)]" aria-label="Close menu">
             ✕
           </button>
         </div>
 
-        <nav className="flex flex-col gap-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm transition ${
-                pathname === item.href
-                  ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-[0_12px_24px_rgba(79,70,229,0.24)]"
-                  : "text-slate-700 hover:bg-indigo-50"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-lg">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
-              </span>
-              {item.badge && (
-                <span
-                  className={`text-xs rounded-full px-2 py-0.5 ${
-                    pathname === item.href ? "bg-white/20 text-white" : "bg-indigo-100 text-indigo-700"
-                  }`}
-                >
-                  {item.badge}
+        <nav className="flex flex-col gap-1.5">
+          {navItems.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={`admin-nav-link flex items-center justify-between text-sm ${
+                  active ? "admin-nav-active" : "text-slate-700 border border-[var(--admin-border)] bg-white/70"
+                }`}
+              >
+                <span className="flex items-center gap-2.5">
+                  <span
+                    className={`h-8 w-8 rounded-xl inline-flex items-center justify-center ${
+                      active ? "bg-white/20" : "bg-[var(--admin-accent-soft)]"
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="font-medium">{item.label}</span>
                 </span>
-              )}
-            </Link>
-          ))}
+                {item.badge && (
+                  <span
+                    className={`text-[10px] rounded-full px-2 py-0.5 font-semibold ${
+                      active ? "bg-white/20 text-white" : "bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]"
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
+
+        <Link href="/" onClick={onClose} className="mt-auto admin-btn justify-center">
+          Back to store
+        </Link>
       </div>
     </div>
   );

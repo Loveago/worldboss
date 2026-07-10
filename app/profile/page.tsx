@@ -250,15 +250,14 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 lg:p-7 relative overflow-hidden store-fade-up">
-        <div className="absolute -top-20 right-0 h-40 w-40 rounded-full bg-fuchsia-100 blur-3xl opacity-70" />
-        <div className="absolute -bottom-24 left-8 h-40 w-40 rounded-full bg-sky-100 blur-3xl opacity-70" />
+      <section className="kb-cosmos-panel p-5 md:p-7 store-fade-up">
         <div className="relative z-10 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="font-sora text-2xl md:text-3xl text-slate-900">My Profile</h1>
-            <p className="text-sm text-slate-600">Wallet, profile settings, and order tracking in one place.</p>
+          <div className="space-y-2">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Account hub</span>
+            <h1 className="font-sora text-2xl md:text-3xl text-white">My Profile</h1>
+            <p className="text-sm text-white/70">Wallet, profile settings, and order tracking in one place.</p>
           </div>
-          <div className="text-xs text-slate-500">Member since {profile ? formatDate(profile.createdAt) : "-"}</div>
+          <div className="text-xs text-white/60">Member since {profile ? formatDate(profile.createdAt) : "-"}</div>
         </div>
       </section>
 
@@ -281,17 +280,16 @@ export default function ProfilePage() {
 
       {!profileQuery.isLoading && !errorMessage && profile && wallet && orderData && (
         <>
-          <section className="store-glass p-5 md:p-6 relative overflow-hidden store-fade-up" style={{ animationDelay: "80ms" }}>
-            <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
-            <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <section className="store-card p-5 md:p-6 store-fade-up" style={{ animationDelay: "80ms" }}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-gradient-to-br from-indigo-500 to-sky-500 text-white font-semibold text-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <div className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white font-semibold text-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
                   {profileInitial}
                 </div>
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h2 className="font-sora text-2xl text-slate-900">{profile.name}</h2>
-                    <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-semibold">{profile.role}</span>
+                    <span className="kb-chip text-[10px]">{profile.role}</span>
                   </div>
                   <p className="text-sm text-slate-600">{profile.email}</p>
                   <p className="text-xs text-slate-500">Member since {formatDate(profile.createdAt)}</p>
@@ -301,35 +299,33 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => setActivePanel("profile")}
-                className="store-outline px-4 py-2 text-sm font-medium text-slate-700 bg-white/80 w-fit"
+                className="store-outline px-4 py-2 text-sm font-medium text-slate-700 bg-white w-fit"
               >
                 Edit profile
               </button>
             </div>
           </section>
 
-          <section className="store-card p-0 overflow-hidden store-fade-up" style={{ animationDelay: "110ms" }}>
-            <div className="grid sm:grid-cols-2 xl:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-              <div className="px-4 py-4">
-                <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet balance</div>
-                <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(wallet.balance)}</div>
-                <div className="text-xs text-slate-500">Available to spend</div>
-              </div>
-              <div className="px-4 py-4">
-                <div className="text-[11px] uppercase tracking-wide text-slate-500">Total spent</div>
-                <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(orderData.totalSpent)}</div>
-                <div className="text-xs text-slate-500">All-time spending</div>
-              </div>
-              <div className="px-4 py-4">
-                <div className="text-[11px] uppercase tracking-wide text-slate-500">Total orders</div>
-                <div className="mt-1 text-2xl font-semibold text-slate-900">{orderData.summary.total}</div>
-                <div className="text-xs text-slate-500">Orders placed</div>
-              </div>
-              <div className="px-4 py-4">
-                <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet deposits</div>
-                <div className="mt-1 text-2xl font-semibold text-slate-900">{wallet.depositsCount}</div>
-                <div className="text-xs text-slate-500">Successful top-ups</div>
-              </div>
+          <section className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 store-fade-up" style={{ animationDelay: "110ms" }}>
+            <div className="store-metric px-4 py-4">
+              <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet balance</div>
+              <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(wallet.balance)}</div>
+              <div className="text-xs text-slate-500">Available to spend</div>
+            </div>
+            <div className="store-metric px-4 py-4">
+              <div className="text-[11px] uppercase tracking-wide text-slate-500">Total spent</div>
+              <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(orderData.totalSpent)}</div>
+              <div className="text-xs text-slate-500">All-time spending</div>
+            </div>
+            <div className="store-metric px-4 py-4">
+              <div className="text-[11px] uppercase tracking-wide text-slate-500">Total orders</div>
+              <div className="mt-1 text-2xl font-semibold text-slate-900">{orderData.summary.total}</div>
+              <div className="text-xs text-slate-500">Orders placed</div>
+            </div>
+            <div className="store-metric px-4 py-4">
+              <div className="text-[11px] uppercase tracking-wide text-slate-500">Wallet deposits</div>
+              <div className="mt-1 text-2xl font-semibold text-slate-900">{wallet.depositsCount}</div>
+              <div className="text-xs text-slate-500">Successful top-ups</div>
             </div>
           </section>
 
@@ -439,20 +435,20 @@ export default function ProfilePage() {
                   <input
                     value={name}
                     onChange={(event) => setName(event.target.value)}
-                    className="w-full store-outline px-3 py-2 text-sm"
+                    className="kb-input"
                     placeholder="Your name"
                   />
                 </label>
                 <label className="space-y-1.5 block">
                   <span className="text-xs text-slate-500">Email</span>
-                  <input value={profile.email} readOnly className="w-full store-outline px-3 py-2 text-sm bg-slate-50 text-slate-500" />
+                  <input value={profile.email} readOnly className="kb-input bg-slate-50 text-slate-500" />
                 </label>
                 <label className="space-y-1.5 block">
                   <span className="text-xs text-slate-500">Phone</span>
                   <input
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                    className="w-full store-outline px-3 py-2 text-sm"
+                    className="kb-input"
                     placeholder="024 000 0000"
                   />
                 </label>
@@ -462,7 +458,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={saveProfileMutation.isLoading || name.trim().length < 2}
-                  className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
+                  className="store-btn-primary px-4 py-2.5 text-sm disabled:opacity-60"
                 >
                   {saveProfileMutation.isLoading ? "Saving..." : "Save profile"}
                 </button>
@@ -507,14 +503,14 @@ export default function ProfilePage() {
                     step="0.01"
                     value={depositAmount}
                     onChange={(event) => setDepositAmount(event.target.value)}
-                    className="store-outline px-3 py-2 text-sm w-[170px]"
+                    className="kb-input w-[170px]"
                     placeholder="Custom amount"
                   />
                   <button
                     type="button"
                     onClick={() => startDeposit(parsedDepositAmount)}
                     disabled={walletDepositMutation.isLoading || !Number.isFinite(parsedDepositAmount) || parsedDepositAmount <= 0}
-                    className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
+                    className="store-btn-primary px-4 py-2.5 text-sm disabled:opacity-60"
                   >
                     {walletDepositMutation.isLoading ? "Redirecting..." : "Deposit now"}
                   </button>
@@ -674,7 +670,7 @@ export default function ProfilePage() {
                   <div className="space-y-2">
                     <label className="text-xs text-slate-500">Storefront name</label>
                     <input
-                      className="w-full store-outline px-3 py-2 text-sm"
+                      className="kb-input"
                       value={storefrontName}
                       onChange={(event) => setStorefrontName(event.target.value)}
                       placeholder="Kwame Data Deals"
@@ -682,13 +678,13 @@ export default function ProfilePage() {
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
                     <input
-                      className="w-full store-outline px-3 py-2 text-sm"
+                      className="kb-input"
                       value={agentPhone}
                       onChange={(event) => setAgentPhone(event.target.value)}
                       placeholder="Phone number"
                     />
                     <input
-                      className="w-full store-outline px-3 py-2 text-sm"
+                      className="kb-input"
                       value={agentWhatsapp}
                       onChange={(event) => setAgentWhatsapp(event.target.value)}
                       placeholder="WhatsApp number"
@@ -709,7 +705,7 @@ export default function ProfilePage() {
                       })
                     }
                     disabled={applyAgentMutation.isLoading || !storefrontName.trim() || !agentPhone.trim() || !agentWhatsapp.trim()}
-                    className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm disabled:opacity-60"
+                    className="store-btn-primary px-4 py-2.5 text-sm disabled:opacity-60"
                   >
                     {applyAgentMutation.isLoading ? "Submitting..." : "Apply to become an agent"}
                   </button>

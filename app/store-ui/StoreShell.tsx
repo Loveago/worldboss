@@ -210,27 +210,30 @@ export default function StoreShell({
         <main className="w-full">{children}</main>
       ) : (
         <div className="mx-auto w-full max-w-[1360px] px-3 py-3 md:px-4 md:py-4">
-          <div className="grid gap-4 md:grid-cols-[240px_minmax(0,1fr)] lg:gap-5">
-            <aside className="store-card hidden md:flex h-[calc(100vh-2rem)] sticky top-4 flex-col p-4 lg:p-5">
-              <Link href="/" className="font-sora text-xl font-semibold flex items-center gap-2 text-slate-900">
-                <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
-                  <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
+          <div className="grid gap-4 md:grid-cols-[250px_minmax(0,1fr)] lg:gap-5">
+            <aside className="store-sidebar hidden md:flex h-[calc(100vh-2rem)] sticky top-4 flex-col p-4 lg:p-5">
+              <Link href="/" className="font-sora text-xl font-semibold flex items-center gap-2.5 text-slate-900">
+                <span className="store-brand-mark" aria-hidden>
+                  <NavIconGlyph name="bolt" className="h-4 w-4" />
                 </span>
-                <span>Korelly</span>
+                <span>
+                  Korelly
+                  <span className="block text-[11px] font-medium text-slate-500 tracking-wide">Command store</span>
+                </span>
               </Link>
 
-              <nav className="mt-6 flex-1 space-y-1.5 overflow-auto pr-1">
+              <nav className="mt-7 flex-1 space-y-1.5 overflow-auto pr-1">
                 {sidebarItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm transition ${
-                      isActive(item.href)
-                        ? "bg-[var(--store-accent-soft)] text-[var(--store-accent)] font-semibold"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                    }`}
+                    className={`store-nav-link ${isActive(item.href) ? "store-nav-active" : ""}`}
                   >
-                    <span className={`h-7 w-7 rounded-lg inline-flex items-center justify-center ${isActive(item.href) ? "bg-white/80" : "bg-slate-100/80"}`}>
+                    <span
+                      className={`h-8 w-8 rounded-xl inline-flex items-center justify-center ${
+                        isActive(item.href) ? "bg-white/20" : "bg-[var(--store-accent-soft)] text-[var(--store-accent)]"
+                      }`}
+                    >
                       <NavIconGlyph name={item.icon} className="h-4 w-4" />
                     </span>
                     <span>{item.label}</span>
@@ -238,23 +241,27 @@ export default function StoreShell({
                 ))}
               </nav>
 
-              {user ? (
-                <button
-                  type="button"
-                  onClick={() => logoutMutation.mutate()}
-                  disabled={logoutMutation.isLoading}
-                  className="store-outline mt-4 px-3 py-2 text-xs font-medium"
-                >
-                  {logoutMutation.isLoading ? "Signing out..." : "Sign out"}
-                </button>
-              ) : (
-                <Link
-                  href="/register"
-                  className="mt-4 rounded-xl bg-[var(--store-accent)] px-3 py-2 text-center text-xs font-semibold text-white"
-                >
-                  Create account
-                </Link>
-              )}
+              <div className="mt-4 space-y-2">
+                {isAdmin && (
+                  <Link href="/admin/dashboard" className="store-outline w-full px-3 py-2 text-xs font-medium text-center block">
+                    Admin console
+                  </Link>
+                )}
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isLoading}
+                    className="store-outline w-full px-3 py-2 text-xs font-medium"
+                  >
+                    {logoutMutation.isLoading ? "Signing out..." : "Sign out"}
+                  </button>
+                ) : (
+                  <Link href="/register" className="store-btn-primary block w-full px-3 py-2.5 text-center text-xs">
+                    Create account
+                  </Link>
+                )}
+              </div>
             </aside>
 
             <div className="min-w-0 space-y-4">
@@ -274,9 +281,9 @@ export default function StoreShell({
                           <span className="h-0.5 w-4 rounded-full bg-current" />
                         </span>
                       </button>
-                      <Link href="/" className="font-sora text-[1.65rem] font-semibold flex items-center gap-2 text-slate-900 leading-none">
-                        <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
-                          <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
+                      <Link href="/" className="font-sora text-[1.55rem] font-semibold flex items-center gap-2 text-slate-900 leading-none">
+                        <span className="store-brand-mark" aria-hidden>
+                          <NavIconGlyph name="bolt" className="h-4 w-4" />
                         </span>
                         <span>Korelly</span>
                       </Link>
@@ -300,11 +307,15 @@ export default function StoreShell({
                       <span className="text-slate-500">
                         <NavIconGlyph name="search" className="h-4 w-4" />
                       </span>
-                      <input className="flex-1 bg-transparent text-sm outline-none" placeholder="Search gadgets, templates, data bundles..." />
+                      <input className="flex-1 bg-transparent text-sm outline-none" placeholder="Search gadgets, templates, data..." />
                     </label>
-                    <button type="button" className="h-11 w-11 rounded-2xl bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white inline-flex items-center justify-center shadow-[0_12px_20px_rgba(236,72,153,0.3)]" aria-label="Quick actions">
-                      ✨
-                    </button>
+                    <Link
+                      href="/data"
+                      className="h-11 w-11 rounded-2xl store-btn-primary inline-flex items-center justify-center"
+                      aria-label="Buy data"
+                    >
+                      <NavIconGlyph name="signal" className="h-4 w-4" />
+                    </Link>
                   </div>
 
                   {user ? (
@@ -316,7 +327,7 @@ export default function StoreShell({
                         type="button"
                         onClick={() => logoutMutation.mutate()}
                         disabled={logoutMutation.isLoading}
-                        className="rounded-2xl bg-[var(--store-accent)] px-4 py-2.5 text-sm text-white font-semibold"
+                        className="store-btn-primary px-4 py-2.5 text-sm"
                       >
                         {logoutMutation.isLoading ? "Signing out..." : "Sign out"}
                       </button>
@@ -326,8 +337,8 @@ export default function StoreShell({
                       <Link href="/login" className="store-outline px-4 py-2.5 text-sm text-center font-medium bg-white/90">
                         Sign in
                       </Link>
-                      <Link href="/register" className="rounded-2xl bg-gradient-to-r from-[var(--store-accent)] to-violet-500 px-4 py-2.5 text-sm text-center text-white font-semibold shadow-[0_12px_22px_rgba(91,92,230,0.32)]">
-                        Register ✨
+                      <Link href="/register" className="store-btn-primary px-4 py-2.5 text-sm text-center">
+                        Register
                       </Link>
                     </div>
                   )}
@@ -341,7 +352,7 @@ export default function StoreShell({
                         href={item.href}
                         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs border transition whitespace-nowrap ${
                           isActive(item.href)
-                            ? "border-[var(--store-accent)] bg-[var(--store-accent-soft)] text-[var(--store-accent)] font-semibold"
+                            ? "border-transparent store-nav-active"
                             : "border-[var(--store-border)] text-slate-600 bg-white"
                         }`}
                       >
@@ -388,7 +399,7 @@ export default function StoreShell({
                       <Link href="/login" className="store-outline px-3 py-2 text-xs font-medium">
                         Sign in
                       </Link>
-                      <Link href="/register" className="rounded-xl bg-[var(--store-accent)] px-3 py-2 text-xs font-semibold text-white">
+                      <Link href="/register" className="store-btn-primary px-3.5 py-2 text-xs">
                         Register
                       </Link>
                     </>
@@ -401,11 +412,22 @@ export default function StoreShell({
               <footer className="store-card px-4 py-4 mb-20 md:mb-0 text-xs sm:text-sm text-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="font-medium text-slate-800">Korelly</span>
-                  <a href="tel:0547419727" className="hover:text-[var(--store-accent)] transition">0547419727</a>
+                  <a href="tel:0547419727" className="hover:text-[var(--store-accent)] transition">
+                    0547419727
+                  </a>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <a href="mailto:officialkorelly@gmail.com" className="hover:text-[var(--store-accent)] transition">officialkorelly@gmail.com</a>
-                  <a href="https://chat.whatsapp.com/GbPWhbaiybQLFgDwcx2182?s=cl&p=a&mlu=1" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--store-accent)] transition">WhatsApp</a>
+                  <a href="mailto:officialkorelly@gmail.com" className="hover:text-[var(--store-accent)] transition">
+                    officialkorelly@gmail.com
+                  </a>
+                  <a
+                    href="https://chat.whatsapp.com/GbPWhbaiybQLFgDwcx2182?s=cl&p=a&mlu=1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[var(--store-accent)] transition"
+                  >
+                    WhatsApp
+                  </a>
                 </div>
               </footer>
             </div>
@@ -413,33 +435,38 @@ export default function StoreShell({
 
           {isMobileMenuOpen && (
             <div className="md:hidden fixed inset-0 z-50">
-              <button type="button" className="absolute inset-0 bg-slate-900/35" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu" />
-              <div className="absolute left-0 top-0 h-full w-[86%] max-w-[320px] bg-white border-r border-[var(--store-border)] shadow-[0_22px_46px_rgba(17,24,39,0.2)] p-4 flex flex-col gap-4 overflow-y-auto">
+              <button type="button" className="absolute inset-0 bg-slate-900/40" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu" />
+              <div className="store-drawer absolute left-0 top-0 h-full w-[86%] max-w-[320px] p-4 flex flex-col gap-4 overflow-y-auto">
                 <div className="flex items-center justify-between">
                   <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-sora text-lg font-semibold flex items-center gap-2 text-slate-900">
-                    <span className="h-8 w-8 rounded-xl bg-[var(--store-accent-soft)] text-[var(--store-accent)] flex items-center justify-center" aria-hidden>
-                      <NavIconGlyph name="bolt" className="h-4.5 w-4.5" />
+                    <span className="store-brand-mark" aria-hidden>
+                      <NavIconGlyph name="bolt" className="h-4 w-4" />
                     </span>
                     <span>Korelly</span>
                   </Link>
-                  <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="h-9 w-9 rounded-xl border border-[var(--store-border)] inline-flex items-center justify-center text-slate-600" aria-label="Close menu">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="h-9 w-9 rounded-xl border border-[var(--store-border)] inline-flex items-center justify-center text-slate-600"
+                    aria-label="Close menu"
+                  >
                     ✕
                   </button>
                 </div>
 
-                <nav className="space-y-2">
+                <nav className="space-y-1.5">
                   {sidebarItems.map((item) => (
                     <Link
                       key={`drawer-${item.href}`}
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition ${
-                        isActive(item.href)
-                          ? "border-[var(--store-accent)] bg-[var(--store-accent-soft)] text-[var(--store-accent)]"
-                          : "border-[var(--store-border)] bg-white text-slate-700"
-                      }`}
+                      className={`store-nav-link ${isActive(item.href) ? "store-nav-active" : "border border-[var(--store-border)] bg-white/70"}`}
                     >
-                      <span className="h-7 w-7 rounded-lg inline-flex items-center justify-center bg-slate-100/80">
+                      <span
+                        className={`h-8 w-8 rounded-xl inline-flex items-center justify-center ${
+                          isActive(item.href) ? "bg-white/20" : "bg-[var(--store-accent-soft)] text-[var(--store-accent)]"
+                        }`}
+                      >
                         <NavIconGlyph name={item.icon} className="h-4 w-4" />
                       </span>
                       <span className="text-sm font-medium">{item.label}</span>
@@ -451,7 +478,7 @@ export default function StoreShell({
                   <Link
                     href="/register"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="rounded-xl bg-[var(--store-accent)] px-3 py-2.5 text-center text-sm font-semibold text-white"
+                    className="store-btn-primary px-3 py-2.5 text-center text-sm"
                   >
                     Create account
                   </Link>
@@ -474,10 +501,7 @@ export default function StoreShell({
                     <Link href="/cart" className="store-outline px-3 py-1.5 text-xs bg-white/80 active:scale-95 transition-transform">
                       View cart
                     </Link>
-                    <Link
-                      href="/checkout"
-                      className="rounded-full bg-[var(--store-accent)] text-white px-3 py-1.5 text-xs active:scale-95 transition-transform"
-                    >
+                    <Link href="/checkout" className="store-btn-primary px-3 py-1.5 text-xs active:scale-95 transition-transform">
                       Checkout
                     </Link>
                   </div>
@@ -487,7 +511,7 @@ export default function StoreShell({
           )}
 
           <div className="md:hidden fixed bottom-3 left-3 right-3 z-40">
-            <div className="rounded-[20px] border border-[var(--store-border)] bg-white/95 px-2 py-2 grid grid-cols-4 gap-1 shadow-[0_18px_34px_rgba(44,62,128,0.14)] backdrop-blur-xl">
+            <div className="store-bottom-nav px-2 py-2 grid grid-cols-4 gap-1">
               {mobileNavItems.map((item) => (
                 <Link
                   key={item.href}
@@ -508,7 +532,9 @@ export default function StoreShell({
                       </span>
                     )}
                   </span>
-                  <span className={`leading-none truncate max-w-full ${isActive(item.href) ? "font-semibold" : ""}`}>{item.label}</span>
+                  <span className={`leading-none truncate max-w-full text-[11px] ${isActive(item.href) ? "font-semibold" : ""}`}>
+                    {item.label}
+                  </span>
                   {isActive(item.href) && <span className="h-0.5 w-6 rounded-full bg-[var(--store-accent)]" />}
                 </Link>
               ))}

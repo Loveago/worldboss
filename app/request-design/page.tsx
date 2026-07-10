@@ -46,46 +46,43 @@ export default function RequestDesignPage() {
 
   return (
     <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Request a design</div>
-            <h1 className="font-sora text-2xl text-slate-900 mt-2">Need a bespoke look for your brand?</h1>
-            <p className="text-sm text-slate-600 mt-2 max-w-xl">
+          <div className="space-y-2">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Design concierge</span>
+            <h1 className="font-sora text-2xl md:text-3xl text-white">Need a bespoke look for your brand?</h1>
+            <p className="text-sm text-white/70 max-w-xl">
               Share your vision and assets. Our design concierge will respond within 1 business day with next steps.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="store-pill px-3 py-1 text-xs">No checkout needed</span>
-            <span className="store-chip px-3 py-1 text-xs">Custom quotes</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white">No checkout needed</span>
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white">Custom quotes</span>
           </div>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Response time</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">1 business day</div>
-            <div className="text-xs text-slate-500">Average first reply</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Channels</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">2</div>
-            <div className="text-xs text-slate-500">WhatsApp & Telegram</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Service mode</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">Concierge</div>
-            <div className="text-xs text-slate-500">Tailored design support</div>
-          </div>
+      <section className="grid sm:grid-cols-3 gap-3">
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Response time</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">1 business day</div>
+          <div className="text-xs text-slate-500">Average first reply</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Channels</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">2</div>
+          <div className="text-xs text-slate-500">WhatsApp & Telegram</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Service mode</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">Concierge</div>
+          <div className="text-xs text-slate-500">Tailored design support</div>
         </div>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <div className="store-card p-6 space-y-5">
-          <div className="text-sm font-semibold text-slate-900">Tell us about your project</div>
+          <div className="font-sora text-lg text-slate-900">Tell us about your project</div>
           <form
             className="space-y-4"
             onSubmit={(event) => {
@@ -101,7 +98,7 @@ export default function RequestDesignPage() {
             <label className="block text-sm text-slate-600 space-y-2">
               <span>Name</span>
               <input
-                className="w-full store-outline bg-white px-4 py-3 text-sm outline-none"
+                className="kb-input"
                 value={form.name}
                 onChange={(event) => updateField("name", event.target.value)}
                 placeholder="Ama Mensah"
@@ -111,7 +108,7 @@ export default function RequestDesignPage() {
             <label className="block text-sm text-slate-600 space-y-2">
               <span>Phone or email</span>
               <input
-                className="w-full store-outline bg-white px-4 py-3 text-sm outline-none"
+                className="kb-input"
                 value={form.contact}
                 onChange={(event) => updateField("contact", event.target.value)}
                 placeholder="+233 54 000 0000"
@@ -128,7 +125,7 @@ export default function RequestDesignPage() {
                     onClick={() => updateField("channel", channel)}
                     className={`px-4 py-2 text-xs rounded-full border transition ${
                       form.channel === channel
-                        ? "bg-[var(--store-accent)] text-white border-transparent"
+                        ? "bg-[var(--store-accent)] text-white border-transparent shadow-[0_8px_18px_rgba(99,102,241,0.28)]"
                         : "border-[var(--store-border)] text-slate-600 bg-white"
                     }`}
                   >
@@ -140,7 +137,7 @@ export default function RequestDesignPage() {
             <label className="block text-sm text-slate-600 space-y-2">
               <span>Project notes (optional)</span>
               <textarea
-                className="w-full min-h-[140px] rounded-2xl border border-[var(--store-border)] bg-white px-4 py-3 text-sm outline-none"
+                className="kb-input min-h-[140px]"
                 value={form.message}
                 onChange={(event) => updateField("message", event.target.value)}
                 placeholder="Logo refresh, social media templates, or packaging mockups..."
@@ -152,7 +149,7 @@ export default function RequestDesignPage() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-[var(--store-accent)] text-white px-4 py-3 text-sm font-semibold"
+              className="store-btn-primary w-full px-4 py-3 text-sm font-semibold disabled:opacity-60"
               disabled={mutation.isLoading}
             >
               {mutation.isLoading ? "Sending..." : "Send request"}
@@ -162,13 +159,13 @@ export default function RequestDesignPage() {
 
         <div className="space-y-4">
           <div className="store-card p-5 space-y-3">
-            <div className="text-sm font-semibold text-slate-900">Quick contact</div>
+            <div className="font-sora text-lg text-slate-900">Quick contact</div>
             <p className="text-sm text-slate-600">
               Prefer to chat? Reach us instantly on your favorite messaging app.
             </p>
             <div className="grid gap-3">
               <a
-                className="rounded-full bg-emerald-500 text-white text-center py-3 text-sm font-semibold"
+                className="rounded-full bg-emerald-500 text-white text-center py-3 text-sm font-semibold hover:bg-emerald-600 transition"
                 href="https://wa.me/1234567890"
                 target="_blank"
                 rel="noreferrer"
@@ -176,7 +173,7 @@ export default function RequestDesignPage() {
                 WhatsApp concierge
               </a>
               <a
-                className="rounded-full bg-blue-500 text-white text-center py-3 text-sm font-semibold"
+                className="rounded-full bg-sky-500 text-white text-center py-3 text-sm font-semibold hover:bg-sky-600 transition"
                 href="https://t.me/bossmarket"
                 target="_blank"
                 rel="noreferrer"
@@ -189,7 +186,7 @@ export default function RequestDesignPage() {
           <div className="store-card p-5 space-y-3 text-sm text-slate-600">
             <div className="text-xs uppercase tracking-[0.2em] text-slate-500">What we can help with</div>
             <ul className="space-y-2">
-              <li>• Brand identity refresh &amp; logo systems</li>
+              <li>• Brand identity refresh & logo systems</li>
               <li>• Event flyers, social media kits, and templates</li>
               <li>• Packaging mockups, product sheets, and brochures</li>
               <li>• UI visuals for product launches</li>

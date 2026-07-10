@@ -185,14 +185,11 @@ export default function ReceiptView({
 
           <div className="flex flex-wrap justify-center gap-3">
             {secondaryHref && secondaryLabel && (
-              <Link href={secondaryHref} className="store-outline px-4 py-2 text-sm">
+              <Link href={secondaryHref} className="store-outline px-4 py-2.5 text-sm">
                 {secondaryLabel}
               </Link>
             )}
-            <Link
-              href={primaryHref}
-              className="rounded-full bg-emerald-600 text-white px-5 py-2.5 text-sm font-medium shadow-[0_14px_28px_rgba(5,150,105,0.3)] hover:bg-emerald-700 transition"
-            >
+            <Link href={primaryHref} className="store-btn-primary px-5 py-2.5 text-sm">
               {primaryLabel}
             </Link>
           </div>

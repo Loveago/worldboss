@@ -45,13 +45,12 @@ export default function LoginPage() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-start">
-      <section className="store-glass p-6 md:p-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
-        <div className="relative z-10 space-y-4">
-          <span className="store-pill px-3 py-1 text-xs">Welcome back</span>
-          <h1 className="font-sora text-2xl md:text-3xl text-slate-900">Sign in to Korelly</h1>
-          <p className="text-sm text-slate-600">
-            Keep your cart synced, track deliveries, and unlock concierge support.
+      <section className="kb-cosmos-panel p-6 md:p-8">
+        <div className="relative z-10 space-y-5">
+          <span className="kb-chip bg-white/10 text-white border border-white/15">Welcome back</span>
+          <h1 className="font-sora text-2xl md:text-3xl text-white">Sign in to Korelly</h1>
+          <p className="text-sm text-white/70 max-w-lg">
+            Keep your cart synced, track deliveries, and unlock concierge support across gadgets, kits, and data.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {[
@@ -62,11 +61,11 @@ export default function LoginPage() {
             ].map((item, index) => (
               <div
                 key={item.title}
-                className="store-card p-4 bg-white/80 space-y-1 store-fade-up"
+                className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3 space-y-1 store-fade-up"
                 style={{ animationDelay: `${120 + index * 90}ms` }}
               >
-                <div className="text-sm font-semibold text-slate-900">{item.title}</div>
-                <div className="text-xs text-slate-500">{item.copy}</div>
+                <div className="text-sm font-semibold text-white">{item.title}</div>
+                <div className="text-xs text-white/60">{item.copy}</div>
               </div>
             ))}
           </div>
@@ -84,7 +83,7 @@ export default function LoginPage() {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full store-outline px-3 py-2 text-sm"
+            className="kb-input"
             placeholder="you@email.com"
           />
         </div>
@@ -94,24 +93,20 @@ export default function LoginPage() {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full store-outline px-3 py-2 text-sm"
+            className="kb-input"
             placeholder="••••••••"
           />
         </div>
 
-        {error && <div className="store-card p-3 text-xs text-rose-600">{error}</div>}
+        {error && <div className="store-card p-3 text-xs text-rose-600 border border-rose-200 bg-rose-50">{error}</div>}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm w-full disabled:opacity-60"
-        >
+        <button type="submit" disabled={submitting} className="store-btn-primary px-4 py-2.5 text-sm w-full disabled:opacity-60">
           {submitting ? "Signing in..." : "Sign in"}
         </button>
 
         <div className="text-xs text-slate-500 text-center">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-[var(--store-accent)]">
+          Don't have an account?{" "}
+          <Link href="/register" className="text-[var(--store-accent)] font-medium">
             Create one
           </Link>
         </div>

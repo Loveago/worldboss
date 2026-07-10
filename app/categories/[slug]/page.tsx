@@ -50,43 +50,41 @@ export default function CategoryDetailPage() {
 
   return (
     <div className="space-y-5 md:space-y-6">
-      <section className="store-glass p-4 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="font-sora text-[1.7rem] leading-[1.04] md:text-3xl text-slate-900">{category ? category.name : "Category"}</h1>
-            <p className="text-[13px] md:text-sm text-slate-600">
+          <div className="space-y-2">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Category</span>
+            <h1 className="font-sora text-[1.75rem] leading-[1.05] md:text-3xl text-white">{category ? category.name : "Category"}</h1>
+            <p className="text-[13px] md:text-sm text-white/70">
               {category ? "Browse the latest picks in this category." : "Select a category to explore products."}
             </p>
           </div>
-          <Link href="/categories" className="store-outline px-4 py-2.5 text-sm w-fit bg-white/85">
+          <Link href="/categories" className="rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm w-fit text-white hover:bg-white/15 transition">
             All categories
           </Link>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden hidden md:block">
-        <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Category status</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{category ? "Found" : "Missing"}</div>
-            <div className="text-xs text-slate-500">Slug: {slug || "-"}</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Products in category</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalProducts}</div>
-            <div className="text-xs text-slate-500">Matching storefront items</div>
-          </div>
+      <section className="hidden md:grid sm:grid-cols-2 gap-3">
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Category status</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{category ? "Found" : "Missing"}</div>
+          <div className="text-xs text-slate-500">Slug: {slug || "-"}</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Products in category</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{totalProducts}</div>
+          <div className="text-xs text-slate-500">Matching storefront items</div>
         </div>
       </section>
 
       <section className="md:hidden">
         <div className="grid grid-cols-2 gap-2">
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Status</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{category ? "Found" : "Missing"}</div>
           </div>
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Products</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{totalProducts}</div>
           </div>

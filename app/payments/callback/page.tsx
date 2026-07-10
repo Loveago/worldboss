@@ -28,10 +28,21 @@ type VerifyResponse = {
 function PaymentCallbackCard({ error }: { error?: string | null }) {
   return (
     <div className="mx-auto max-w-xl px-4 py-14">
-      <div className="store-card p-6 space-y-3 text-center">
-        <h1 className="font-sora text-xl text-slate-900">Confirming your payment</h1>
-        <p className="text-sm text-slate-600">Please wait while we verify your transaction and prepare your receipt.</p>
-        {error && <p className="text-sm text-rose-600">{error}</p>}
+      <div className="kb-cosmos-panel p-6 md:p-8 space-y-4 text-center">
+        <div className="relative z-10 space-y-3">
+          <div className="mx-auto h-12 w-12 rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-xl">
+            {error ? "⚠️" : "⏳"}
+          </div>
+          <h1 className="font-sora text-xl md:text-2xl text-white">
+            {error ? "Payment verification issue" : "Confirming your payment"}
+          </h1>
+          <p className="text-sm text-white/70">
+            {error
+              ? "We hit a snag verifying this transaction. You can retry from checkout or contact support with your reference."
+              : "Please wait while we verify your transaction and prepare your receipt."}
+          </p>
+          {error && <p className="text-sm text-rose-200">{error}</p>}
+        </div>
       </div>
     </div>
   );

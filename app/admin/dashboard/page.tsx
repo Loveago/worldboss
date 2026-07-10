@@ -126,15 +126,23 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardLayout
-      hero={<h1 className="text-2xl font-semibold text-slate-900">Admin overview</h1>}
+      hero={
+        <div className="space-y-2">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-white/60">Mission control</div>
+          <h1 className="font-sora text-2xl md:text-3xl font-semibold text-white">Admin overview</h1>
+          <p className="text-sm text-white/70 max-w-2xl">
+            Revenue, inventory, and fulfillment signals — tuned for Korelly's cosmos command aesthetic.
+          </p>
+        </div>
+      }
       stats={stats.map((stat) => (
         <StatCard key={stat.label} {...stat} />
       ))}
     >
-      <div className="card p-4 bg-white space-y-3">
+      <div className="card p-4 md:p-5 space-y-3 border border-[var(--admin-border)]">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-semibold text-slate-900">Recent orders</div>
-          <span className="text-xs text-slate-500">{orders.length} total</span>
+          <div className="text-sm font-semibold text-slate-900 font-sora">Recent orders</div>
+          <span className="admin-pill px-2.5 py-0.5 text-[10px]">{orders.length} total</span>
         </div>
         {ordersQuery.isLoading && <div className="text-sm text-slate-500">Loading orders...</div>}
         {ordersError && <div className="text-sm text-rose-600">{ordersError}</div>}
@@ -144,12 +152,13 @@ export default function AdminDashboardPage() {
         {!ordersQuery.isLoading && !ordersError && recentOrders.length > 0 && (
           <div className="space-y-2">
             {recentOrders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between text-sm text-slate-700">
+              <div
+                key={order.id}
+                className="flex items-center justify-between rounded-xl border border-[var(--admin-border)] bg-[color-mix(in_srgb,var(--admin-card)_94%,var(--admin-bg)_6%)] px-3 py-2.5 text-sm text-slate-700"
+              >
                 <div>
                   <div className="font-medium text-slate-900">#{order.id.slice(0, 6)}</div>
-                  <div className="text-xs text-slate-500">
-                    {order.user?.name || order.user?.email || "Guest"}
-                  </div>
+                  <div className="text-xs text-slate-500">{order.user?.name || order.user?.email || "Guest"}</div>
                 </div>
                 <div className="text-right">
                   <div className="font-semibold text-slate-900">{formatCurrency(toNumber(order.total))}</div>
@@ -160,10 +169,10 @@ export default function AdminDashboardPage() {
           </div>
         )}
       </div>
-      <div className="card p-4 bg-white space-y-3">
+      <div className="card p-4 md:p-5 space-y-3 border border-[var(--admin-border)]">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-semibold text-slate-900">Recent payments</div>
-          <span className="text-xs text-slate-500">{payments.length} total</span>
+          <div className="text-sm font-semibold text-slate-900 font-sora">Recent payments</div>
+          <span className="admin-pill px-2.5 py-0.5 text-[10px]">{payments.length} total</span>
         </div>
         {paymentsQuery.isLoading && <div className="text-sm text-slate-500">Loading payments...</div>}
         {paymentsError && <div className="text-sm text-rose-600">{paymentsError}</div>}
@@ -173,7 +182,10 @@ export default function AdminDashboardPage() {
         {!paymentsQuery.isLoading && !paymentsError && recentPayments.length > 0 && (
           <div className="space-y-2">
             {recentPayments.map((payment) => (
-              <div key={payment.id} className="flex items-center justify-between text-sm text-slate-700">
+              <div
+                key={payment.id}
+                className="flex items-center justify-between rounded-xl border border-[var(--admin-border)] bg-[color-mix(in_srgb,var(--admin-card)_94%,var(--admin-bg)_6%)] px-3 py-2.5 text-sm text-slate-700"
+              >
                 <div>
                   <div className="font-medium text-slate-900">{payment.reference}</div>
                   <div className="text-xs text-slate-500">

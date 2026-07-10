@@ -66,58 +66,55 @@ export default function ShopPage() {
 
   return (
     <div className="space-y-5 md:space-y-6">
-      <section className="store-glass p-4 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <span className="store-pill px-3 py-1 text-[11px] md:text-xs">Shop collection</span>
-            <h1 className="font-sora text-[1.7rem] leading-[1.04] md:text-3xl text-slate-900">Build your next drop.</h1>
-            <p className="text-[13px] md:text-sm text-slate-600">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Shop collection</span>
+            <h1 className="font-sora text-[1.75rem] leading-[1.05] md:text-3xl text-white">Build your next drop.</h1>
+            <p className="text-[13px] md:text-sm text-white/70">
               Curated accessories, creative kits, and instant digital bundles tailored for busy teams.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
-            <Link href="/cart" className="store-outline px-4 py-2.5 text-sm text-center bg-white/85">
+            <Link href="/cart" className="rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-center text-white hover:bg-white/15 transition">
               View cart
             </Link>
-            <Link href="/categories" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2.5 text-sm text-center">
+            <Link href="/categories" className="store-btn-primary px-4 py-2.5 text-sm text-center">
               Categories
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden hidden md:block">
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total products</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalProducts}</div>
-            <div className="text-xs text-slate-500">Available in store</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Showing now</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{filteredProducts.length}</div>
-            <div className="text-xs text-slate-500">For selected filter</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Categories</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{categoriesCount}</div>
-            <div className="text-xs text-slate-500">Collections available</div>
-          </div>
+      <section className="hidden md:grid sm:grid-cols-3 gap-3">
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Total products</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{totalProducts}</div>
+          <div className="text-xs text-slate-500">Available in store</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Showing now</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{filteredProducts.length}</div>
+          <div className="text-xs text-slate-500">For selected filter</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Categories</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{categoriesCount}</div>
+          <div className="text-xs text-slate-500">Collections available</div>
         </div>
       </section>
 
       <section className="md:hidden">
         <div className="grid grid-cols-3 gap-2">
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Products</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{totalProducts}</div>
           </div>
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Showing</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{filteredProducts.length}</div>
           </div>
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Categories</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{categoriesCount}</div>
           </div>
@@ -127,7 +124,7 @@ export default function ShopPage() {
       <section className="store-card p-4 md:p-5 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-sora text-lg text-slate-900">Filter by category</h2>
-          <Link href="/categories" className="text-xs text-[var(--store-accent)]">
+          <Link href="/categories" className="text-xs text-[var(--store-accent)] font-medium">
             Browse categories
           </Link>
         </div>
@@ -137,8 +134,8 @@ export default function ShopPage() {
             onClick={() => setSelectedCategory("all")}
             className={`px-3 py-1.5 text-sm rounded-full border transition whitespace-nowrap ${
               selectedCategory === "all"
-                ? "bg-[var(--store-accent)] text-white border-transparent"
-                : "border-[var(--store-border)] text-slate-600 bg-white"
+                ? "bg-[var(--store-accent)] text-white border-transparent shadow-[0_8px_18px_rgba(99,102,241,0.28)]"
+                : "border-[var(--store-border)] text-slate-600 bg-white hover:border-[var(--store-accent)]/40"
             }`}
           >
             All products
@@ -150,8 +147,8 @@ export default function ShopPage() {
               onClick={() => setSelectedCategory(category.slug)}
               className={`px-3 py-1.5 text-sm rounded-full border transition whitespace-nowrap ${
                 selectedCategory === category.slug
-                  ? "bg-[var(--store-accent)] text-white border-transparent"
-                  : "border-[var(--store-border)] text-slate-600 bg-white"
+                  ? "bg-[var(--store-accent)] text-white border-transparent shadow-[0_8px_18px_rgba(99,102,241,0.28)]"
+                  : "border-[var(--store-border)] text-slate-600 bg-white hover:border-[var(--store-accent)]/40"
               }`}
             >
               {category.name}
@@ -160,7 +157,7 @@ export default function ShopPage() {
         </div>
       </section>
 
-      {productError && <div className="store-card p-4 text-sm text-rose-600">{productError}</div>}
+      {productError && <div className="store-card p-4 text-sm text-rose-600 border border-rose-200 bg-rose-50">{productError}</div>}
 
       {productsQuery.isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -191,7 +188,7 @@ export default function ShopPage() {
               <button
                 type="button"
                 onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-                className="rounded-full bg-gradient-to-r from-[var(--store-accent)] to-violet-500 text-white px-5 py-2 text-sm"
+                className="store-btn-primary px-5 py-2.5 text-sm"
               >
                 Load more
               </button>

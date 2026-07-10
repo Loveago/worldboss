@@ -233,56 +233,53 @@ export default function DataPage() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      <section className="store-glass p-4 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <span className="store-pill px-3 py-1 text-[11px] md:text-xs">Instant data bundles</span>
-            <h1 className="font-sora text-[1.7rem] leading-[1.04] md:text-3xl text-slate-900">Buy data in minutes.</h1>
-            <p className="text-[13px] md:text-sm text-slate-600">Choose a network, pick a bundle, and complete payment securely.</p>
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Instant data bundles</span>
+            <h1 className="font-sora text-[1.75rem] leading-[1.05] md:text-3xl text-white">Buy data in minutes.</h1>
+            <p className="text-[13px] md:text-sm text-white/70">Choose a network, pick a bundle, and complete payment securely.</p>
           </div>
           <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap">
-            <Link href="/orders" className="store-outline px-4 py-2.5 text-sm text-center bg-white/85">
+            <Link href="/orders" className="rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-center text-white hover:bg-white/15 transition">
               View my orders
             </Link>
-            <Link href="/shop" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2.5 text-sm text-center">
+            <Link href="/shop" className="store-btn-primary px-4 py-2.5 text-sm text-center">
               Shop products
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden hidden md:block">
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total bundles</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalBundles}</div>
-            <div className="text-xs text-slate-500">Across all networks</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Selected network</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{networkMeta[selectedNetwork].label}</div>
-            <div className="text-xs text-slate-500">Currently active tab</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Available now</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{availableBundles.length}</div>
-            <div className="text-xs text-slate-500">Bundles in this network</div>
-          </div>
+      <section className="hidden md:grid sm:grid-cols-3 gap-3">
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Total bundles</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{totalBundles}</div>
+          <div className="text-xs text-slate-500">Across all networks</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Selected network</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{networkMeta[selectedNetwork].label}</div>
+          <div className="text-xs text-slate-500">Currently active tab</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Available now</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{availableBundles.length}</div>
+          <div className="text-xs text-slate-500">Bundles in this network</div>
         </div>
       </section>
 
       <section className="md:hidden">
         <div className="grid grid-cols-3 gap-2">
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Bundles</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{totalBundles}</div>
           </div>
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Network</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{networkMeta[selectedNetwork].label}</div>
           </div>
-          <div className="store-card px-2.5 py-2 text-center">
+          <div className="store-metric px-2.5 py-2 text-center">
             <div className="text-[10px] uppercase tracking-wide text-slate-500">Available</div>
             <div className="text-sm font-semibold text-slate-900 mt-0.5">{availableBundles.length}</div>
           </div>
@@ -300,7 +297,7 @@ export default function DataPage() {
                 onClick={() => setSelectedNetwork(network.id)}
                 className={`rounded-xl px-3 py-2 text-xs md:text-sm font-medium border transition flex items-center gap-2 ${
                   active
-                    ? "bg-[var(--store-accent)] text-white border-[var(--store-accent)]"
+                    ? "bg-[var(--store-accent)] text-white border-[var(--store-accent)] shadow-[0_8px_18px_rgba(99,102,241,0.28)]"
                     : "bg-white text-slate-700 border-[var(--store-border)] hover:bg-slate-50"
                 }`}
               >
@@ -332,7 +329,7 @@ export default function DataPage() {
             return (
               <article
                 key={bundle.id}
-                className={`rounded-2xl border ${meta.cardBorder} bg-[#ececec] px-2.5 py-3 flex flex-col items-center text-center shadow-[0_4px_10px_rgba(15,23,42,0.08)] min-h-[162px]`}
+                className={`rounded-2xl border ${meta.cardBorder} bg-white px-2.5 py-3 flex flex-col items-center text-center shadow-[0_8px_20px_rgba(15,23,42,0.08)] min-h-[168px] store-tile-lift`}
               >
                 <div className={`h-7 w-7 rounded-md ${meta.logoBg} ${meta.logoText} text-[10px] font-semibold flex items-center justify-center`}>
                   {meta.short}
@@ -342,7 +339,7 @@ export default function DataPage() {
                 <button
                   type="button"
                   onClick={() => openModal(bundle)}
-                  className="mt-auto w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-medium py-2.5 hover:from-blue-700 hover:to-blue-800"
+                  className="mt-auto w-full store-btn-primary text-xs font-medium py-2.5"
                 >
                   🛒 BUY NOW
                 </button>
@@ -369,9 +366,9 @@ export default function DataPage() {
       </a>
 
       {activeBundle && (
-        <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-[1px] p-3 md:p-6 flex items-start md:items-center justify-center overflow-auto">
-          <div className="w-full max-w-[560px] rounded-xl md:rounded-2xl border border-slate-300 bg-[#f4f5f7] shadow-[0_28px_70px_rgba(15,23,42,0.35)] overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-700 to-blue-600 text-white px-4 md:px-6 py-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm p-3 md:p-6 flex items-start md:items-center justify-center overflow-auto">
+          <div className="w-full max-w-[560px] rounded-2xl border border-[var(--store-border)] bg-white shadow-[0_28px_70px_rgba(15,23,42,0.35)] overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--store-accent)] to-violet-600 text-white px-4 md:px-6 py-4 flex items-center justify-between">
               <div className="text-lg md:text-xl font-semibold flex items-center gap-2">🛒 Buy Data Bundle</div>
               <button
                 type="button"
@@ -384,19 +381,19 @@ export default function DataPage() {
             </div>
 
             <div className="px-4 md:px-6 py-4 md:py-5 space-y-4 md:space-y-5">
-              <div className="rounded-lg border border-sky-300 bg-sky-100 px-4 py-3 text-sky-900 font-medium text-base md:text-lg leading-tight">
+              <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-indigo-900 font-medium text-base md:text-lg leading-tight">
                 ⓘ {networkMeta[activeBundle.network].label} Data - {activeBundle.volume} - GHS{" "}
                 {Number(activeBundle.price).toFixed(2)}
               </div>
 
               <div className="space-y-2">
-                <div className="text-xl md:text-2xl font-semibold text-slate-800">✉️ Confirmation Method</div>
-                <div className="grid grid-cols-2 gap-0 rounded-lg overflow-hidden border border-blue-500">
+                <div className="text-base md:text-lg font-semibold text-slate-800">✉️ Confirmation Method</div>
+                <div className="grid grid-cols-2 gap-0 rounded-xl overflow-hidden border border-[var(--store-accent)]">
                   <button
                     type="button"
                     onClick={() => setConfirmationMethod("email")}
-                    className={`py-2.5 text-base md:text-lg font-medium ${
-                      confirmationMethod === "email" ? "bg-blue-600 text-white" : "bg-white text-blue-700"
+                    className={`py-2.5 text-sm md:text-base font-medium ${
+                      confirmationMethod === "email" ? "bg-[var(--store-accent)] text-white" : "bg-white text-[var(--store-accent)]"
                     }`}
                   >
                     ✉️ Email
@@ -404,8 +401,8 @@ export default function DataPage() {
                   <button
                     type="button"
                     onClick={() => setConfirmationMethod("phone")}
-                    className={`py-2.5 text-base md:text-lg font-medium ${
-                      confirmationMethod === "phone" ? "bg-blue-600 text-white" : "bg-white text-blue-700"
+                    className={`py-2.5 text-sm md:text-base font-medium ${
+                      confirmationMethod === "phone" ? "bg-[var(--store-accent)] text-white" : "bg-white text-[var(--store-accent)]"
                     }`}
                   >
                     📱 Phone
@@ -415,45 +412,45 @@ export default function DataPage() {
 
               {confirmationMethod === "email" ? (
                 <label className="space-y-2 block">
-                  <span className="text-lg md:text-xl font-semibold text-slate-800">✉️ Your Email *</span>
+                  <span className="text-sm md:text-base font-semibold text-slate-800">✉️ Your Email *</span>
                   <input
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="example@email.com"
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-base md:text-lg"
+                    className="kb-input text-base"
                   />
                 </label>
               ) : (
                 <label className="space-y-2 block">
-                  <span className="text-lg md:text-xl font-semibold text-slate-800">📱 Confirmation Phone *</span>
+                  <span className="text-sm md:text-base font-semibold text-slate-800">📱 Confirmation Phone *</span>
                   <input
                     type="tel"
                     value={confirmationPhone}
                     onChange={(event) => setConfirmationPhone(event.target.value)}
                     placeholder="0241234567"
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-base md:text-lg"
+                    className="kb-input text-base"
                   />
                 </label>
               )}
 
               <label className="space-y-2 block">
-                <span className="text-lg md:text-xl font-semibold text-slate-800">📱 Recipient Phone (number to receive the data) *</span>
+                <span className="text-sm md:text-base font-semibold text-slate-800">📱 Recipient Phone (number to receive the data) *</span>
                 <input
                   type="tel"
                   value={recipientPhone}
                   onChange={(event) => setRecipientPhone(event.target.value)}
                   placeholder="0241234567"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-3 text-base md:text-lg"
+                  className="kb-input text-base"
                 />
               </label>
 
-              <div className="rounded-lg border border-amber-300 bg-amber-100 px-4 py-3 text-amber-800 text-base md:text-lg font-medium">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm md:text-base font-medium">
                 💳 Secure payment processing
               </div>
 
               {purchaseError && (
-                <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700 text-sm md:text-base">
+                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700 text-sm md:text-base">
                   {isUnauthorized ? (
                     <div className="flex items-center justify-between gap-3 flex-wrap">
                       <span>Sign in to complete this purchase.</span>
@@ -468,11 +465,11 @@ export default function DataPage() {
               )}
             </div>
 
-            <div className="px-4 md:px-6 py-4 border-t border-slate-300 flex justify-end gap-3 bg-white/75">
+            <div className="px-4 md:px-6 py-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50/80">
               <button
                 type="button"
                 onClick={closeModal}
-                className="rounded-lg bg-slate-500 text-white px-5 py-2.5 text-sm md:text-base font-medium"
+                className="store-outline px-5 py-2.5 text-sm md:text-base font-medium"
               >
                 Cancel
               </button>
@@ -480,7 +477,7 @@ export default function DataPage() {
                 type="button"
                 onClick={handlePurchase}
                 disabled={submitting}
-                className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 text-sm md:text-base font-medium disabled:opacity-60"
+                className="store-btn-primary px-6 py-2.5 text-sm md:text-base font-medium disabled:opacity-60"
               >
                 {submitting ? "Redirecting..." : "💳 Pay Now"}
               </button>

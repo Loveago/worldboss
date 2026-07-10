@@ -228,7 +228,7 @@ export default function Page() {
 
             <Link
               href="/shop"
-              className="w-full rounded-full bg-gradient-to-r from-[var(--store-accent)] to-violet-500 text-white px-4 py-3 text-sm font-semibold shadow-[0_16px_30px_rgba(91,92,230,0.3)] inline-flex items-center justify-between"
+              className="store-btn-primary w-full px-4 py-3 text-sm font-semibold inline-flex items-center justify-between"
             >
               <span>Shop products</span>
               <span className="h-7 w-7 rounded-full bg-white/90 text-[var(--store-accent)] inline-flex items-center justify-center">→</span>
@@ -283,10 +283,7 @@ export default function Page() {
               <span className="store-outline px-3 py-1">💜 Creator support</span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link
-                href="/shop"
-                className="rounded-full bg-[var(--store-accent)] text-white px-5 py-2.5 text-sm shadow-[0_14px_26px_rgba(91,92,230,0.3)]"
-              >
+              <Link href="/shop" className="store-btn-primary px-5 py-2.5 text-sm">
                 Shop products
               </Link>
               <Link href="/request-design" className="store-outline px-5 py-2.5 text-sm">
@@ -436,10 +433,7 @@ export default function Page() {
                   <span className="store-outline px-3 py-1">Secure checkout</span>
                   <span className="store-outline px-3 py-1">Top quality</span>
                 </div>
-                <Link
-                  href="/shop"
-                  className="rounded-full bg-[var(--store-accent)] text-white px-5 py-2.5 text-sm inline-flex shadow-[0_14px_28px_rgba(91,92,230,0.32)]"
-                >
+                <Link href="/shop" className="store-btn-primary px-5 py-2.5 text-sm inline-flex">
                   Shop featured
                 </Link>
               </div>

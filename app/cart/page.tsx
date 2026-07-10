@@ -19,43 +19,41 @@ export default function CartPage() {
 
   return (
     <div className="space-y-6">
-      <section className="store-glass p-5 md:p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(99,102,241,0.08),rgba(14,165,233,0.04)_45%,transparent_70%)]" />
+      <section className="kb-cosmos-panel p-5 md:p-7">
         <div className="relative z-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="font-sora text-2xl text-slate-900">Your cart</h1>
-            <p className="text-sm text-slate-600">Review items and proceed to checkout.</p>
+          <div className="space-y-2">
+            <span className="kb-chip bg-white/10 text-white border border-white/15">Basket</span>
+            <h1 className="font-sora text-2xl md:text-3xl text-white">Your cart</h1>
+            <p className="text-sm text-white/70">Review items and proceed to secure checkout.</p>
           </div>
-          <Link href="/shop" className="store-outline px-4 py-2 text-sm w-fit bg-white/80">
+          <Link href="/shop" className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm w-fit text-white hover:bg-white/15 transition">
             Continue shopping
           </Link>
         </div>
       </section>
 
-      <section className="store-card p-0 overflow-hidden">
-        <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Line items</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{items.length}</div>
-            <div className="text-xs text-slate-500">Unique products</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Total quantity</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{totalItems}</div>
-            <div className="text-xs text-slate-500">Items in basket</div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[11px] uppercase tracking-wide text-slate-500">Subtotal</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(subtotal)}</div>
-            <div className="text-xs text-slate-500">Before checkout fees</div>
-          </div>
+      <section className="grid sm:grid-cols-3 gap-3">
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Line items</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{items.length}</div>
+          <div className="text-xs text-slate-500">Unique products</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Total quantity</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{totalItems}</div>
+          <div className="text-xs text-slate-500">Items in basket</div>
+        </div>
+        <div className="store-metric px-4 py-4">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Subtotal</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900">{formatCurrency(subtotal)}</div>
+          <div className="text-xs text-slate-500">Before checkout fees</div>
         </div>
       </section>
 
       {items.length === 0 ? (
         <div className="store-card p-6 text-sm text-slate-600 space-y-3">
           <p>Your cart is empty.</p>
-          <Link href="/shop" className="store-outline px-4 py-2 text-sm inline-flex">
+          <Link href="/shop" className="store-btn-primary px-4 py-2.5 text-sm inline-flex">
             Browse products
           </Link>
         </div>
@@ -63,7 +61,7 @@ export default function CartPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <div key={`${item.productId}-${item.variant ?? "base"}`} className="store-card p-4 space-y-3">
+              <div key={`${item.productId}-${item.variant ?? "base"}`} className="store-card p-4 space-y-3 store-tile-lift">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm font-semibold text-slate-900">{item.name}</div>
@@ -72,7 +70,7 @@ export default function CartPage() {
                   <button
                     type="button"
                     onClick={() => remove(item.productId, item.variant)}
-                    className="text-xs text-slate-400 hover:text-slate-600"
+                    className="text-xs text-slate-400 hover:text-rose-500 transition"
                   >
                     Remove
                   </button>
@@ -113,13 +111,13 @@ export default function CartPage() {
               <span className="font-semibold text-slate-900">{formatCurrency(subtotal)}</span>
             </div>
             <p className="text-xs text-slate-500">Shipping and taxes are calculated at checkout.</p>
-            <Link href="/checkout" className="rounded-full bg-[var(--store-accent)] text-white px-4 py-2 text-sm text-center">
+            <Link href="/checkout" className="store-btn-primary px-4 py-2.5 text-sm text-center w-full block">
               Proceed to checkout
             </Link>
             <button
               type="button"
               onClick={clear}
-              className="store-outline px-4 py-2 text-sm"
+              className="store-outline px-4 py-2 text-sm w-full"
             >
               Clear cart
             </button>
