@@ -12,6 +12,29 @@ export const SETTING_KEYS = {
 const DEFAULT_PROVIDER: DataProvider = "encart";
 const DEFAULT_GRANDTECH_BASE_URL = "https://backend.grandtechub.cloud";
 
+type AppSettingDelegate = {
+  findUnique: (args: { where: { key: string } }) => Promise<{ key: string; value: string; updatedAt: Date } | null>;
+  upsert: (args: {
+    where: { key: string };
+    create: { key: string; value: string };
+    update: { value: string };
+  }) => Promise<{ key: string; value: string; updatedAt: Date }>;
+};
+
+/**
+ * Access AppSetting without depending on a potentially stale PrismaClient type cache
+ * in the editor after schema migrations.
+ */
+function appSettings(prisma: PrismaClient): AppSettingDelegate {
+  const delegate = (prisma as unknown as { appSetting?: AppSettingDelegate }).appSetting;
+  if (!delegate) {
+    throw new Error(
+      "Prisma client is missing AppSetting model. Run `npx prisma generate` and restart the TypeScript server."
+    );
+  }
+  return delegate;
+}
+
 function normalizeProvider(value?: string | null): DataProvider {
   const normalized = (value || "").trim().toLowerCase();
   if (normalized === "grandtech") return "grandtech";
@@ -19,12 +42,12 @@ function normalizeProvider(value?: string | null): DataProvider {
 }
 
 export async function getSetting(prisma: PrismaClient, key: string): Promise<string | null> {
-  const row = await prisma.appSetting.findUnique({ where: { key } });
+  const row = await appSettings(prisma).findUnique({ where: { key } });
   return row?.value ?? null;
 }
 
 export async function setSetting(prisma: PrismaClient, key: string, value: string) {
-  return prisma.appSetting.upsert({
+  return appSettings(prisma).upsert({
     where: { key },
     create: { key, value },
     update: { value },
