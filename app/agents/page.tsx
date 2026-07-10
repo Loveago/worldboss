@@ -32,33 +32,33 @@ export default function AgentsPage() {
   const agents = leaderboardQuery.data || [];
 
   return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-[30px] border border-[var(--store-border)] bg-gradient-to-br from-[#0f0c29] via-[#1a1a4e] to-[#24243e] px-6 py-8 md:px-8 md:py-10 text-white">
+    <div className="space-y-5 md:space-y-6">
+      <section className="relative overflow-hidden rounded-2xl md:rounded-[30px] border border-[var(--store-border)] bg-gradient-to-br from-[#0f0c29] via-[#1a1a4e] to-[#24243e] px-4 py-6 md:px-8 md:py-10 text-white">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(99,102,241,0.4),transparent_42%),radial-gradient(circle_at_85%_70%,rgba(236,72,153,0.25),transparent_40%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(rgba(255,255,255,0.08)_1px,transparent_0)] [background-size:28px_28px]" />
-        <div className="relative z-10 space-y-5 max-w-3xl">
+        <div className="relative z-10 space-y-4 md:space-y-5 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-indigo-100">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
             Korelly Agent Network
           </div>
-          <h1 className="font-sora text-3xl md:text-5xl font-semibold tracking-tight">
+          <h1 className="font-sora text-2xl leading-[1.1] md:text-5xl font-semibold tracking-tight">
             Sell data. Build your pulse. Climb the cosmos.
           </h1>
           <p className="text-sm md:text-base text-indigo-100/80 leading-relaxed max-w-2xl">
             Agents run premium storefronts, set their own markup, and earn commissions on every delivery. Rank up through badge tiers as your sales velocity grows.
           </p>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/profile" className="rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_16px_40px_rgba(255,255,255,0.18)]">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+            <Link href="/profile" className="rounded-2xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-[0_16px_40px_rgba(255,255,255,0.18)] text-center">
               Open agent dashboard
             </Link>
-            <Link href="/login" className="rounded-2xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/90 backdrop-blur">
+            <Link href="/login" className="rounded-2xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/90 backdrop-blur text-center">
               Sign in to apply
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-2 md:gap-3 xl:grid-cols-4">
         {tierRanges.map((tier) => (
           <div
             key={tier.tier}
@@ -73,49 +73,49 @@ export default function AgentsPage() {
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.35fr]">
-        <div className="store-card p-5 md:p-6 space-y-5 relative overflow-hidden">
+      <section className="grid gap-4 md:gap-6 lg:grid-cols-[0.95fr_1.35fr]">
+        <div className="store-card p-4 md:p-6 space-y-4 md:space-y-5 relative overflow-hidden">
           <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-[var(--store-accent)]/10 blur-3xl" />
           <div className="relative z-10 space-y-4">
             <div>
               <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Join the fleet</div>
-              <h2 className="font-sora text-2xl text-[var(--store-ink)] mt-1">Become an agent</h2>
+              <h2 className="font-sora text-xl md:text-2xl text-[var(--store-ink)] mt-1">Become an agent</h2>
               <p className="text-sm text-[var(--store-muted)] mt-2 leading-relaxed">
                 Applications live in your profile dashboard. Once approved you unlock a branded Data Pulse storefront, markup controls, wallet, and withdrawal tools.
               </p>
             </div>
 
-            <ul className="space-y-2.5 text-sm text-[var(--store-muted)]">
+            <ul className="space-y-2 text-sm text-[var(--store-muted)]">
               <li className="flex gap-2">
-                <span className="text-[var(--store-accent)]">▸</span>
+                <span className="text-[var(--store-accent)] shrink-0">▸</span>
                 Custom storefront link customers can buy from instantly
               </li>
               <li className="flex gap-2">
-                <span className="text-[var(--store-accent)]">▸</span>
+                <span className="text-[var(--store-accent)] shrink-0">▸</span>
                 Per-bundle markup engine so you set your own margins
               </li>
               <li className="flex gap-2">
-                <span className="text-[var(--store-accent)]">▸</span>
+                <span className="text-[var(--store-accent)] shrink-0">▸</span>
                 Commission wallet with MoMo withdrawals
               </li>
             </ul>
 
-            <div className="flex flex-wrap gap-2 pt-1">
-              <Link href="/profile" className="agent-btn-primary inline-flex">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-1">
+              <Link href="/profile" className="agent-btn-primary inline-flex text-center justify-center">
                 Open profile dashboard
               </Link>
-              <Link href="/login" className="store-outline px-4 py-2 text-sm font-medium">
+              <Link href="/login" className="store-outline px-4 py-2 text-sm font-medium text-center">
                 Sign in
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="store-card p-5 md:p-6 space-y-4">
+        <div className="store-card p-4 md:p-6 space-y-4">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
               <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Leaderboard</div>
-              <h2 className="font-sora text-2xl text-[var(--store-ink)] mt-1">Top agents</h2>
+              <h2 className="font-sora text-xl md:text-2xl text-[var(--store-ink)] mt-1">Top agents</h2>
             </div>
             <span className="text-xs text-[var(--store-muted)]">Ranked by sales velocity</span>
           </div>
@@ -132,11 +132,11 @@ export default function AgentsPage() {
             </div>
           )}
 
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {agents.map((agent, index) => (
               <div
                 key={agent.userId}
-                className="agent-leader-row group px-3.5 py-3 flex items-center justify-between gap-3"
+                className="agent-leader-row group px-3 py-2.5 md:px-3.5 md:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="agent-leader-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white">
@@ -144,18 +144,18 @@ export default function AgentsPage() {
                   </div>
                   <div className="min-w-0">
                     <div className="font-semibold text-[var(--store-ink)] truncate">{agent.storefrontName}</div>
-                    <div className="text-xs text-[var(--store-muted)] mt-0.5">
+                    <div className="text-xs text-[var(--store-muted)] mt-0.5 truncate">
                       {agent.salesCount} sales · {formatCurrency(agent.totalCommissions)} earned
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="store-pill px-2.5 py-1 text-[10px] font-semibold">
-                    T{agent.tier} · {agent.badge}
+                <div className="flex items-center gap-2 shrink-0 sm:ml-0">
+                  <span className="store-pill px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
+                    T{agent.tier}
                   </span>
                   <Link
                     href={`/agents/storefront/${agent.storefrontSlug}`}
-                    className="rounded-full border border-[var(--store-border)] px-3 py-1.5 text-xs font-semibold text-[var(--store-accent)] transition group-hover:bg-[var(--store-accent)] group-hover:text-white group-hover:border-transparent"
+                    className="rounded-full border border-[var(--store-border)] px-2.5 py-1.5 text-xs font-semibold text-[var(--store-accent)] transition group-hover:bg-[var(--store-accent)] group-hover:text-white group-hover:border-transparent whitespace-nowrap"
                   >
                     View store
                   </Link>
