@@ -28,8 +28,8 @@ export default function CategoryDetailPage() {
     queryFn: () => apiFetch<StoreProduct[]>("/api/products"),
   });
 
-  const categories = categoriesQuery.data ?? [];
-  const products = productsQuery.data ?? [];
+  const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
+  const products = useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
 
   const category = useMemo(
     () => categories.find((item) => item.slug === slug) || null,

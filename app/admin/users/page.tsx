@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
     },
   });
 
-  const users = usersQuery.data ?? [];
+  const users = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
   const errorMessage = usersQuery.isError
     ? usersQuery.error instanceof Error
       ? usersQuery.error.message

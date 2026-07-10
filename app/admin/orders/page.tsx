@@ -57,7 +57,7 @@ export default function AdminOrdersPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-orders"] }),
   });
 
-  const orders = ordersQuery.data ?? [];
+  const orders = useMemo(() => ordersQuery.data ?? [], [ordersQuery.data]);
   const errorMessage = ordersQuery.isError
     ? ordersQuery.error instanceof Error
       ? ordersQuery.error.message

@@ -105,7 +105,7 @@ export default function LoginPage() {
         </button>
 
         <div className="text-xs text-slate-500 text-center">
-          Don't have an account?{" "}
+          No account yet?{" "}
           <Link href="/register" className="text-[var(--store-accent)] font-medium">
             Create one
           </Link>

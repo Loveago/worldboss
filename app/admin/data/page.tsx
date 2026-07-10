@@ -24,6 +24,8 @@ const EMPTY_BUNDLES: DataBundle[] = [];
 
 type DataOrderStatus = "PLACED" | "PENDING" | "PROCESSING" | "DELIVERED" | "FAILED";
 
+const dataStatusOptions: DataOrderStatus[] = ["PENDING", "PLACED", "PROCESSING", "DELIVERED", "FAILED"];
+
 type DataOrder = {
   id: string;
   total: number | string;
@@ -157,8 +159,8 @@ export default function AdminDataOrdersPage() {
     },
   });
 
-  const orders = ordersQuery.data ?? EMPTY_ORDERS;
-  const bundles = bundlesQuery.data ?? EMPTY_BUNDLES;
+  const orders = useMemo(() => ordersQuery.data ?? EMPTY_ORDERS, [ordersQuery.data]);
+  const bundles = useMemo(() => bundlesQuery.data ?? EMPTY_BUNDLES, [bundlesQuery.data]);
   const errorMessage = ordersQuery.isError
     ? ordersQuery.error instanceof Error
       ? ordersQuery.error.message
@@ -185,8 +187,6 @@ export default function AdminDataOrdersPage() {
       return matchesNetwork && matchesSearch;
     });
   }, [bundles, bundleSearch, networkFilter]);
-
-  const dataStatusOptions: DataOrderStatus[] = ["PENDING", "PLACED", "PROCESSING", "DELIVERED", "FAILED"];
 
   const rows = useMemo(
     () =>

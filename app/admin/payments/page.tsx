@@ -36,7 +36,7 @@ export default function AdminPaymentsPage() {
     queryFn: () => apiFetch<AdminPayment[]>("/api/payments"),
   });
 
-  const payments = paymentsQuery.data ?? [];
+  const payments = useMemo(() => paymentsQuery.data ?? [], [paymentsQuery.data]);
   const errorMessage = paymentsQuery.isError
     ? paymentsQuery.error instanceof Error
       ? paymentsQuery.error.message

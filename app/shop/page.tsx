@@ -38,9 +38,9 @@ export default function ShopPage() {
     queryFn: () => apiFetch<StoreCategory[]>("/api/categories"),
   });
 
-  const products = productsQuery.data ?? [];
-  const categories = categoriesQuery.data ?? [];
-  const topCategories = categories.filter((category) => !category.parentId);
+  const products = useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
+  const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
+  const topCategories = useMemo(() => categories.filter((category) => !category.parentId), [categories]);
   const hasCategories = categories.length > 0;
   const displayCategories = topCategories.length ? topCategories : hasCategories ? categories : fallbackCategories;
 

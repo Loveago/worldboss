@@ -397,6 +397,7 @@ export default function AdminProductsPage() {
               <div className="flex items-start gap-3">
                 {(upload.preview || form.mediaUrl) && (
                   <div className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={upload.preview || form.mediaUrl}
                       alt="Preview"

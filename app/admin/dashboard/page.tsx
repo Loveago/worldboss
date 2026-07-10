@@ -67,9 +67,9 @@ export default function AdminDashboardPage() {
   });
 
   const orders = productOrders;
-  const payments = paymentsQuery.data ?? [];
-  const products = productsQuery.data ?? [];
-  const users = usersQuery.data ?? [];
+  const payments = useMemo(() => paymentsQuery.data ?? [], [paymentsQuery.data]);
+  const products = useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
+  const users = useMemo(() => usersQuery.data ?? [], [usersQuery.data]);
 
   const totalRevenue = useMemo(
     () => payments.reduce((sum, payment) => (payment.status === "SUCCESS" ? sum + toNumber(payment.amount) : sum), 0),
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/60">Mission control</div>
           <h1 className="font-sora text-2xl md:text-3xl font-semibold text-white">Admin overview</h1>
           <p className="text-sm text-white/70 max-w-2xl">
-            Revenue, inventory, and fulfillment signals — tuned for Korelly's cosmos command aesthetic.
+            Revenue, inventory, and fulfillment signals — tuned for the Korelly cosmos command aesthetic.
           </p>
         </div>
       }

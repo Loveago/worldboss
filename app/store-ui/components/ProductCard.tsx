@@ -53,6 +53,7 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
 
       <div className="h-28 sm:h-36 rounded-2xl border border-[var(--store-border)] bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 flex items-center justify-center text-3xl overflow-hidden">
         {imageUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img src={imageUrl} alt={product.name} className="h-full w-full object-cover" loading="lazy" />
         ) : (
           "📦"
