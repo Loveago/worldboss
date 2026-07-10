@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import type { Network, PrismaClient } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+import { getDataProvider } from "./settings";
 
 type JsonMap = Record<string, unknown>;
 
@@ -218,6 +219,7 @@ export async function submitDataOrderToEncart(orderId: string, prisma: PrismaCli
 
     const nextInfo: Prisma.InputJsonValue = {
       ...deliveryInfo,
+      dataProvider: "encart",
       encartStatus,
       ...(encartReference ? { encartReference } : {}),
       encartSubmittedAt: new Date().toISOString(),
@@ -238,6 +240,7 @@ export async function submitDataOrderToEncart(orderId: string, prisma: PrismaCli
       data: {
         deliveryInfo: {
           ...deliveryInfo,
+          dataProvider: "encart",
           encartStatus: "submit_failed",
           encartLastError: error instanceof Error ? error.message : "Unknown provider error",
           encartLastAttemptAt: new Date().toISOString(),
@@ -286,10 +289,20 @@ export async function syncOutstandingDataOrders(prisma: PrismaClient) {
     return typeof info.encartReference === "string" && info.encartReference;
   });
 
+  const activeProvider = await getDataProvider(prisma);
+
   // Separate: paid orders that were never submitted to Encart (retry submission)
   const retryOrders = candidates.filter((o) => {
     const info = (o.deliveryInfo || {}) as JsonMap;
-    return o.status === "PAID" && info.type === "DATA" && !info.encartReference;
+    const marked = typeof info.dataProvider === "string" ? info.dataProvider.toLowerCase() : "";
+    const shouldUseEncart = marked === "encart" || (!marked && activeProvider === "encart");
+    return (
+      o.status === "PAID" &&
+      info.type === "DATA" &&
+      !info.encartReference &&
+      !info.grandtechReference &&
+      shouldUseEncart
+    );
   });
 
   console.log(`[encart] sync: ${pollOrders.length} to poll, ${retryOrders.length} to retry`);

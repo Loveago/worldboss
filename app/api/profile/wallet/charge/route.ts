@@ -4,6 +4,8 @@ import { getUserFromRequest } from "@/lib/auth";
 import { fail, ok, unauthorized } from "@/lib/response";
 import { walletChargeSchema } from "@/lib/validators";
 import { getUserWalletMetrics, isWalletTopupOrder } from "@/lib/wallet";
+import { submitDataOrderToProvider } from "@/lib/data-provider";
+import { creditAgentCommissionForOrder } from "@/lib/agent-commission";
 
 export async function POST(req: NextRequest) {
   const { user } = await getUserFromRequest(req);
@@ -80,5 +82,14 @@ export async function POST(req: NextRequest) {
   });
 
   if ("error" in result) return result.error;
+
+  // Submit DATA orders to the active provider after wallet payment succeeds.
+  await creditAgentCommissionForOrder(result.orderId, prisma).catch((err) => {
+    console.error("[wallet-charge] creditAgentCommissionForOrder failed:", err);
+  });
+  await submitDataOrderToProvider(result.orderId, prisma).catch((err) => {
+    console.error("[wallet-charge] submitDataOrderToProvider failed:", err);
+  });
+
   return ok(result);
 }

@@ -10,7 +10,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
     "prisma:seed": "node prisma/seed.js",
-    "worker:encart": "tsx workers/encart-status.ts"
+    "worker:encart": "tsx workers/encart-status.ts",
+    "worker:grandtech": "tsx workers/grandtech-status.ts"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
