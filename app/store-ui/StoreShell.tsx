@@ -205,12 +205,12 @@ export default function StoreShell({
     !pathname.startsWith("/receipts");
 
   return (
-    <div className="store-shell min-h-screen">
+    <div className="store-shell min-h-screen overflow-x-clip">
       {isAgentStorefront ? (
-        <main className="w-full">{children}</main>
+        <main className="w-full min-w-0">{children}</main>
       ) : (
-        <div className="mx-auto w-full max-w-[1360px] px-3 py-3 md:px-4 md:py-4">
-          <div className="grid gap-4 md:grid-cols-[250px_minmax(0,1fr)] lg:gap-5">
+        <div className="mx-auto w-full max-w-[1360px] min-w-0 px-3 py-3 md:px-4 md:py-4">
+          <div className="grid gap-4 md:grid-cols-[250px_minmax(0,1fr)] lg:gap-5 min-w-0">
             <aside className="store-sidebar hidden md:flex h-[calc(100vh-2rem)] sticky top-4 flex-col p-4 lg:p-5">
               <Link href="/" className="font-sora text-xl font-semibold flex items-center gap-2.5 text-slate-900">
                 <span className="store-brand-mark" aria-hidden>

@@ -209,10 +209,17 @@ body {
 .kb-cosmos-panel {
   position: relative;
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 22px;
   background: linear-gradient(135deg, var(--cosmos-deep) 0%, var(--cosmos-mid) 42%, var(--cosmos-edge) 100%);
   color: #f8fafc;
   box-shadow: 0 24px 48px rgba(15, 12, 41, 0.28);
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .kb-cosmos-panel {
+    border-radius: 28px;
+  }
 }
 
 .kb-cosmos-panel::before {
@@ -1040,16 +1047,26 @@ a {
   --cosmos-accent: #6366f1;
   --cosmos-glow: rgba(99, 102, 241, 0.35);
   --cosmos-surface: color-mix(in srgb, var(--store-card) 92%, var(--store-bg) 8%);
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .agent-cosmos-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 28px;
-  padding: 1.75rem 1.5rem;
+  border-radius: 22px;
+  padding: 1.15rem 1rem;
   background: linear-gradient(135deg, #0f0c29 0%, #1a1a4e 38%, #24243e 100%);
   color: #f8fafc;
   animation: agentHeroIn 0.9s cubic-bezier(0.2, 0.9, 0.22, 1) forwards;
+}
+
+@media (min-width: 768px) {
+  .agent-cosmos-hero {
+    border-radius: 28px;
+    padding: 1.75rem 1.5rem;
+  }
 }
 
 .agent-cosmos-hero::before {
@@ -1204,14 +1221,22 @@ a {
 .agent-pricing-row {
   border-radius: 16px;
   border: 1px solid var(--store-border);
-  padding: 0.75rem 1rem;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: color-mix(in srgb, var(--store-card) 96%, var(--store-bg) 4%);
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .agent-pricing-row {
+    padding: 0.75rem 1rem;
+  }
 }
 
 .agent-pricing-row:hover {
-  transform: translateX(4px);
   border-color: color-mix(in srgb, var(--store-accent) 40%, var(--store-border));
+  box-shadow: 0 8px 20px rgba(38, 58, 105, 0.08);
 }
 
 .agent-metric {
@@ -1239,20 +1264,45 @@ a {
 
 @media (max-width: 1023px) {
   .agent-nav-rail {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 0.4rem;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .agent-nav-rail::-webkit-scrollbar {
-    display: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+    overflow: visible;
+    padding: 0.55rem;
   }
 
   .agent-nav-item {
-    flex: 0 0 auto;
-    min-width: max-content;
+    flex: initial;
+    min-width: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.55rem 0.55rem;
+  }
+
+  .agent-nav-item > span:last-child {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .agent-nav-item > span:last-child > span:first-child {
+    display: block;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .agent-nav-item > span:last-child > span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .agent-nav-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

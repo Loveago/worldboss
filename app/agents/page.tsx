@@ -96,7 +96,7 @@ export default function AgentsPage() {
   const topAgent = agents[0] ?? null;
 
   return (
-    <div className="space-y-5 md:space-y-6 min-w-0">
+    <div className="space-y-5 md:space-y-6 min-w-0 max-w-full overflow-x-clip">
       {/* Hero */}
       <section className="kb-cosmos-panel p-4 sm:p-5 md:p-8 overflow-hidden">
         <div className="relative z-10 grid gap-5 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
@@ -117,7 +117,7 @@ export default function AgentsPage() {
             <p className="text-[13px] sm:text-sm md:text-base text-white/70 max-w-xl leading-relaxed">
               Run a premium storefront, set your own markup, and earn commissions on every successful delivery.
             </p>
-            <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-wrap gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
               <Link href="/profile" className="store-btn-primary px-4 py-2.5 text-sm text-center">
                 Open agent dashboard
               </Link>

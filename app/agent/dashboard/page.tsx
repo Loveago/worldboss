@@ -263,49 +263,49 @@ export default function AgentDashboardPage() {
   }, [pricingRows]);
 
   return (
-    <div className="agent-cosmos space-y-5 md:space-y-6">
+    <div className="agent-cosmos space-y-4 md:space-y-6 min-w-0 max-w-full">
       <section id="agent-overview" className="agent-cosmos-hero">
-        <div className="relative z-10 space-y-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-2 max-w-2xl">
+        <div className="relative z-10 space-y-4 md:space-y-5 min-w-0">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+            <div className="space-y-2 max-w-2xl min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold tracking-[0.14em] uppercase text-indigo-100">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
                 Cosmos Command Center
               </div>
-              <h1 className="font-sora text-3xl md:text-4xl font-semibold tracking-tight">
+              <h1 className="font-sora text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight break-words">
                 {data?.profile?.storefrontName || "Agent Command Deck"}
               </h1>
               <p className="text-sm text-indigo-100/80 leading-relaxed">
                 Orchestrate storefront identity, live markup pricing, wallet velocity, and order flow from one cinematic control surface.
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm w-full sm:w-auto shrink-0">
               <div className="text-[10px] uppercase tracking-[0.16em] text-indigo-200/70">Clearance</div>
               <div className="mt-1 text-lg font-semibold text-white">{data?.profile?.status || "Not applied"}</div>
               <div className="mt-0.5 text-xs text-indigo-100/70">Tier {data?.stats.tier ?? "—"} · {data?.stats.badge || "No badge"}</div>
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="agent-stat-card">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Sales pulse</div>
-              <div className="mt-2 text-2xl font-semibold text-white">{data?.stats.salesCount ?? 0}</div>
-              <div className="mt-1 text-xs text-indigo-100/60">Completed storefront orders</div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
+            <div className="agent-stat-card min-w-0">
+              <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Sales pulse</div>
+              <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-semibold text-white truncate">{data?.stats.salesCount ?? 0}</div>
+              <div className="mt-1 text-[10px] sm:text-xs text-indigo-100/60 leading-snug">Completed orders</div>
             </div>
-            <div className="agent-stat-card">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Agent badge</div>
-              <div className="mt-2 text-2xl font-semibold text-white">{data?.stats.badge || "—"}</div>
-              <div className="mt-1 text-xs text-indigo-100/60">Rank signal across network</div>
+            <div className="agent-stat-card min-w-0">
+              <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Agent badge</div>
+              <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-semibold text-white truncate">{data?.stats.badge || "—"}</div>
+              <div className="mt-1 text-[10px] sm:text-xs text-indigo-100/60 leading-snug">Rank signal</div>
             </div>
-            <div className="agent-stat-card">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Wallet fuel</div>
-              <div className="mt-2 text-2xl font-semibold text-white">{formatCurrency(data?.wallet.balance ?? 0)}</div>
-              <div className="mt-1 text-xs text-indigo-100/60">Available for withdrawal</div>
+            <div className="agent-stat-card min-w-0">
+              <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Wallet fuel</div>
+              <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-semibold text-white truncate">{formatCurrency(data?.wallet.balance ?? 0)}</div>
+              <div className="mt-1 text-[10px] sm:text-xs text-indigo-100/60 leading-snug">Available</div>
             </div>
-            <div className="agent-stat-card">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Commission vault</div>
-              <div className="mt-2 text-2xl font-semibold text-white">{formatCurrency(data?.wallet.totalCommissions ?? 0)}</div>
-              <div className="mt-1 text-xs text-indigo-100/60">Lifetime earnings captured</div>
+            <div className="agent-stat-card min-w-0">
+              <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-indigo-200/70">Commissions</div>
+              <div className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-semibold text-white truncate">{formatCurrency(data?.wallet.totalCommissions ?? 0)}</div>
+              <div className="mt-1 text-[10px] sm:text-xs text-indigo-100/60 leading-snug">Lifetime earned</div>
             </div>
           </div>
         </div>
@@ -349,8 +349,8 @@ export default function AgentDashboardPage() {
           )}
 
           {data.isApproved && data.profile && (
-            <div className="grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)]">
-              <aside className="lg:sticky lg:top-4 h-fit space-y-3">
+            <div className="grid gap-4 md:gap-5 lg:grid-cols-[240px_minmax(0,1fr)] min-w-0">
+              <aside className="lg:sticky lg:top-4 h-fit space-y-3 min-w-0">
                 <nav className="agent-nav-rail">
                   {navItems.map((item) => (
                     <button
@@ -390,8 +390,8 @@ export default function AgentDashboardPage() {
                 </div>
               </aside>
 
-              <div className="space-y-5 min-w-0">
-                <section id="agent-storefront" className="agent-panel p-4 md:p-6 space-y-5">
+              <div className="space-y-4 md:space-y-5 min-w-0 max-w-full">
+                <section id="agent-storefront" className="agent-panel p-3 sm:p-4 md:p-6 space-y-4 md:space-y-5 min-w-0 overflow-hidden">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Identity</div>
@@ -463,19 +463,17 @@ export default function AgentDashboardPage() {
                   </div>
                 </section>
 
-                <section id="agent-pricing" className="agent-panel p-4 md:p-6 space-y-4">
-                  <div className="flex flex-wrap items-end justify-between gap-3">
-                    <div>
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Revenue engine</div>
-                      <h2 className="font-sora text-2xl text-[var(--store-ink)] mt-1">Bundle markup pricing</h2>
-                      <p className="text-sm text-[var(--store-muted)] mt-1">
-                        {pricingRows.length} bundle(s) in view · potential markup stack {formatCurrency(totalMarkupPotential)}
-                      </p>
-                    </div>
+                <section id="agent-pricing" className="agent-panel p-3 sm:p-4 md:p-6 space-y-4 min-w-0 overflow-hidden">
+                  <div className="min-w-0">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Revenue engine</div>
+                    <h2 className="font-sora text-xl md:text-2xl text-[var(--store-ink)] mt-1">Bundle markup pricing</h2>
+                    <p className="text-sm text-[var(--store-muted)] mt-1 break-words">
+                      {pricingRows.length} bundle(s) · markup stack {formatCurrency(totalMarkupPotential)}
+                    </p>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <label className="space-y-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 min-w-0">
+                    <label className="space-y-1.5 min-w-0">
                       <span className="text-xs font-medium text-[var(--store-muted)]">Filter network</span>
                       <select
                         value={networkFilter}
@@ -488,7 +486,7 @@ export default function AgentDashboardPage() {
                         <option value="airteltigo">AirtelTigo</option>
                       </select>
                     </label>
-                    <label className="space-y-1.5">
+                    <label className="space-y-1.5 min-w-0">
                       <span className="text-xs font-medium text-[var(--store-muted)]">Search bundle</span>
                       <input
                         value={pricingSearch}
@@ -497,7 +495,7 @@ export default function AgentDashboardPage() {
                         placeholder="e.g. 5GB, weekly"
                       />
                     </label>
-                    <label className="space-y-1.5">
+                    <label className="space-y-1.5 min-w-0">
                       <span className="text-xs font-medium text-[var(--store-muted)]">Sort by</span>
                       <select
                         value={bundleSortKey}
@@ -510,7 +508,7 @@ export default function AgentDashboardPage() {
                         <option value="finalPrice">Final price</option>
                       </select>
                     </label>
-                    <label className="space-y-1.5">
+                    <label className="space-y-1.5 min-w-0">
                       <span className="text-xs font-medium text-[var(--store-muted)]">Order</span>
                       <select
                         value={bundleSortDirection}
@@ -528,9 +526,9 @@ export default function AgentDashboardPage() {
                       No bundles match your current filters.
                     </div>
                   ) : (
-                    <div className="space-y-2.5">
+                    <div className="space-y-2.5 min-w-0">
                       {pricingRows.map((bundle) => (
-                        <div key={bundle.id} className="agent-pricing-row grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-center">
+                        <div key={bundle.id} className="agent-pricing-row grid grid-cols-1 gap-3 min-w-0">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                               <div className="text-base font-semibold text-[var(--store-ink)]">{bundle.volume}</div>
@@ -538,16 +536,16 @@ export default function AgentDashboardPage() {
                                 {networkLabel[bundle.network]}
                               </span>
                             </div>
-                            <div className="text-xs text-[var(--store-muted)] mt-1">
+                            <div className="text-xs text-[var(--store-muted)] mt-1 break-words">
                               {bundle.name} · {bundle.validity}
                             </div>
-                            <div className="text-xs text-[var(--store-muted)] mt-0.5">
+                            <div className="text-xs text-[var(--store-muted)] mt-0.5 break-words">
                               Base {formatCurrency(bundle.basePrice)} → Final{" "}
                               <span className="font-semibold text-[var(--store-ink)]">{formatCurrency(bundle.liveFinalPrice)}</span>
                             </div>
                           </div>
-                          <label className="flex items-center gap-2 sm:justify-end">
-                            <span className="text-xs font-medium text-[var(--store-muted)]">Markup</span>
+                          <label className="flex items-center justify-between gap-2 min-w-0 sm:max-w-[220px]">
+                            <span className="text-xs font-medium text-[var(--store-muted)] shrink-0">Markup</span>
                             <input
                               type="number"
                               step="0.1"
@@ -559,7 +557,7 @@ export default function AgentDashboardPage() {
                                   [bundle.id]: Number(event.target.value || 0),
                                 }))
                               }
-                              className="agent-input w-[110px]"
+                              className="agent-input w-[120px] max-w-[45vw] shrink-0"
                             />
                           </label>
                         </div>
@@ -571,14 +569,14 @@ export default function AgentDashboardPage() {
                     type="button"
                     onClick={() => saveStoreMutation.mutate()}
                     disabled={saveStoreMutation.isLoading}
-                    className="agent-btn-primary"
+                    className="agent-btn-primary w-full sm:w-auto"
                   >
                     {saveStoreMutation.isLoading ? "Saving pricing..." : "Save pricing changes"}
                   </button>
                 </section>
 
-                <div className="grid gap-5 xl:grid-cols-2">
-                  <section id="agent-wallet" className="agent-panel p-4 md:p-6 space-y-4">
+                <div className="grid gap-4 md:gap-5 xl:grid-cols-2 min-w-0">
+                  <section id="agent-wallet" className="agent-panel p-3 sm:p-4 md:p-6 space-y-4 min-w-0 overflow-hidden">
                     <div>
                       <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Liquidity</div>
                       <h2 className="font-sora text-2xl text-[var(--store-ink)] mt-1">Agent wallet</h2>
@@ -646,7 +644,7 @@ export default function AgentDashboardPage() {
                     )}
                   </section>
 
-                  <section id="agent-withdrawals" className="agent-panel p-4 md:p-6 space-y-4">
+                  <section id="agent-withdrawals" className="agent-panel p-3 sm:p-4 md:p-6 space-y-4 min-w-0 overflow-hidden">
                     <div>
                       <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Trail</div>
                       <h2 className="font-sora text-2xl text-[var(--store-ink)] mt-1">Withdrawal history</h2>
@@ -661,11 +659,11 @@ export default function AgentDashboardPage() {
                         {data.withdrawals.map((item) => (
                           <div
                             key={item.id}
-                            className="rounded-2xl border border-[var(--store-border)] px-3.5 py-3 flex items-center justify-between gap-3"
+                            className="rounded-2xl border border-[var(--store-border)] px-3 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 min-w-0"
                           >
-                            <div>
+                            <div className="min-w-0">
                               <div className="text-sm font-semibold text-[var(--store-ink)]">{formatCurrency(item.amount)}</div>
-                              <div className="text-[11px] text-[var(--store-muted)] mt-0.5">
+                              <div className="text-[11px] text-[var(--store-muted)] mt-0.5 break-words">
                                 {item.momoNetwork} · {item.momoNumber} · {item.momoName}
                               </div>
                             </div>
@@ -687,7 +685,7 @@ export default function AgentDashboardPage() {
                   </section>
                 </div>
 
-                <section id="agent-orders" className="agent-panel p-4 md:p-6 space-y-4">
+                <section id="agent-orders" className="agent-panel p-3 sm:p-4 md:p-6 space-y-4 min-w-0 overflow-hidden">
                   <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                       <div className="text-[11px] uppercase tracking-[0.14em] text-[var(--store-muted)]">Live feed</div>
