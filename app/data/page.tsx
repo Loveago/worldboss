@@ -366,9 +366,9 @@ export default function DataPage() {
       </a>
 
       {activeBundle && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm p-3 md:p-6 flex items-start md:items-center justify-center overflow-auto">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm p-2 md:p-6 flex items-end md:items-center justify-center">
           <div className="w-full max-w-[560px] rounded-2xl border border-[var(--store-border)] bg-white shadow-[0_28px_70px_rgba(15,23,42,0.35)] overflow-hidden">
-            <div className="bg-gradient-to-r from-[var(--store-accent)] to-violet-600 text-white px-4 md:px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[var(--store-accent)] to-violet-600 text-white px-3 md:px-6 py-3 md:py-4 flex items-center justify-between">
               <div className="text-lg md:text-xl font-semibold flex items-center gap-2">🛒 Buy Data Bundle</div>
               <button
                 type="button"
@@ -380,14 +380,14 @@ export default function DataPage() {
               </button>
             </div>
 
-            <div className="px-4 md:px-6 py-4 md:py-5 space-y-4 md:space-y-5">
-              <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-indigo-900 font-medium text-base md:text-lg leading-tight">
+            <div className="px-3 md:px-6 py-3 md:py-5 space-y-3 md:space-y-5">
+              <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2.5 md:px-4 md:py-3 text-indigo-900 font-medium text-sm md:text-lg leading-tight">
                 ⓘ {networkMeta[activeBundle.network].label} Data - {activeBundle.volume} - GHS{" "}
                 {Number(activeBundle.price).toFixed(2)}
               </div>
 
               <div className="space-y-2">
-                <div className="text-base md:text-lg font-semibold text-slate-800">✉️ Confirmation Method</div>
+                <div className="text-sm md:text-lg font-semibold text-slate-800">✉️ Confirmation Method</div>
                 <div className="grid grid-cols-2 gap-0 rounded-xl overflow-hidden border border-[var(--store-accent)]">
                   <button
                     type="button"
@@ -465,11 +465,11 @@ export default function DataPage() {
               )}
             </div>
 
-            <div className="px-4 md:px-6 py-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50/80">
+            <div className="px-3 md:px-6 py-3 md:py-4 border-t border-slate-200 flex gap-2 bg-slate-50/80">
               <button
                 type="button"
                 onClick={closeModal}
-                className="store-outline px-5 py-2.5 text-sm md:text-base font-medium"
+                className="store-outline px-4 py-2.5 text-sm md:text-base font-medium flex-1 md:flex-none"
               >
                 Cancel
               </button>
@@ -477,9 +477,9 @@ export default function DataPage() {
                 type="button"
                 onClick={handlePurchase}
                 disabled={submitting}
-                className="store-btn-primary px-6 py-2.5 text-sm md:text-base font-medium disabled:opacity-60"
+                className="store-btn-primary px-4 md:px-6 py-2.5 text-sm md:text-base font-medium disabled:opacity-60 flex-1 md:flex-none"
               >
-                {submitting ? "Redirecting..." : "💳 Pay Now"}
+                {submitting ? "..." : "💳 Pay Now"}
               </button>
             </div>
           </div>

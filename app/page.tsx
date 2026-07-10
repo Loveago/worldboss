@@ -190,7 +190,7 @@ export default function Page() {
   }, [themedCategories.length]);
 
   return (
-    <div className="space-y-10 md:space-y-12">
+    <div className="space-y-8 md:space-y-12">
       <section className="md:hidden space-y-4">
         <div className="store-hero p-4 relative overflow-hidden">
           <div className="absolute -top-10 -left-8 h-24 w-24 rounded-full bg-fuchsia-200/70 blur-3xl" aria-hidden />
@@ -247,10 +247,10 @@ export default function Page() {
 
         <div className="space-y-3">
           <h2 className="font-sora text-[1.7rem] text-slate-900 leading-none px-1">Why you&apos;ll love Korelly</h2>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {mobileWhyCards.map((card) => (
               <div key={card.title} className={`store-card p-2.5 text-center bg-gradient-to-b ${card.tint}`}>
-                <div className="text-2xl mb-1" aria-hidden>
+                <div className="text-xl mb-1" aria-hidden>
                   {card.icon}
                 </div>
                 <div className="text-[11px] font-semibold text-slate-900 leading-tight">{card.title}</div>

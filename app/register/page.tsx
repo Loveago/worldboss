@@ -55,7 +55,7 @@ export default function RegisterPage() {
           <p className="text-sm text-white/70 max-w-lg">
             Save carts, unlock concierge support, and access members-only drops across gadgets, kits, and data.
           </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-2">
             {[
               { title: "Concierge chat", copy: "Get custom sourcing fast." },
               { title: "Exclusive drops", copy: "Limited kits and bundles." },

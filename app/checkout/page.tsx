@@ -252,7 +252,7 @@ export default function CheckoutPage() {
               <h2 className="font-sora text-lg text-slate-900">Order summary</h2>
               <div className="space-y-3 text-sm">
                 {items.map((item) => (
-                  <div key={`${item.productId}-${item.variant ?? "base"}`} className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                  <div key={`${item.productId}-${item.variant ?? "base"}`} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
                     <div>
                       <div className="font-medium text-slate-900">{item.name}</div>
                       {item.variant && <div className="text-xs text-slate-500">{item.variant}</div>}

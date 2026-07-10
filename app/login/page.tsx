@@ -52,7 +52,7 @@ export default function LoginPage() {
           <p className="text-sm text-white/70 max-w-lg">
             Keep your cart synced, track deliveries, and unlock concierge support across gadgets, kits, and data.
           </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-2">
             {[
               { title: "Saved carts", copy: "Pick up from any device." },
               { title: "Fast checkout", copy: "One tap to pay." },

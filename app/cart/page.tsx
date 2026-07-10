@@ -76,7 +76,7 @@ export default function CartPage() {
                   </button>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="text-sm text-slate-600">{formatCurrency(item.price)}</div>
                   <div className="flex items-center gap-2">
                     <button
@@ -86,7 +86,7 @@ export default function CartPage() {
                     >
                       -
                     </button>
-                    <span className="min-w-[32px] text-center text-sm font-semibold text-slate-900">
+                    <span className="min-w-[28px] text-center text-sm font-semibold text-slate-900">
                       {item.qty}
                     </span>
                     <button
