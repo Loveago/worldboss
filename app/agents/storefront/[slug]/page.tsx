@@ -57,10 +57,36 @@ const buildSyntheticEmail = (value: string) => {
   return `storefront+${normalized}@korelly.local`;
 };
 
-const networkMeta: Record<Bundle["network"], { label: string; short: string; color: string }> = {
-  mtn: { label: "MTN", short: "MTN", color: "bg-yellow-400 text-yellow-950" },
-  telecel: { label: "Telecel", short: "T", color: "bg-rose-500 text-white" },
-  airteltigo: { label: "AT", short: "AT", color: "bg-indigo-100 text-indigo-700" },
+const networkMeta: Record<
+  Bundle["network"],
+  { label: string; short: string; emoji: string; chip: string }
+> = {
+  mtn: {
+    label: "MTN",
+    short: "MTN",
+    emoji: "⚡",
+    chip: "from-yellow-400 to-amber-300 text-black",
+  },
+  telecel: {
+    label: "Telecel",
+    short: "TEL",
+    emoji: "🔥",
+    chip: "from-rose-500 to-pink-400 text-white",
+  },
+  airteltigo: {
+    label: "AirtelTigo",
+    short: "AT",
+    emoji: "✦",
+    chip: "from-indigo-400 to-violet-400 text-white",
+  },
+};
+
+const dataStatusTone: Record<string, string> = {
+  PLACED: "bg-sky-500/15 text-sky-300 border-sky-400/30",
+  PENDING: "bg-amber-500/15 text-amber-300 border-amber-400/30",
+  PROCESSING: "bg-indigo-500/15 text-indigo-300 border-indigo-400/30",
+  DELIVERED: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30",
+  FAILED: "bg-rose-500/15 text-rose-300 border-rose-400/30",
 };
 
 export default function AgentStorefrontPage() {
@@ -96,6 +122,11 @@ export default function AgentStorefrontPage() {
     };
   }, [storefrontQuery.data?.bundles]);
 
+  const storeInitial = useMemo(() => {
+    const name = storefrontQuery.data?.agent.storefrontName || "K";
+    return name.trim().charAt(0).toUpperCase() || "K";
+  }, [storefrontQuery.data?.agent.storefrontName]);
+
   const trackOrdersByPhone = async () => {
     if (!trackPhone.trim()) {
       setTrackError("Enter a phone number to track orders.");
@@ -104,7 +135,9 @@ export default function AgentStorefrontPage() {
     setTrackLoading(true);
     setTrackError(null);
     try {
-      const data = await apiFetch<StorefrontOrder[]>(`/api/agents/storefront/${encodeURIComponent(slug)}/track?phone=${encodeURIComponent(trackPhone.trim())}`);
+      const data = await apiFetch<StorefrontOrder[]>(
+        `/api/agents/storefront/${encodeURIComponent(slug)}/track?phone=${encodeURIComponent(trackPhone.trim())}`
+      );
       setTrackOrders(data || []);
     } catch (err) {
       setTrackError(err instanceof Error ? err.message : "Unable to track orders");
@@ -168,14 +201,6 @@ export default function AgentStorefrontPage() {
     }
   };
 
-  const dataStatusTone: Record<string, string> = {
-    PLACED: "bg-blue-100 text-blue-700",
-    PENDING: "bg-amber-100 text-amber-700",
-    PROCESSING: "bg-indigo-100 text-indigo-700",
-    DELIVERED: "bg-emerald-100 text-emerald-700",
-    FAILED: "bg-rose-100 text-rose-700",
-  };
-
   const formatDate = (value: string) =>
     new Date(value).toLocaleDateString("en-GH", {
       year: "numeric",
@@ -185,244 +210,332 @@ export default function AgentStorefrontPage() {
       minute: "2-digit",
     });
 
+  const whatsappLink = storefrontQuery.data?.agent.whatsappNumber
+    ? `https://wa.me/${storefrontQuery.data.agent.whatsappNumber.replace(/\D/g, "")}`
+    : null;
+
   return (
-    <div className="min-h-screen bg-slate-100 pb-8">
-      {storefrontQuery.isLoading && <div className="store-card p-4 text-sm text-slate-500 m-4">Loading storefront...</div>}
+    <div className="pulse-shell pb-28" data-network={selectedNetwork}>
+      {storefrontQuery.isLoading && (
+        <div className="px-4 py-16 text-center text-sm text-white/50">Igniting Data Pulse storefront...</div>
+      )}
       {storefrontQuery.isError && (
-        <div className="store-card p-4 text-sm text-rose-600 m-4">{storefrontQuery.error instanceof Error ? storefrontQuery.error.message : "Storefront unavailable"}</div>
+        <div className="px-4 py-16 text-center text-sm text-rose-300">
+          {storefrontQuery.error instanceof Error ? storefrontQuery.error.message : "Storefront unavailable"}
+        </div>
       )}
 
       {storefrontQuery.data && (
         <>
-          <section className="storefront-hero text-white px-4 py-10 text-center space-y-3 store-fade-up">
-            <div className="w-14 h-14 mx-auto rounded-2xl border border-white/35 bg-white/15 backdrop-blur flex items-center justify-center text-2xl store-float">
-              🛍️
-            </div>
-            <h1 className="font-sora text-3xl md:text-4xl font-semibold">{storefrontQuery.data.agent.storefrontName}</h1>
-            <p className="text-sm text-blue-100">Affordable data bundles · fast checkout · instant confirmation</p>
-            <div className="flex items-center justify-center">
-              <a
-                href={`tel:${storefrontQuery.data.agent.contactPhone}`}
-                className="rounded-full border border-white/40 bg-white/10 px-5 py-2 text-sm font-medium shadow-[0_12px_30px_rgba(0,0,0,0.25)]"
-              >
-                📞 {storefrontQuery.data.agent.contactPhone}
-              </a>
+          <section className="pulse-hero">
+            <div className="relative z-10 space-y-4">
+              <div className="pulse-avatar">{storeInitial}</div>
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60">
+                  Data Pulse · Live store
+                </div>
+                <h1 className="font-sora text-3xl md:text-4xl font-semibold tracking-tight text-white">
+                  {storefrontQuery.data.agent.storefrontName}
+                </h1>
+                <p className="text-sm text-white/55 max-w-md mx-auto leading-relaxed">
+                  Premium data in seconds. Pick a network, choose a bundle, pay securely, and track delivery without leaving the pulse.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                <a
+                  href={`tel:${storefrontQuery.data.agent.contactPhone}`}
+                  className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur"
+                >
+                  📞 {storefrontQuery.data.agent.contactPhone}
+                </a>
+                {whatsappLink && (
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-200"
+                  >
+                    WhatsApp
+                  </a>
+                )}
+              </div>
             </div>
           </section>
 
-          <div className="bg-[#0f1c34] text-slate-100 px-4 py-3 flex gap-5 text-sm font-semibold overflow-x-auto no-scrollbar">
-            <button
-              type="button"
-              onClick={() => setActiveTab("data")}
-              className={`pb-1 ${activeTab === "data" ? "opacity-100 border-b-2 border-white" : "opacity-70"}`}
-            >
-              📶 DATA
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("vouchers")}
-              className={`pb-1 ${activeTab === "vouchers" ? "opacity-100 border-b-2 border-white" : "opacity-70"}`}
-            >
-              🎟️ VOUCHERS
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("track")}
-              className={`pb-1 ${activeTab === "track" ? "opacity-100 border-b-2 border-white" : "opacity-70"}`}
-            >
-              🔎 TRACK
-            </button>
-          </div>
-
-          {activeTab === "data" && (
-            <div className="px-3 md:px-4 pt-5 space-y-4">
-              <div className="text-[11px] tracking-wide font-semibold text-slate-500">CHOOSE NETWORK</div>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                {(["mtn", "telecel", "airteltigo"] as const).map((network) => {
-                  const active = selectedNetwork === network;
-                  const meta = networkMeta[network];
-                  return (
-                    <button
-                      key={network}
-                      type="button"
-                      onClick={() => setSelectedNetwork(network)}
-                      className={`min-w-[96px] rounded-xl border px-3 py-2 text-center transition store-fade-up ${
-                        active
-                          ? "bg-white border-blue-500 shadow-[0_10px_24px_rgba(37,99,235,0.18)]"
-                          : "bg-white/85 border-slate-300"
-                      }`}
-                    >
-                      <div className={`w-9 h-9 mx-auto rounded-lg text-xs font-bold flex items-center justify-center ${meta.color}`}>{meta.short}</div>
-                      <div className="text-[11px] font-semibold text-slate-700 mt-1">{meta.label}</div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <section className="space-y-3">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                  {groupedBundles[selectedNetwork].map((bundle, index) => (
-                    <div
-                      key={bundle.id}
-                      className="relative store-film-card is-visible"
-                      style={{ "--film-delay": `${Math.min(index * 55, 330)}ms` } as React.CSSProperties}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setActiveBundle(bundle)}
-                        className="w-full overflow-hidden rounded-2xl border border-yellow-500/70 bg-white shadow-[0_14px_30px_rgba(15,23,42,0.08)] hover:-translate-y-1 transition-transform"
-                      >
-                        <div className="h-20 bg-[#facc15] flex items-center justify-center">
-                          <div className="rounded-full border-4 border-black px-6 py-1 text-2xl font-black tracking-tight text-black">
-                            {networkMeta[bundle.network].short}
-                          </div>
-                        </div>
-                        <div className="p-3 text-center space-y-1">
-                          <div className="text-xl font-extrabold text-slate-800">{bundle.volume}</div>
-                          <div className="text-[11px] font-medium text-slate-500 uppercase">{bundle.validity}</div>
-                          <div className="text-[22px] leading-none font-black text-emerald-600">{formatCurrency(bundle.price)}</div>
-                          <div className="pt-2">
-                            <span className="inline-flex items-center justify-center w-full rounded-lg bg-blue-600 text-white py-2 text-sm font-semibold shadow-[0_10px_20px_rgba(37,99,235,0.32)]">
-                              🛒 Buy Now
-                            </span>
-                          </div>
-                        </div>
-                      </button>
+          <div className="px-3 md:px-5 -mt-6 relative z-20">
+            {activeTab === "data" && (
+              <div className="space-y-5">
+                <div className="rounded-[28px] border border-white/10 bg-[#12121c]/95 p-4 md:p-5 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur">
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Choose network</div>
+                      <div className="text-sm text-white/70 mt-0.5">Colors shift with your selection</div>
                     </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-          )}
-
-          {activeTab === "vouchers" && (
-            <div className="px-3 md:px-4 pt-5 space-y-4">
-              <div className="store-card p-6 text-center text-sm text-slate-500">
-                <div className="text-3xl mb-2">🎟️</div>
-                <p>Vouchers coming soon.</p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "track" && (
-            <div className="px-3 md:px-4 pt-5 space-y-4">
-              <div className="store-card p-4 space-y-3">
-                <div className="text-sm font-semibold text-slate-700">Track your data order</div>
-                <div className="flex gap-2">
-                  <input
-                    value={trackPhone}
-                    onChange={(e) => setTrackPhone(e.target.value)}
-                    placeholder="Enter phone number (e.g. 0547419727)"
-                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    onKeyDown={(e) => e.key === "Enter" && trackOrdersByPhone()}
-                  />
-                  <button
-                    type="button"
-                    onClick={trackOrdersByPhone}
-                    disabled={trackLoading}
-                    className="rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-semibold disabled:opacity-60"
-                  >
-                    {trackLoading ? "Loading..." : "Track"}
-                  </button>
-                </div>
-                {trackError && <div className="text-xs text-rose-600">{trackError}</div>}
-              </div>
-
-              {!trackLoading && trackOrders.length === 0 && !trackError && (
-                <div className="store-card p-4 text-sm text-slate-500 text-center">
-                  Enter your phone number above to see your orders.
-                </div>
-              )}
-
-              {trackOrders.length > 0 && (
-                <div className="space-y-3">
-                  {trackOrders.map((order) => (
-                    <div key={order.id} className="store-card p-4 space-y-3">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div>
-                          <div className="text-xs text-slate-500">Order ID</div>
-                          <div className="text-sm font-semibold text-slate-900">{order.id}</div>
-                        </div>
-                        <span
-                          className={`text-[10px] px-2 py-1 rounded-full ${
-                            order.dataStatus ? dataStatusTone[order.dataStatus] : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          {order.dataStatus || "PENDING"}
-                        </span>
-                      </div>
-
-                      <div className="grid gap-2 sm:grid-cols-2 text-xs text-slate-600">
-                        <div>
-                          <span className="text-slate-500">Bundle: </span>
-                          <span className="font-medium text-slate-900">
-                            {order.deliveryInfo.bundleName || order.deliveryInfo.bundleVolume || "-"}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500">Network: </span>
-                          <span className="font-medium text-slate-900">
-                            {order.deliveryInfo.bundleNetwork?.toUpperCase() || order.deliveryInfo.network?.toUpperCase() || "-"}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500">Phone: </span>
-                          <span className="font-medium text-slate-900">{order.deliveryInfo.phone || "-"}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500">Amount: </span>
-                          <span className="font-medium text-slate-900">{formatCurrency(order.total)}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500">Date: </span>
-                          <span className="font-medium text-slate-900">{formatDate(order.createdAt)}</span>
-                        </div>
-                      </div>
-
-                      {order.payment && (
-                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 border-t border-slate-100 pt-2">
-                          <span>Ref: {order.payment.reference}</span>
-                          <span
-                            className={`px-2 py-0.5 rounded-full ${
-                              order.payment.status === "SUCCESS"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : order.payment.status === "FAILED"
-                                  ? "bg-rose-100 text-rose-700"
-                                  : "bg-amber-100 text-amber-700"
-                            }`}
-                          >
-                            {order.payment.status}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeBundle && (
-            <div className="fixed inset-0 z-50 bg-[#0f172a]/55 p-4 flex items-center justify-center backdrop-blur-[2px]">
-              <div className="w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-[0_25px_60px_rgba(2,6,23,0.35)] storefront-modal-enter overflow-hidden">
-                <div className="bg-gradient-to-r from-[#2d57c7] to-[#6d84bd] px-4 py-3 flex items-center justify-between text-white">
-                  <h3 className="font-sora text-xl font-semibold">🛒 Buy Data Bundle</h3>
-                  <button type="button" onClick={() => setActiveBundle(null)} className="text-white/80 hover:text-white text-xl leading-none">×</button>
-                </div>
-
-                <div className="p-4 space-y-3">
-                  <div className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900 font-medium">
-                    {networkMeta[activeBundle.network].label} Data — {activeBundle.volume} — {formatCurrency(activeBundle.price)}
+                    <div className="text-xs text-white/40">{groupedBundles[selectedNetwork].length} plans</div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <div className="text-sm font-semibold text-slate-700">Confirmation Method</div>
-                    <div className="rounded-lg bg-slate-100 p-1 grid grid-cols-2 gap-1">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                    {(["mtn", "telecel", "airteltigo"] as const).map((network) => {
+                      const active = selectedNetwork === network;
+                      const meta = networkMeta[network];
+                      return (
+                        <button
+                          key={network}
+                          type="button"
+                          onClick={() => setSelectedNetwork(network)}
+                          className={`pulse-network-pill shrink-0 ${active ? "is-active" : ""}`}
+                        >
+                          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br text-[10px] font-black ${meta.chip}`}>
+                            {meta.short}
+                          </span>
+                          <span>{meta.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <section className="space-y-3">
+                  <div className="flex items-end justify-between px-1">
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                        {networkMeta[selectedNetwork].emoji} {networkMeta[selectedNetwork].label} bundles
+                      </div>
+                      <h2 className="font-sora text-xl text-white mt-1">Tap a plan to checkout</h2>
+                    </div>
+                  </div>
+
+                  {groupedBundles[selectedNetwork].length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-white/10 px-4 py-12 text-center text-sm text-white/45">
+                      No {networkMeta[selectedNetwork].label} bundles available right now.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {groupedBundles[selectedNetwork].map((bundle, index) => (
+                        <button
+                          key={bundle.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveBundle(bundle);
+                            setError(null);
+                          }}
+                          className="pulse-bundle-card text-left w-full p-4"
+                          style={{ "--pulse-delay": `${Math.min(index * 45, 360)}ms` } as React.CSSProperties}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div
+                              className={`inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br text-[10px] font-black ${networkMeta[bundle.network].chip}`}
+                            >
+                              {networkMeta[bundle.network].short}
+                            </div>
+                            <span className="text-[10px] uppercase tracking-wide text-white/40">{bundle.validity}</span>
+                          </div>
+                          <div className="mt-4 space-y-1">
+                            <div className="text-2xl font-black tracking-tight text-white">{bundle.volume}</div>
+                            <div className="text-[11px] text-white/45 line-clamp-1">{bundle.name}</div>
+                          </div>
+                          <div className="mt-4 flex items-end justify-between gap-2">
+                            <div className="text-lg font-bold" style={{ color: "var(--pulse-accent, #818cf8)" }}>
+                              {formatCurrency(bundle.price)}
+                            </div>
+                            <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white/70">
+                              Buy
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </div>
+            )}
+
+            {activeTab === "vouchers" && (
+              <div className="rounded-[28px] border border-white/10 bg-[#12121c] p-8 text-center space-y-3 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 text-3xl">🎟️</div>
+                <h2 className="font-sora text-2xl text-white">Vouchers incoming</h2>
+                <p className="text-sm text-white/50 max-w-sm mx-auto">
+                  Gift codes and promo drops will land here soon. For now, grab a data bundle and keep the signal strong.
+                </p>
+              </div>
+            )}
+
+            {activeTab === "track" && (
+              <div className="space-y-4">
+                <div className="rounded-[28px] border border-white/10 bg-[#12121c] p-5 space-y-4 shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+                  <div>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Order radar</div>
+                    <h2 className="font-sora text-2xl text-white mt-1">Track your delivery</h2>
+                    <p className="text-sm text-white/50 mt-1">Enter the phone number used at checkout.</p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      value={trackPhone}
+                      onChange={(e) => setTrackPhone(e.target.value)}
+                      placeholder="e.g. 0547419727"
+                      className="pulse-input flex-1"
+                      onKeyDown={(e) => e.key === "Enter" && trackOrdersByPhone()}
+                    />
+                    <button
+                      type="button"
+                      onClick={trackOrdersByPhone}
+                      disabled={trackLoading}
+                      className="rounded-2xl px-5 py-2.5 text-sm font-semibold text-black disabled:opacity-60"
+                      style={{ background: "var(--pulse-accent, #818cf8)" }}
+                    >
+                      {trackLoading ? "Scanning..." : "Track order"}
+                    </button>
+                  </div>
+                  {trackError && <div className="text-xs text-rose-300">{trackError}</div>}
+                </div>
+
+                {!trackLoading && trackOrders.length === 0 && !trackError && (
+                  <div className="rounded-3xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-white/45">
+                    Enter your phone number above to surface order history.
+                  </div>
+                )}
+
+                {trackOrders.length > 0 && (
+                  <div className="space-y-3">
+                    {trackOrders.map((order) => (
+                      <div key={order.id} className="pulse-track-card space-y-3">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <div className="text-[11px] text-white/40">Order ID</div>
+                            <div className="text-sm font-semibold text-white break-all">{order.id}</div>
+                          </div>
+                          <span
+                            className={`text-[10px] px-2.5 py-1 rounded-full border font-semibold ${
+                              order.dataStatus ? dataStatusTone[order.dataStatus] : "bg-white/5 text-white/60 border-white/10"
+                            }`}
+                          >
+                            {order.dataStatus || "PENDING"}
+                          </span>
+                        </div>
+
+                        <div className="grid gap-2 sm:grid-cols-2 text-xs text-white/55">
+                          <div>
+                            <span className="text-white/35">Bundle: </span>
+                            <span className="font-medium text-white">
+                              {order.deliveryInfo.bundleName || order.deliveryInfo.bundleVolume || "-"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-white/35">Network: </span>
+                            <span className="font-medium text-white">
+                              {order.deliveryInfo.bundleNetwork?.toUpperCase() || order.deliveryInfo.network?.toUpperCase() || "-"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-white/35">Phone: </span>
+                            <span className="font-medium text-white">{order.deliveryInfo.phone || "-"}</span>
+                          </div>
+                          <div>
+                            <span className="text-white/35">Amount: </span>
+                            <span className="font-medium text-white">{formatCurrency(order.total)}</span>
+                          </div>
+                          <div className="sm:col-span-2">
+                            <span className="text-white/35">Date: </span>
+                            <span className="font-medium text-white">{formatDate(order.createdAt)}</span>
+                          </div>
+                        </div>
+
+                        {order.payment && (
+                          <div className="flex flex-wrap items-center gap-3 text-[11px] text-white/40 border-t border-white/10 pt-2">
+                            <span>Ref: {order.payment.reference}</span>
+                            <span
+                              className={`px-2 py-0.5 rounded-full border ${
+                                order.payment.status === "SUCCESS"
+                                  ? "bg-emerald-500/15 text-emerald-300 border-emerald-400/30"
+                                  : order.payment.status === "FAILED"
+                                    ? "bg-rose-500/15 text-rose-300 border-rose-400/30"
+                                    : "bg-amber-500/15 text-amber-300 border-amber-400/30"
+                              }`}
+                            >
+                              {order.payment.status}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="pt-8 pb-4 text-center text-xs text-white/35">
+              Want your own pulse storefront?{" "}
+              <Link href="/agents" className="text-white/70 underline underline-offset-2">
+                Apply as an agent
+              </Link>
+            </div>
+          </div>
+
+          <nav className="pulse-tab-bar">
+            {(
+              [
+                { key: "data" as const, label: "Data", icon: "📶" },
+                { key: "vouchers" as const, label: "Vouchers", icon: "🎟️" },
+                { key: "track" as const, label: "Track", icon: "🛰️" },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`pulse-tab-btn ${activeTab === tab.key ? "is-active" : ""}`}
+              >
+                <span className="pulse-tab-icon text-sm">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+
+          {activeBundle && (
+            <>
+              <div className="pulse-sheet-backdrop" onClick={() => !submitting && setActiveBundle(null)} />
+              <div className="pulse-sheet">
+                <div className="pulse-sheet-handle" />
+                <div className="px-5 pt-4 pb-6 space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">Checkout</div>
+                      <h3 className="font-sora text-2xl text-white mt-1">Buy data bundle</h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => !submitting && setActiveBundle(null)}
+                      className="h-9 w-9 rounded-full border border-white/10 bg-white/5 text-white/70"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  <div
+                    className="rounded-2xl border px-4 py-3"
+                    style={{
+                      borderColor: "color-mix(in srgb, var(--pulse-accent, #818cf8) 35%, transparent)",
+                      background: "color-mix(in srgb, var(--pulse-accent, #818cf8) 12%, transparent)",
+                    }}
+                  >
+                    <div className="text-sm font-semibold text-white">
+                      {networkMeta[activeBundle.network].label} · {activeBundle.volume}
+                    </div>
+                    <div className="text-xs text-white/55 mt-0.5">{activeBundle.name} · {activeBundle.validity}</div>
+                    <div className="mt-2 text-xl font-bold" style={{ color: "var(--pulse-accent, #818cf8)" }}>
+                      {formatCurrency(activeBundle.price)}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-white/80">Confirmation method</div>
+                    <div className="grid grid-cols-2 gap-1 rounded-2xl bg-white/5 p-1">
                       <button
                         type="button"
                         onClick={() => setConfirmationMethod("email")}
-                        className={`rounded-md py-2 text-sm font-medium ${
-                          confirmationMethod === "email" ? "bg-blue-600 text-white" : "text-slate-600"
+                        className={`rounded-xl py-2.5 text-sm font-medium transition ${
+                          confirmationMethod === "email" ? "bg-white text-black" : "text-white/60"
                         }`}
                       >
                         ✉️ Email
@@ -430,8 +543,8 @@ export default function AgentStorefrontPage() {
                       <button
                         type="button"
                         onClick={() => setConfirmationMethod("phone")}
-                        className={`rounded-md py-2 text-sm font-medium ${
-                          confirmationMethod === "phone" ? "bg-blue-600 text-white" : "text-slate-600"
+                        className={`rounded-xl py-2.5 text-sm font-medium transition ${
+                          confirmationMethod === "phone" ? "bg-white text-black" : "text-white/60"
                         }`}
                       >
                         📱 Phone
@@ -440,46 +553,49 @@ export default function AgentStorefrontPage() {
                   </div>
 
                   {confirmationMethod === "email" ? (
-                    <label className="block space-y-1">
-                      <span className="text-sm font-medium text-slate-700">Your Email</span>
+                    <label className="block space-y-1.5">
+                      <span className="text-sm font-medium text-white/80">Your email</span>
                       <input
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         placeholder="example@email.com"
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                        className="pulse-input"
                       />
                     </label>
                   ) : (
-                    <label className="block space-y-1">
-                      <span className="text-sm font-medium text-slate-700">Your Confirmation Phone</span>
+                    <label className="block space-y-1.5">
+                      <span className="text-sm font-medium text-white/80">Confirmation phone</span>
                       <input
                         value={confirmationPhone}
                         onChange={(event) => setConfirmationPhone(event.target.value)}
                         placeholder="0241234567"
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                        className="pulse-input"
                       />
                     </label>
                   )}
 
-                  <label className="block space-y-1">
-                    <span className="text-sm font-medium text-slate-700">Recipient Phone</span>
+                  <label className="block space-y-1.5">
+                    <span className="text-sm font-medium text-white/80">Recipient phone</span>
                     <input
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
                       placeholder="0241234567"
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                      className="pulse-input"
                     />
-                    <span className="text-xs text-slate-500">Number that will receive the data bundle</span>
+                    <span className="text-xs text-white/40">Number that will receive the data bundle</span>
                   </label>
 
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">🛡️ Payments are processed securely</div>
-                  {error && <div className="text-xs text-rose-600">{error}</div>}
+                  <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-3.5 py-2.5 text-sm text-amber-100">
+                    🛡️ Payments are processed securely with Paystack
+                  </div>
+                  {error && <div className="text-xs text-rose-300">{error}</div>}
 
-                  <div className="flex justify-end gap-2 pt-1">
+                  <div className="flex gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => setActiveBundle(null)}
-                      className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700"
+                      disabled={submitting}
+                      className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 disabled:opacity-60"
                     >
                       Cancel
                     </button>
@@ -487,19 +603,16 @@ export default function AgentStorefrontPage() {
                       type="button"
                       onClick={buyBundle}
                       disabled={submitting}
-                      className="rounded-lg bg-blue-600 text-white px-5 py-2 text-sm font-semibold shadow-[0_12px_24px_rgba(37,99,235,0.34)] disabled:opacity-60"
+                      className="flex-[1.4] rounded-2xl px-4 py-3 text-sm font-semibold text-black disabled:opacity-60"
+                      style={{ background: "var(--pulse-accent, #818cf8)" }}
                     >
-                      {submitting ? "Redirecting..." : "💳 Pay Now"}
+                      {submitting ? "Redirecting..." : "Pay now"}
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
-
-          <div className="text-xs text-slate-500 px-4 pt-5">
-            Want your own storefront? <Link href="/agents" className="text-[var(--store-accent)]">Apply as an agent</Link>
-          </div>
         </>
       )}
     </div>
